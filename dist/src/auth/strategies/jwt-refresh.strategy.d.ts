@@ -4,10 +4,10 @@ declare const JwtRefreshStrategy_base: new (...args: any) => any;
 export declare class JwtRefreshStrategy extends JwtRefreshStrategy_base {
     constructor(config: ConfigService);
     validate(req: Request, payload: {
-        sub: number;
+        sub: string;
         email: string;
     }): {
-        userId: number;
+        sub: string;
         email: string;
         refreshToken: any;
     };

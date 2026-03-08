@@ -13,7 +13,7 @@ export declare class AuthController {
     }>;
     refresh(req: Request & {
         user: {
-            userId: number;
+            sub: string;
             email: string;
             refreshToken: string;
         };
@@ -22,7 +22,7 @@ export declare class AuthController {
     }>;
     logout(req: Request & {
         user: {
-            userId: number;
+            sub: string;
         };
     }, res: Response): Promise<{
         message: string;

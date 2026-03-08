@@ -5,19 +5,189 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider  = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+// --- Énumérations ---
+
+enum UserRole {
+  ADMIN
+  AUDITOR
+}
+
+enum AssetStatus {
+  GOOD
+  DAMAGED
+  REPAIR
+  REPLACE
+}
+
+enum LocationType {
+  HOTEL
+  FLOOR
+  ZONE
+  SUBZONE
+}
+
+enum AlertType {
+  DAMAGED
+  REPAIR
+  REPLACE
+  NOT_SCANNED
+}
+
+enum AlertStatus {
+  OPEN
+  RESOLVED
+}
+
+// --- Modèles ---
 
 model User {
-  user_id            Int     @id @default(autoincrement())
-  email              String  @unique
+  id                 String         @id @default(uuid()) @db.Uuid
+  name               String
+  email              String         @unique
   password           String
+  role               UserRole       @default(AUDITOR)
+  created_at         DateTime       @default(now())
   hashedRefreshToken String?
+  
+  scans              Scan[]
+  reports            Report[]
+  history            AssetHistory[]
 
   @@map("users")
+}
+
+model Asset {
+  id            String       @id @default(uuid()) @db.Uuid
+  tag_id        String       @unique
+  name          String
+  category_id   String       @db.Uuid
+  brand         String
+  model         String
+  supplier_id   String       @db.Uuid
+  purchase_date DateTime
+  price         Decimal      @db.Decimal(10, 2)
+  warranty_end  DateTime?
+  location_id   String       @db.Uuid
+  status        AssetStatus  @default(GOOD)
+  created_at    DateTime     @default(now())
+
+  category      Category     @relation(fields: [category_id], references: [id])
+  supplier      Supplier     @relation(fields: [supplier_id], references: [id])
+  location      Location     @relation(fields: [location_id], references: [id])
+  
+  scans         Scan[]
+  alerts        Alert[]
+  history       AssetHistory[]
+  movements     AssetMovement[]
+
+  @@map("assets")
+}
+
+model Location {
+  id        String       @id @default(uuid()) @db.Uuid
+  name      String
+  parent_id String?      @db.Uuid
+  type      LocationType
+
+  parent    Location?    @relation("LocationHierarchy", fields: [parent_id], references: [id])
+  children  Location[]   @relation("LocationHierarchy")
+  
+  assets    Asset[]
+  scans     Scan[]
+  movements AssetMovement[] @relation("ToLocation")
+  from_movements AssetMovement[] @relation("FromLocation")
+
+  @@map("locations")
+}
+
+model Category {
+  id     String  @id @default(uuid()) @db.Uuid
+  name   String  @unique
+  assets Asset[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String
+  contact_email String?
+  phone         String?
+  assets        Asset[]
+
+  @@map("suppliers")
+}
+
+model Scan {
+  id          String      @id @default(uuid()) @db.Uuid
+  asset_id    String      @db.Uuid
+  user_id     String      @db.Uuid
+  location_id String      @db.Uuid
+  status      AssetStatus
+  scanned_at  DateTime    @default(now())
+
+  asset       Asset       @relation(fields: [asset_id], references: [id])
+  user        User        @relation(fields: [user_id], references: [id])
+  location    Location    @relation(fields: [location_id], references: [id])
+
+  @@map("scans")
+}
+
+model Alert {
+  id         String      @id @default(uuid()) @db.Uuid
+  asset_id   String      @db.Uuid
+  type       AlertType
+  status     AlertStatus @default(OPEN)
+  created_at DateTime    @default(now())
+
+  asset      Asset       @relation(fields: [asset_id], references: [id])
+
+  @@map("alerts")
+}
+
+model Report {
+  id           String   @id @default(uuid()) @db.Uuid
+  generated_by String   @db.Uuid
+  report_type  String
+  filters      Json?
+  created_at   DateTime @default(now())
+
+  user         User     @relation(fields: [generated_by], references: [id])
+
+  @@map("reports")
+}
+
+model AssetHistory {
+  id         String   @id @default(uuid()) @db.Uuid
+  asset_id   String   @db.Uuid
+  action     String
+  user_id    String   @db.Uuid
+  timestamp  DateTime @default(now())
+
+  asset      Asset    @relation(fields: [asset_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@map("asset_history")
+}
+
+model AssetMovement {
+  id              String   @id @default(uuid()) @db.Uuid
+  asset_id        String   @db.Uuid
+  from_location_id String  @db.Uuid
+  to_location_id   String  @db.Uuid
+  moved_at        DateTime @default(now())
+
+  asset           Asset    @relation(fields: [asset_id], references: [id])
+  from_location   Location @relation("FromLocation", fields: [from_location_id], references: [id])
+  to_location     Location @relation("ToLocation", fields: [to_location_id], references: [id])
+
+  @@map("asset_movements")
 }

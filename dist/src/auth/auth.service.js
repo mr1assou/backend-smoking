@@ -60,10 +60,14 @@ let AuthService = class AuthService {
     async signup(dto) {
         const hashedPassword = await argon2.hash(dto.password);
         const user = await this.prisma.user.create({
-            data: { email: dto.email, password: hashedPassword },
+            data: {
+                email: dto.email,
+                password: hashedPassword,
+                name: dto.name
+            },
         });
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
     async login(dto) {
@@ -75,31 +79,31 @@ let AuthService = class AuthService {
         const passwordMatches = await argon2.verify(user.password, dto.password);
         if (!passwordMatches)
             throw new common_1.ForbiddenException('Invalid credentials');
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
     async refresh(userId, refreshToken) {
         const user = await this.prisma.user.findUnique({
-            where: { user_id: userId },
+            where: { id: userId },
         });
         if (!user || !user.hashedRefreshToken)
             throw new common_1.ForbiddenException('Access denied');
         const tokenMatches = await argon2.verify(user.hashedRefreshToken, refreshToken);
         if (!tokenMatches)
             throw new common_1.ForbiddenException('Access denied');
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
     async logout(userId) {
         await this.prisma.user.update({
-            where: { user_id: userId },
+            where: { id: userId },
             data: { hashedRefreshToken: null },
         });
     }
-    async generateTokens(userId, email) {
-        const payload = { sub: userId, email };
+    async generateTokens(userId, email, role) {
+        const payload = { sub: userId, email, role };
         const [accessToken, refreshToken] = await Promise.all([
             this.jwt.signAsync(payload, {
                 secret: this.config.get('JWT_SECRET'),
@@ -115,7 +119,7 @@ let AuthService = class AuthService {
     async saveRefreshToken(userId, refreshToken) {
         const hashed = await argon2.hash(refreshToken);
         await this.prisma.user.update({
-            where: { user_id: userId },
+            where: { id: userId },
             data: { hashedRefreshToken: hashed },
         });
     }

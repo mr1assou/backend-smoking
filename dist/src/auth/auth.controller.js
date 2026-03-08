@@ -35,12 +35,12 @@ let AuthController = class AuthController {
         return { accessToken };
     }
     async refresh(req, res) {
-        const { accessToken, refreshToken } = await this.authService.refresh(req.user.userId, req.user.refreshToken);
+        const { accessToken, refreshToken } = await this.authService.refresh(req.user.sub, req.user.refreshToken);
         this.setRefreshTokenCookie(res, refreshToken);
         return { accessToken };
     }
     async logout(req, res) {
-        await this.authService.logout(req.user.userId);
+        await this.authService.logout(req.user.sub);
         res.clearCookie('refresh_token');
         return { message: 'Logged out successfully' };
     }

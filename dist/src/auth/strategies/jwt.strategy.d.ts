@@ -1,13 +1,16 @@
 import { ConfigService } from '@nestjs/config';
+import { UserRole } from '@prisma/client';
 declare const JwtStrategy_base: new (...args: any) => any;
 export declare class JwtStrategy extends JwtStrategy_base {
     constructor(config: ConfigService);
     validate(payload: {
-        sub: number;
+        sub: string;
         email: string;
+        role: UserRole;
     }): {
-        userId: number;
+        sub: string;
         email: string;
+        role: import(".prisma/client").$Enums.UserRole;
     };
 }
 export {};

@@ -26,7 +26,7 @@ let JwtRefreshStrategy = class JwtRefreshStrategy extends (0, passport_1.Passpor
     }
     validate(req, payload) {
         const refreshToken = req.cookies['refresh_token'];
-        return { userId: payload.sub, email: payload.email, refreshToken };
+        return { sub: payload.sub, email: payload.email, refreshToken };
     }
 };
 exports.JwtRefreshStrategy = JwtRefreshStrategy;

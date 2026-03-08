@@ -17,7 +17,7 @@ import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('signup')
   async signup(
@@ -44,11 +44,11 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   async refresh(
-    @Req() req: Request & { user: { userId: number; email: string; refreshToken: string } },
+    @Req() req: Request & { user: { sub: string; email: string; refreshToken: string } },
     @Res({ passthrough: true }) res: Response,
   ) {
     const { accessToken, refreshToken } = await this.authService.refresh(
-      req.user.userId,
+      req.user.sub,
       req.user.refreshToken,
     );
     this.setRefreshTokenCookie(res, refreshToken);
@@ -59,10 +59,10 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @Post('logout')
   async logout(
-    @Req() req: Request & { user: { userId: number } },
+    @Req() req: Request & { user: { sub: string } },
     @Res({ passthrough: true }) res: Response,
   ) {
-    await this.authService.logout(req.user.userId);
+    await this.authService.logout(req.user.sub);
     res.clearCookie('refresh_token');
     return { message: 'Logged out successfully' };
   }

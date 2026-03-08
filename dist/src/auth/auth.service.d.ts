@@ -16,11 +16,11 @@ export declare class AuthService {
         accessToken: string;
         refreshToken: string;
     }>;
-    refresh(userId: number, refreshToken: string): Promise<{
+    refresh(userId: string, refreshToken: string): Promise<{
         accessToken: string;
         refreshToken: string;
     }>;
-    logout(userId: number): Promise<void>;
+    logout(userId: string): Promise<void>;
     private generateTokens;
     private saveRefreshToken;
 }
