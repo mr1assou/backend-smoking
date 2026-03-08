@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssetsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const client_1 = require("@prisma/client");
 let AssetsService = class AssetsService {
     prisma;
     constructor(prisma) {
@@ -34,6 +35,45 @@ let AssetsService = class AssetsService {
         }
         return this.mapToOutput(asset);
     }
+    async findAll() {
+        const assets = await this.prisma.asset.findMany({
+            include: {
+                category: true,
+                location: true,
+                scans: {
+                    orderBy: { scanned_at: 'desc' },
+                    take: 1,
+                },
+            },
+        });
+        return assets.map(asset => this.mapToOutput(asset));
+    }
+    async create(dto) {
+        const asset = await this.prisma.asset.create({
+            data: {
+                tag_id: dto.tag_id,
+                name: dto.name,
+                category_id: dto.category_id,
+                brand: dto.brand,
+                model: dto.model,
+                supplier_id: dto.supplier_id,
+                purchase_date: new Date(dto.purchase_date),
+                price: dto.price,
+                warranty_end: dto.warranty_end ? new Date(dto.warranty_end) : null,
+                location_id: dto.location_id,
+                status: dto.status || client_1.AssetStatus.GOOD,
+            },
+            include: {
+                category: true,
+                location: true,
+                scans: {
+                    orderBy: { scanned_at: 'desc' },
+                    take: 1,
+                },
+            },
+        });
+        return this.mapToOutput(asset);
+    }
     mapToOutput(asset) {
         const netValue = this.calculateNetValue(Number(asset.price), asset.purchase_date);
         return {
@@ -44,7 +84,7 @@ let AssetsService = class AssetsService {
             prix_achat: Number(asset.price),
             annee_achat: asset.purchase_date.getFullYear(),
             localisation: asset.location.name,
-            valeur_net: netValue.toFixed(2),
+            valeur_net: `${netValue.toFixed(2)} €`,
             dernier_scan: asset.scans[0]?.scanned_at || null,
             marque: asset.brand,
         };

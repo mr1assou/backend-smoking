@@ -91,13 +91,13 @@ async function main() {
 
     const lobby = await createLocation('Lobby Principal', LocationType.ZONE, rdc.id);
     const suite101 = await createLocation('Suite Royale 101', LocationType.ZONE, etage1.id);
-    const spa = await createLocation('Spa & Bien-être', LocationType.ZONE, etage1.id);
+    const spa = await createLocation('Spa Baccarat', LocationType.ZONE, etage1.id);
 
     // --- 5. ACTIFS (ASSETS) ---
     const assetsToCreate = [
         {
             tag_id: 'RFID-001',
-            name: 'Lustre motorisé Cristal Baccarat',
+            name: 'Lustre Cristal Baccarat',
             brand: 'Baccarat',
             model: 'Zenith 48L',
             price: 15000,

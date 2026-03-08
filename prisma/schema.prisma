@@ -24,7 +24,8 @@ enum AssetStatus {
   GOOD
   DAMAGED
   REPAIR
-  REPLACE
+  BROKEN
+  TO_REPLACE
 }
 
 enum LocationType {
@@ -147,6 +148,9 @@ model Alert {
   type       AlertType
   status     AlertStatus @default(OPEN)
   created_at DateTime    @default(now())
+
+  comment    String?     // Stocke le texte du constat
+  image_url  String?     // Stocke les données de l'image (Base64 ou URL)
 
   asset      Asset       @relation(fields: [asset_id], references: [id])
 

@@ -5,4 +5,6 @@ export declare class CreateScanDto {
     location_id: string;
     status: AssetStatus;
     user_id?: string;
+    comment?: string;
+    image_data?: string;
 }

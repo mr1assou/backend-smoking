@@ -19,10 +19,18 @@ const jwt_guard_1 = require("../auth/guards/jwt.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const client_1 = require("@prisma/client");
+const create_asset_dto_1 = require("./dto/create-asset.dto");
 let AssetsController = class AssetsController {
     assetsService;
     constructor(assetsService) {
         this.assetsService = assetsService;
+    }
+    async create(dto) {
+        return this.assetsService.create(dto);
+    }
+    async findAll() {
+        console.log('Requête reçue pour les actifs à', new Date());
+        return this.assetsService.findAll();
     }
     async getByTag(tagId) {
         return this.assetsService.findByTag(tagId);
@@ -35,6 +43,20 @@ let AssetsController = class AssetsController {
     }
 };
 exports.AssetsController = AssetsController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_asset_dto_1.CreateAssetDto]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('tag/:tag_id'),
     __param(0, (0, common_1.Param)('tag_id')),

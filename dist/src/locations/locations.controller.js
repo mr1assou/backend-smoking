@@ -14,11 +14,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LocationsController = void 0;
 const common_1 = require("@nestjs/common");
-const locations_service_1 = require("./locations.service");
+const client_1 = require("@prisma/client");
+const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const jwt_guard_1 = require("../auth/guards/jwt.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
-const roles_decorator_1 = require("../auth/decorators/roles.decorator");
-const client_1 = require("@prisma/client");
+const locations_service_1 = require("./locations.service");
 let LocationsController = class LocationsController {
     locationsService;
     constructor(locationsService) {
@@ -43,12 +43,14 @@ let LocationsController = class LocationsController {
 exports.LocationsController = LocationsController;
 __decorate([
     (0, common_1.Get)(),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.AUDITOR),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], LocationsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.AUDITOR),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -56,6 +58,7 @@ __decorate([
 ], LocationsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -63,6 +66,7 @@ __decorate([
 ], LocationsController.prototype, "create", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -71,6 +75,7 @@ __decorate([
 ], LocationsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -79,7 +84,6 @@ __decorate([
 exports.LocationsController = LocationsController = __decorate([
     (0, common_1.Controller)('locations'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
     __metadata("design:paramtypes", [locations_service_1.LocationsService])
 ], LocationsController);
 //# sourceMappingURL=locations.controller.js.map

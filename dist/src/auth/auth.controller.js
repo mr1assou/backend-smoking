@@ -44,6 +44,9 @@ let AuthController = class AuthController {
         res.clearCookie('refresh_token');
         return { message: 'Logged out successfully' };
     }
+    getMe(req) {
+        return req.user;
+    }
     setRefreshTokenCookie(res, token) {
         res.cookie('refresh_token', token, {
             httpOnly: true,
@@ -91,6 +94,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Get)('me'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getMe", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

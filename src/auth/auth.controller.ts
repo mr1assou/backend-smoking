@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Get,
   Req,
   Res,
   UseGuards,
@@ -65,6 +66,12 @@ export class AuthController {
     await this.authService.logout(req.user.sub);
     res.clearCookie('refresh_token');
     return { message: 'Logged out successfully' };
+  }
+
+  @Get('me')
+  @UseGuards(JwtGuard)
+  getMe(@Req() req: Request & { user: any }) {
+    return req.user;
   }
 
   private setRefreshTokenCookie(res: Response, token: string) {

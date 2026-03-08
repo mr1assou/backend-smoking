@@ -18,6 +18,8 @@ class CreateScanDto {
     location_id;
     status;
     user_id;
+    comment;
+    image_data;
 }
 exports.CreateScanDto = CreateScanDto;
 __decorate([
@@ -45,4 +47,14 @@ __decorate([
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], CreateScanDto.prototype, "user_id", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateScanDto.prototype, "comment", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateScanDto.prototype, "image_data", void 0);
 //# sourceMappingURL=create-scan.dto.js.map

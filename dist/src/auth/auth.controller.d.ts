@@ -27,5 +27,8 @@ export declare class AuthController {
     }, res: Response): Promise<{
         message: string;
     }>;
+    getMe(req: Request & {
+        user: any;
+    }): any;
     private setRefreshTokenCookie;
 }

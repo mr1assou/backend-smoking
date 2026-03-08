@@ -21,4 +21,12 @@ export class CreateScanDto {
     @IsOptional()
     @IsUUID()
     user_id?: string;
+
+    @IsOptional()
+    @IsString()
+    comment?: string;
+
+    @IsOptional()
+    @IsString()
+    image_data?: string;
 }

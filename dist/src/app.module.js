@@ -15,6 +15,7 @@ const assets_module_1 = require("./assets/assets.module");
 const scans_module_1 = require("./scans/scans.module");
 const locations_module_1 = require("./locations/locations.module");
 const ai_module_1 = require("./ai/ai.module");
+const alerts_module_1 = require("./alerts/alerts.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             scans_module_1.ScansModule,
             locations_module_1.LocationsModule,
             ai_module_1.AiModule,
+            alerts_module_1.AlertsModule,
         ],
     })
 ], AppModule);

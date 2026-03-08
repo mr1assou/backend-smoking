@@ -12,67 +12,100 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScansService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const client_1 = require("@prisma/client");
 let ScansService = class ScansService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async findRecent() {
+        return this.prisma.scan.findMany({
+            take: 20,
+            orderBy: { scanned_at: 'desc' },
+            include: {
+                asset: { include: { category: true } },
+                user: { select: { id: true, name: true, email: true, role: true } },
+                location: true,
+            },
+        });
+    }
     async registerScan(dto, userIdFromToken) {
-        const finalUserId = userIdFromToken || dto.user_id;
-        if (!finalUserId) {
-            throw new Error('User ID is required for scanning');
+        if (!userIdFromToken) {
+            throw new common_1.BadRequestException('L\'identifiant de l\'utilisateur est requis');
         }
         const asset = await this.prisma.asset.findUnique({
             where: { id: dto.asset_id },
+            include: { location: true },
         });
-        if (!asset) {
-            throw new common_1.NotFoundException(`Asset ${dto.asset_id} not found`);
-        }
-        const oldLocationId = asset.location_id;
+        if (!asset)
+            throw new common_1.NotFoundException(`L'actif ${dto.asset_id} est introuvable`);
+        const newLocation = await this.prisma.location.findUnique({
+            where: { id: dto.location_id },
+        });
+        if (!newLocation)
+            throw new common_1.NotFoundException(`Zone ${dto.location_id} introuvable`);
+        const movementDetected = asset.location_id !== dto.location_id;
         return this.prisma.$transaction(async (tx) => {
-            const updatedAsset = await tx.asset.update({
+            await tx.asset.update({
                 where: { id: dto.asset_id },
-                data: {
-                    status: dto.status,
-                    location_id: dto.location_id,
-                },
+                data: { status: dto.status, location_id: dto.location_id },
             });
             const scan = await tx.scan.create({
                 data: {
                     asset_id: dto.asset_id,
-                    user_id: finalUserId,
+                    user_id: userIdFromToken,
                     location_id: dto.location_id,
                     status: dto.status,
-                    scanned_at: new Date(),
-                },
-                include: {
-                    asset: {
-                        include: {
-                            category: true,
-                            location: true,
-                        }
-                    }
                 }
             });
-            await tx.assetHistory.create({
-                data: {
-                    asset_id: dto.asset_id,
-                    user_id: finalUserId,
-                    action: `SCAN [STATUS: ${dto.status}] [LOCATION: ${dto.location_id}]`,
-                    timestamp: new Date(),
-                },
-            });
-            if (oldLocationId !== dto.location_id) {
-                await tx.assetMovement.create({
+            if (dto.status === "TO_REPLACE" || dto.status === "DAMAGED") {
+                await tx.alert.create({
                     data: {
-                        asset_id: dto.asset_id,
-                        from_location_id: oldLocationId,
-                        to_location_id: dto.location_id,
-                        moved_at: new Date(),
+                        asset_id: asset.id,
+                        type: dto.status === "TO_REPLACE" ? client_1.AlertType.REPLACE : client_1.AlertType.DAMAGED,
+                        status: client_1.AlertStatus.OPEN,
+                        comment: dto.comment,
+                        image_url: dto.image_data,
                     },
                 });
             }
-            return scan;
+            await tx.assetHistory.create({
+                data: {
+                    asset_id: dto.asset_id,
+                    user_id: userIdFromToken,
+                    action: dto.comment ? `Constat : ${dto.comment}` : `Audit effectué`,
+                },
+            });
+            return { ...scan, movementDetected };
+        });
+    }
+    async registerMassScan(dto, userId) {
+        const location = await this.prisma.location.findUnique({
+            where: { id: dto.location_id }
+        });
+        if (!location)
+            throw new common_1.NotFoundException('Zone de masse introuvable');
+        const assets = await this.prisma.asset.findMany({
+            where: { tag_id: { in: dto.tag_ids } },
+        });
+        if (assets.length === 0)
+            throw new common_1.BadRequestException('Aucun tag valide détecté');
+        return this.prisma.$transaction(async (tx) => {
+            for (const asset of assets) {
+                await tx.asset.update({
+                    where: { id: asset.id },
+                    data: { location_id: dto.location_id, status: dto.status }
+                });
+                await tx.scan.create({
+                    data: {
+                        asset_id: asset.id,
+                        user_id: userId,
+                        location_id: dto.location_id,
+                        status: dto.status,
+                    }
+                });
+            }
+            return { count: assets.length, message: "Inventaire de masse réussi" };
         });
     }
 };

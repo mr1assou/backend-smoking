@@ -27,6 +27,49 @@ export class AssetsService {
         return this.mapToOutput(asset);
     }
 
+    async findAll(): Promise<AssetOutputDto[]> {
+        const assets = await this.prisma.asset.findMany({
+            include: {
+                category: true,
+                location: true,
+                scans: {
+                    orderBy: { scanned_at: 'desc' },
+                    take: 1,
+                },
+            },
+        });
+
+        return assets.map(asset => this.mapToOutput(asset));
+    }
+
+    async create(dto: any): Promise<AssetOutputDto> {
+        const asset = await this.prisma.asset.create({
+            data: {
+                tag_id: dto.tag_id,
+                name: dto.name,
+                category_id: dto.category_id,
+                brand: dto.brand,
+                model: dto.model,
+                supplier_id: dto.supplier_id,
+                purchase_date: new Date(dto.purchase_date),
+                price: dto.price,
+                warranty_end: dto.warranty_end ? new Date(dto.warranty_end) : null,
+                location_id: dto.location_id,
+                status: dto.status || AssetStatus.GOOD,
+            },
+            include: {
+                category: true,
+                location: true,
+                scans: {
+                    orderBy: { scanned_at: 'desc' },
+                    take: 1,
+                },
+            },
+        });
+
+        return this.mapToOutput(asset);
+    }
+
     private mapToOutput(asset: any): AssetOutputDto {
         const netValue = this.calculateNetValue(Number(asset.price), asset.purchase_date);
 
@@ -38,7 +81,7 @@ export class AssetsService {
             prix_achat: Number(asset.price),
             annee_achat: asset.purchase_date.getFullYear(),
             localisation: asset.location.name,
-            valeur_net: netValue.toFixed(2),
+            valeur_net: `${netValue.toFixed(2)} €`,
             dernier_scan: asset.scans[0]?.scanned_at || null,
             marque: asset.brand,
         };
