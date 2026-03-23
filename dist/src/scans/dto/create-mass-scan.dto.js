@@ -28,6 +28,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMassScanDto.prototype, "status", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], CreateMassScanDto.prototype, "location_id", void 0);

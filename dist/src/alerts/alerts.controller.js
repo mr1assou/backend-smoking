@@ -14,11 +14,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AlertsController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const alerts_service_1 = require("./alerts.service");
 const jwt_guard_1 = require("../auth/guards/jwt.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const client_1 = require("@prisma/client");
+const create_alert_dto_1 = require("./dto/create-alert.dto");
 let AlertsController = class AlertsController {
     alertsService;
     constructor(alertsService) {
@@ -26,6 +28,10 @@ let AlertsController = class AlertsController {
     }
     async findAll() {
         return this.alertsService.findAll();
+    }
+    async create(createAlertDto, image) {
+        console.log('Payload reçu du mobile:', createAlertDto);
+        return this.alertsService.create(createAlertDto, image);
     }
     async update(id, status) {
         return this.alertsService.updateStatus(id, status);
@@ -39,6 +45,16 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AlertsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.AUDITOR),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image')),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_alert_dto_1.CreateAlertDto, Object]),
+    __metadata("design:returntype", Promise)
+], AlertsController.prototype, "create", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),

@@ -11,12 +11,13 @@ const common_1 = require("@nestjs/common");
 const scans_service_1 = require("./scans.service");
 const scans_controller_1 = require("./scans.controller");
 const prisma_module_1 = require("../prisma/prisma.module");
+const files_module_1 = require("../files/files.module");
 let ScansModule = class ScansModule {
 };
 exports.ScansModule = ScansModule;
 exports.ScansModule = ScansModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [prisma_module_1.PrismaModule, files_module_1.FilesModule],
         providers: [scans_service_1.ScansService],
         controllers: [scans_controller_1.ScansController],
     })

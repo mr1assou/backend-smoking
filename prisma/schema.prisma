@@ -61,6 +61,7 @@ model User {
   scans              Scan[]
   reports            Report[]
   history            AssetHistory[]
+  movements          AssetMovement[]
 
   @@map("users")
 }
@@ -103,6 +104,7 @@ model Location {
   
   assets    Asset[]
   scans     Scan[]
+  alerts    Alert[]
   movements AssetMovement[] @relation("ToLocation")
   from_movements AssetMovement[] @relation("FromLocation")
 
@@ -138,21 +140,24 @@ model Scan {
   asset       Asset       @relation(fields: [asset_id], references: [id])
   user        User        @relation(fields: [user_id], references: [id])
   location    Location    @relation(fields: [location_id], references: [id])
+  movements   AssetMovement[]
 
   @@map("scans")
 }
 
 model Alert {
-  id         String      @id @default(uuid()) @db.Uuid
-  asset_id   String      @db.Uuid
-  type       AlertType
-  status     AlertStatus @default(OPEN)
-  created_at DateTime    @default(now())
+  id          String      @id @default(uuid()) @db.Uuid
+  asset_id    String?     @db.Uuid
+  location_id String?     @db.Uuid
+  type        AlertType
+  status      AlertStatus @default(OPEN)
+  created_at  DateTime    @default(now())
 
-  comment    String?     // Stocke le texte du constat
-  image_url  String?     // Stocke les données de l'image (Base64 ou URL)
+  comment     String?     // Stocke le texte du constat
+  photo_url   String?     @map("image_url")
 
-  asset      Asset       @relation(fields: [asset_id], references: [id])
+  asset       Asset?      @relation(fields: [asset_id], references: [id])
+  location    Location?   @relation(fields: [location_id], references: [id])
 
   @@map("alerts")
 }
@@ -183,15 +188,19 @@ model AssetHistory {
 }
 
 model AssetMovement {
-  id              String   @id @default(uuid()) @db.Uuid
-  asset_id        String   @db.Uuid
-  from_location_id String  @db.Uuid
-  to_location_id   String  @db.Uuid
-  moved_at        DateTime @default(now())
+  id               String   @id @default(uuid()) @db.Uuid
+  asset_id         String   @db.Uuid
+  from_location_id String?  @db.Uuid
+  to_location_id   String   @db.Uuid
+  user_id          String   @db.Uuid
+  scan_id          String?  @db.Uuid
+  moved_at         DateTime @default(now())
 
-  asset           Asset    @relation(fields: [asset_id], references: [id])
-  from_location   Location @relation("FromLocation", fields: [from_location_id], references: [id])
-  to_location     Location @relation("ToLocation", fields: [to_location_id], references: [id])
+  asset            Asset    @relation(fields: [asset_id], references: [id])
+  from_location    Location? @relation("FromLocation", fields: [from_location_id], references: [id])
+  to_location      Location  @relation("ToLocation", fields: [to_location_id], references: [id])
+  user             User      @relation(fields: [user_id], references: [id])
+  scan             Scan?     @relation(fields: [scan_id], references: [id])
 
   @@map("asset_movements")
 }

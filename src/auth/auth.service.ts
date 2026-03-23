@@ -2,6 +2,7 @@ import {
     ForbiddenException,
     Injectable,
     NotFoundException,
+    ServiceUnavailableException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -30,24 +31,32 @@ export class AuthService {
             },
         });
 
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
         await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
 
     async login(dto: LoginDto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { email: dto.email },
+            });
 
-        if (!user) throw new NotFoundException('User not found');
+            if (!user) throw new NotFoundException('Utilisateur introuvable');
 
-        const passwordMatches = await argon2.verify(user.password, dto.password);
-        if (!passwordMatches) throw new ForbiddenException('Invalid credentials');
+            const passwordMatches = await argon2.verify(user.password, dto.password);
+            if (!passwordMatches) throw new ForbiddenException('Identifiants incorrects');
 
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
-        await this.saveRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+            const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
+            await this.saveRefreshToken(user.id, tokens.refreshToken);
+            return tokens;
+        } catch (error) {
+            console.error('Erreur Login:', error.code);
+            if (error.code === 'P1001') {
+                throw new ServiceUnavailableException('La base de données est injoignable. Le serveur redémarre peut-être.');
+            }
+            throw error;
+        }
     }
 
     async refresh(userId: string, refreshToken: string) {
@@ -64,7 +73,7 @@ export class AuthService {
         );
         if (!tokenMatches) throw new ForbiddenException('Access denied');
 
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
         await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
@@ -76,8 +85,8 @@ export class AuthService {
         });
     }
 
-    private async generateTokens(userId: string, email: string, role: UserRole) {
-        const payload = { sub: userId, email, role };
+    private async generateTokens(userId: string, email: string, role: UserRole, name: string) {
+        const payload = { sub: userId, email, role, name };
 
         const [accessToken, refreshToken] = await Promise.all([
             this.jwt.signAsync(payload, {

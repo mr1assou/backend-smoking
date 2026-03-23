@@ -3,15 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssetOutputDto = void 0;
 class AssetOutputDto {
     id;
-    nom;
-    categorie;
-    etat;
-    prix_achat;
-    annee_achat;
-    localisation;
-    valeur_net;
-    dernier_scan;
-    marque;
+    tag_id;
+    name;
+    category;
+    location;
+    status;
+    brand;
+    purchase_price;
+    net_value;
+    purchase_year;
+    last_scan;
 }
 exports.AssetOutputDto = AssetOutputDto;
 //# sourceMappingURL=asset-output.dto.js.map

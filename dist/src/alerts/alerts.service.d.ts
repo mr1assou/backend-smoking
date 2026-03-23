@@ -2,8 +2,14 @@ import { PrismaService } from '../prisma/prisma.service';
 export declare class AlertsService {
     private prisma;
     constructor(prisma: PrismaService);
-    findAll(): Promise<({
-        asset: {
+    create(createAlertDto: any, imageFile?: Express.Multer.File): Promise<{
+        location: {
+            id: string;
+            name: string;
+            parent_id: string | null;
+            type: import(".prisma/client").$Enums.LocationType;
+        } | null;
+        asset: ({
             category: {
                 id: string;
                 name: string;
@@ -28,23 +34,62 @@ export declare class AlertsService {
             warranty_end: Date | null;
             location_id: string;
             status: import(".prisma/client").$Enums.AssetStatus;
-        };
+        }) | null;
     } & {
         id: string;
         created_at: Date;
         type: import(".prisma/client").$Enums.AlertType;
+        location_id: string | null;
         status: import(".prisma/client").$Enums.AlertStatus;
-        asset_id: string;
+        asset_id: string | null;
         comment: string | null;
-        image_url: string | null;
+        photo_url: string | null;
+    }>;
+    findAll(): Promise<({
+        asset: ({
+            category: {
+                id: string;
+                name: string;
+            };
+            location: {
+                id: string;
+                name: string;
+                parent_id: string | null;
+                type: import(".prisma/client").$Enums.LocationType;
+            };
+        } & {
+            id: string;
+            name: string;
+            created_at: Date;
+            tag_id: string;
+            category_id: string;
+            brand: string;
+            model: string;
+            supplier_id: string;
+            purchase_date: Date;
+            price: import("@prisma/client/runtime/library").Decimal;
+            warranty_end: Date | null;
+            location_id: string;
+            status: import(".prisma/client").$Enums.AssetStatus;
+        }) | null;
+    } & {
+        id: string;
+        created_at: Date;
+        type: import(".prisma/client").$Enums.AlertType;
+        location_id: string | null;
+        status: import(".prisma/client").$Enums.AlertStatus;
+        asset_id: string | null;
+        comment: string | null;
+        photo_url: string | null;
     })[]>;
     updateStatus(id: string, status: string): Promise<{
         id: string;
         created_at: Date;
         type: import(".prisma/client").$Enums.AlertType;
+        location_id: string | null;
         status: import(".prisma/client").$Enums.AlertStatus;
-        asset_id: string;
+        asset_id: string | null;
         comment: string | null;
-        image_url: string | null;
+        photo_url: string | null;
     }>;
 }

@@ -18,12 +18,30 @@ const assets_service_1 = require("./assets.service");
 const jwt_guard_1 = require("../auth/guards/jwt.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
+const public_decorator_1 = require("../auth/decorators/public.decorator");
 const client_1 = require("@prisma/client");
 const create_asset_dto_1 = require("./dto/create-asset.dto");
+const platform_express_1 = require("@nestjs/platform-express");
 let AssetsController = class AssetsController {
     assetsService;
     constructor(assetsService) {
         this.assetsService = assetsService;
+    }
+    async getTemplate(res) {
+        const buffer = this.assetsService.getTemplate();
+        res.set({
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': 'attachment; filename="Template_AssetIQ.xlsx"',
+            'Content-Length': buffer.length,
+        });
+        res.end(buffer);
+    }
+    async import(file) {
+        console.log('Fichier reçu dans le contrôleur');
+        return this.assetsService.importAssets(file.buffer);
+    }
+    async reset() {
+        return this.assetsService.resetAll();
     }
     async create(dto) {
         return this.assetsService.create(dto);
@@ -33,6 +51,7 @@ let AssetsController = class AssetsController {
         return this.assetsService.findAll();
     }
     async getByTag(tagId) {
+        console.log('Recherche par TAG RFID:', tagId);
         return this.assetsService.findByTag(tagId);
     }
     async update(id, updateDto) {
@@ -41,8 +60,36 @@ let AssetsController = class AssetsController {
     async remove(id) {
         return { message: 'Asset deleted by admin' };
     }
+    async findOne(id) {
+        console.log('REQUÊTE REÇUE POUR ID:', id);
+        return { debug: true, id_recu: id };
+    }
 };
 exports.AssetsController = AssetsController;
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('template'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "getTemplate", null);
+__decorate([
+    (0, common_1.Post)('import'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "import", null);
+__decorate([
+    (0, common_1.Delete)('reset'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "reset", null);
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
@@ -58,8 +105,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)('tag/:tag_id'),
-    __param(0, (0, common_1.Param)('tag_id')),
+    (0, common_1.Get)('tag/:tagId'),
+    __param(0, (0, common_1.Param)('tagId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -81,6 +128,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "findOne", null);
 exports.AssetsController = AssetsController = __decorate([
     (0, common_1.Controller)('assets'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard, roles_guard_1.RolesGuard),

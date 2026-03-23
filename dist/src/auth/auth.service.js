@@ -66,22 +66,31 @@ let AuthService = class AuthService {
                 name: dto.name
             },
         });
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
         await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
     async login(dto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
-        if (!user)
-            throw new common_1.NotFoundException('User not found');
-        const passwordMatches = await argon2.verify(user.password, dto.password);
-        if (!passwordMatches)
-            throw new common_1.ForbiddenException('Invalid credentials');
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
-        await this.saveRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { email: dto.email },
+            });
+            if (!user)
+                throw new common_1.NotFoundException('Utilisateur introuvable');
+            const passwordMatches = await argon2.verify(user.password, dto.password);
+            if (!passwordMatches)
+                throw new common_1.ForbiddenException('Identifiants incorrects');
+            const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
+            await this.saveRefreshToken(user.id, tokens.refreshToken);
+            return tokens;
+        }
+        catch (error) {
+            console.error('Erreur Login:', error.code);
+            if (error.code === 'P1001') {
+                throw new common_1.ServiceUnavailableException('La base de données est injoignable. Le serveur redémarre peut-être.');
+            }
+            throw error;
+        }
     }
     async refresh(userId, refreshToken) {
         const user = await this.prisma.user.findUnique({
@@ -92,7 +101,7 @@ let AuthService = class AuthService {
         const tokenMatches = await argon2.verify(user.hashedRefreshToken, refreshToken);
         if (!tokenMatches)
             throw new common_1.ForbiddenException('Access denied');
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
         await this.saveRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
@@ -102,8 +111,8 @@ let AuthService = class AuthService {
             data: { hashedRefreshToken: null },
         });
     }
-    async generateTokens(userId, email, role) {
-        const payload = { sub: userId, email, role };
+    async generateTokens(userId, email, role, name) {
+        const payload = { sub: userId, email, role, name };
         const [accessToken, refreshToken] = await Promise.all([
             this.jwt.signAsync(payload, {
                 secret: this.config.get('JWT_SECRET'),

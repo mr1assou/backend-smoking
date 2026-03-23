@@ -1,11 +1,20 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { AssetOutputDto } from './dto/asset-output.dto';
 export declare class AssetsService {
     private prisma;
     constructor(prisma: PrismaService);
-    findByTag(tagId: string): Promise<AssetOutputDto>;
-    findAll(): Promise<AssetOutputDto[]>;
-    create(dto: any): Promise<AssetOutputDto>;
+    findByTag(tagId: string): Promise<any>;
+    findOne(id: string): Promise<any>;
+    findAll(): Promise<any[]>;
+    resetAll(): Promise<{
+        message: string;
+    }>;
+    create(dto: any): Promise<any>;
+    importAssets(fileBuffer: Buffer): Promise<{
+        success: number;
+        errors: any[];
+        total: any;
+    }>;
     private mapToOutput;
-    calculateNetValue(price: number, purchaseDate: Date): number;
+    private calculateNetValue;
+    getTemplate(): Buffer;
 }
