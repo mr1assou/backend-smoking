@@ -2,8 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
 import { ValidationPipe } from '@nestjs/common';
+import { mkdirSync } from 'fs';
 
 async function bootstrap() {
+  mkdirSync('uploads', { recursive: true });
+
   const app = await NestFactory.create(AppModule);
   
   // Validation globale des DTOs

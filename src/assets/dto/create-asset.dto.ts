@@ -1,5 +1,4 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
-import { AssetStatus } from '@prisma/client';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateAssetDto {
     @IsString()
@@ -10,34 +9,61 @@ export class CreateAssetDto {
     @IsNotEmpty()
     name: string;
 
+    // Catégorie : UUID direct OU nom texte libre (findOrCreate)
     @IsUUID()
-    category_id: string;
+    @IsOptional()
+    category_id?: string;
 
     @IsString()
-    @IsNotEmpty()
-    brand: string;
+    @IsOptional()
+    category?: string;
+
+    // Localisation : UUID direct OU nom texte libre
+    @IsUUID()
+    @IsOptional()
+    location_id?: string;
 
     @IsString()
-    @IsNotEmpty()
-    model: string;
+    @IsOptional()
+    location?: string;
 
+    // Fournisseur : UUID direct OU nom texte libre
     @IsUUID()
-    supplier_id: string;
+    @IsOptional()
+    supplier_id?: string;
 
-    @IsDateString()
-    purchase_date: string;
+    @IsString()
+    @IsOptional()
+    supplier?: string;
+
+    // Statut : string libre — le service mappe vers AssetStatus
+    @IsString()
+    @IsOptional()
+    status?: string;
 
     @IsNumber()
-    price: number;
+    @IsOptional()
+    price?: number;
 
-    @IsDateString()
+    @IsString()
+    @IsOptional()
+    brand?: string;
+
+    @IsString()
+    @IsOptional()
+    model?: string;
+
+    // Dates en string libre — new Date() gère tous les formats ISO
+    @IsString()
+    @IsOptional()
+    purchase_date?: string;
+
+    @IsString()
     @IsOptional()
     warranty_end?: string;
 
-    @IsUUID()
-    location_id: string;
-
-    @IsEnum(AssetStatus)
+    // Image : base64 ou URL
+    @IsString()
     @IsOptional()
-    status?: AssetStatus;
+    image_url?: string;
 }

@@ -7,23 +7,25 @@ export declare class AssetsController {
     getTemplate(res: Response): Promise<void>;
     import(file: any): Promise<{
         success: number;
+        skipped_no_name: number;
         errors: any[];
         total: any;
     }>;
     reset(): Promise<{
         message: string;
     }>;
+    findUntagged(): Promise<any[]>;
+    findOrphans(q?: string): Promise<any[]>;
+    getCategories(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
+    getByTag(tagId: string): Promise<any>;
     create(dto: CreateAssetDto): Promise<any>;
     findAll(): Promise<any[]>;
-    getByTag(tagId: string): Promise<any>;
-    update(id: string, updateDto: any): Promise<{
-        message: string;
-    }>;
+    enroll(id: string, tagId: string): Promise<any>;
+    findOne(id: string): Promise<any>;
     remove(id: string): Promise<{
         message: string;
-    }>;
-    findOne(id: string): Promise<{
-        debug: boolean;
-        id_recu: string;
     }>;
 }

@@ -24,7 +24,7 @@ export declare class AlertsService {
             id: string;
             name: string;
             created_at: Date;
-            tag_id: string;
+            tag_id: string | null;
             category_id: string;
             brand: string;
             model: string;
@@ -34,6 +34,7 @@ export declare class AlertsService {
             warranty_end: Date | null;
             location_id: string;
             status: import(".prisma/client").$Enums.AssetStatus;
+            image_url: string | null;
         }) | null;
     } & {
         id: string;
@@ -61,7 +62,7 @@ export declare class AlertsService {
             id: string;
             name: string;
             created_at: Date;
-            tag_id: string;
+            tag_id: string | null;
             category_id: string;
             brand: string;
             model: string;
@@ -71,6 +72,7 @@ export declare class AlertsService {
             warranty_end: Date | null;
             location_id: string;
             status: import(".prisma/client").$Enums.AssetStatus;
+            image_url: string | null;
         }) | null;
     } & {
         id: string;

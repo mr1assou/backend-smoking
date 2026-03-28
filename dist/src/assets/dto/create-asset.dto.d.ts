@@ -1,14 +1,17 @@
-import { AssetStatus } from '@prisma/client';
 export declare class CreateAssetDto {
     tag_id: string;
     name: string;
-    category_id: string;
-    brand: string;
-    model: string;
-    supplier_id: string;
-    purchase_date: string;
-    price: number;
+    category_id?: string;
+    category?: string;
+    location_id?: string;
+    location?: string;
+    supplier_id?: string;
+    supplier?: string;
+    status?: string;
+    price?: number;
+    brand?: string;
+    model?: string;
+    purchase_date?: string;
     warranty_end?: string;
-    location_id: string;
-    status?: AssetStatus;
+    image_url?: string;
 }

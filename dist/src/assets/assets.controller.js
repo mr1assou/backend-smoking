@@ -37,32 +37,39 @@ let AssetsController = class AssetsController {
         res.end(buffer);
     }
     async import(file) {
-        console.log('Fichier reçu dans le contrôleur');
+        console.log('Import Excel reçu');
         return this.assetsService.importAssets(file.buffer);
     }
     async reset() {
         return this.assetsService.resetAll();
     }
-    async create(dto) {
-        return this.assetsService.create(dto);
+    async findUntagged() {
+        return this.assetsService.findUntagged();
     }
-    async findAll() {
-        console.log('Requête reçue pour les actifs à', new Date());
-        return this.assetsService.findAll();
+    async findOrphans(q) {
+        return this.assetsService.findOrphans(q);
+    }
+    async getCategories() {
+        return this.assetsService.getCategories();
     }
     async getByTag(tagId) {
         console.log('Recherche par TAG RFID:', tagId);
         return this.assetsService.findByTag(tagId);
     }
-    async update(id, updateDto) {
-        return { message: 'Asset updated by admin' };
+    async create(dto) {
+        return this.assetsService.create(dto);
+    }
+    async findAll() {
+        return this.assetsService.findAll();
+    }
+    async enroll(id, tagId) {
+        return this.assetsService.enrollTag(id, tagId);
+    }
+    async findOne(id) {
+        return this.assetsService.findOne(id);
     }
     async remove(id) {
         return { message: 'Asset deleted by admin' };
-    }
-    async findOne(id) {
-        console.log('REQUÊTE REÇUE POUR ID:', id);
-        return { debug: true, id_recu: id };
     }
 };
 exports.AssetsController = AssetsController;
@@ -91,6 +98,33 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "reset", null);
 __decorate([
+    (0, common_1.Get)('untagged'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "findUntagged", null);
+__decorate([
+    (0, common_1.Get)('orphans'),
+    __param(0, (0, common_1.Query)('q')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "findOrphans", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('categories'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "getCategories", null);
+__decorate([
+    (0, common_1.Get)('tag/:tagId'),
+    __param(0, (0, common_1.Param)('tagId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "getByTag", null);
+__decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
     __param(0, (0, common_1.Body)()),
@@ -105,21 +139,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)('tag/:tagId'),
-    __param(0, (0, common_1.Param)('tagId')),
+    (0, common_1.Patch)(':id/enroll'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('tag_id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "enroll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], AssetsController.prototype, "getByTag", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], AssetsController.prototype, "update", null);
+], AssetsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
@@ -128,13 +161,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], AssetsController.prototype, "findOne", null);
 exports.AssetsController = AssetsController = __decorate([
     (0, common_1.Controller)('assets'),
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard, roles_guard_1.RolesGuard),

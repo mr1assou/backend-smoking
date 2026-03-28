@@ -68,7 +68,7 @@ model User {
 
 model Asset {
   id            String       @id @default(uuid()) @db.Uuid
-  tag_id        String       @unique
+  tag_id        String?      @unique
   name          String
   category_id   String       @db.Uuid
   brand         String
@@ -80,6 +80,7 @@ model Asset {
   location_id   String       @db.Uuid
   status        AssetStatus  @default(GOOD)
   created_at    DateTime     @default(now())
+  image_url     String?      @db.Text
 
   category      Category     @relation(fields: [category_id], references: [id])
   supplier      Supplier     @relation(fields: [supplier_id], references: [id])

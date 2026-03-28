@@ -1,4 +1,7 @@
-import { Controller, Get, Param, UseGuards, Patch, Delete, Body, Post, Request, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import {
+    Controller, Get, Param, UseGuards, Patch, Delete, Body,
+    Post, UseInterceptors, UploadedFile, Res, Query,
+} from '@nestjs/common';
 import { AssetsService } from './assets.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -14,6 +17,8 @@ import { Response } from 'express';
 export class AssetsController {
     constructor(private readonly assetsService: AssetsService) { }
 
+    // ── Template Excel ─────────────────────────────────────────────────────────
+
     @Public()
     @Get('template')
     async getTemplate(@Res() res: Response) {
@@ -26,13 +31,17 @@ export class AssetsController {
         res.end(buffer);
     }
 
+    // ── Import Excel ───────────────────────────────────────────────────────────
+
     @Post('import')
     @Roles(UserRole.ADMIN)
     @UseInterceptors(FileInterceptor('file'))
     async import(@UploadedFile() file: any) {
-        console.log('Fichier reçu dans le contrôleur');
+        console.log('Import Excel reçu');
         return this.assetsService.importAssets(file.buffer);
     }
+
+    // ── Reset BD ───────────────────────────────────────────────────────────────
 
     @Delete('reset')
     @Roles(UserRole.ADMIN)
@@ -40,17 +49,29 @@ export class AssetsController {
         return this.assetsService.resetAll();
     }
 
-    @Post()
-    @Roles(UserRole.ADMIN)
-    async create(@Body() dto: CreateAssetDto) {
-        return this.assetsService.create(dto);
+    // ── Actifs sans tag (en attente d'enrôlement) ──────────────────────────────
+
+    @Get('untagged')
+    async findUntagged() {
+        return this.assetsService.findUntagged();
     }
 
-    @Get()
-    async findAll() {
-        console.log('Requête reçue pour les actifs à', new Date());
-        return this.assetsService.findAll();
+    // ── Actifs orphelins avec recherche (utilisé par le mobile) ────────────────
+
+    @Get('orphans')
+    async findOrphans(@Query('q') q?: string) {
+        return this.assetsService.findOrphans(q);
     }
+
+    // ── Catégories ─────────────────────────────────────────────────────────────
+
+    @Public()
+    @Get('categories')
+    async getCategories() {
+        return this.assetsService.getCategories();
+    }
+
+    // ── Recherche par Tag RFID ─────────────────────────────────────────────────
 
     @Get('tag/:tagId')
     async getByTag(@Param('tagId') tagId: string) {
@@ -58,23 +79,44 @@ export class AssetsController {
         return this.assetsService.findByTag(tagId);
     }
 
-    @Patch(':id')
+    // ── Création manuelle ──────────────────────────────────────────────────────
+
+    @Post()
     @Roles(UserRole.ADMIN)
-    async update(@Param('id') id: string, @Body() updateDto: any) {
-        // Implementation for admin only
-        return { message: 'Asset updated by admin' };
+    async create(@Body() dto: CreateAssetDto) {
+        return this.assetsService.create(dto);
     }
+
+    // ── Liste complète ─────────────────────────────────────────────────────────
+
+    @Get()
+    async findAll() {
+        return this.assetsService.findAll();
+    }
+
+    // ── Enrôlement : associer un tag RFID à un actif existant ─────────────────
+    // PATCH /assets/:id/enroll  { tag_id: "RFID-XXX" }
+
+    @Patch(':id/enroll')
+    async enroll(
+        @Param('id') id: string,
+        @Body('tag_id') tagId: string,
+    ) {
+        return this.assetsService.enrollTag(id, tagId);
+    }
+
+    // ── Fiche actif ────────────────────────────────────────────────────────────
+
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return this.assetsService.findOne(id);
+    }
+
+    // ── Suppression ────────────────────────────────────────────────────────────
 
     @Delete(':id')
     @Roles(UserRole.ADMIN)
     async remove(@Param('id') id: string) {
-        // Implementation for admin only
         return { message: 'Asset deleted by admin' };
-    }
-
-    @Get(':id')
-    async findOne(@Param('id') id: string) {
-        console.log('REQUÊTE REÇUE POUR ID:', id);
-        return { debug: true, id_recu: id };
     }
 }
