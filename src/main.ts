@@ -31,7 +31,7 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   app.getHttpAdapter().get('/', (req: any, res: any) => {
-    res.json({ message: 'Welcome to Hotel Royal API! 🏨' });
+    res.json({ message: 'Welcome to Hotel Royal Manssour API! 🏨' });
   });
 
   // Écouter sur 0.0.0.0 pour accepter les connexions venant de l'extérieur (ton téléphone)
