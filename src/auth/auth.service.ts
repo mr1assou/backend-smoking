@@ -1,8 +1,9 @@
 import {
     ForbiddenException,
+    HttpException,
     Injectable,
-    NotFoundException,
     ServiceUnavailableException,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -42,19 +43,32 @@ export class AuthService {
                 where: { email: dto.email },
             });
 
-            if (!user) throw new NotFoundException('Utilisateur introuvable');
+            const unauthorized = () =>
+                new UnauthorizedException('Identifiants incorrects.');
+
+            if (!user) throw unauthorized();
 
             const passwordMatches = await argon2.verify(user.password, dto.password);
-            if (!passwordMatches) throw new ForbiddenException('Identifiants incorrects');
+            if (!passwordMatches) throw unauthorized();
 
             const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
             await this.saveRefreshToken(user.id, tokens.refreshToken);
             return tokens;
-        } catch (error) {
-            console.error('Erreur Login:', error.code);
-            if (error.code === 'P1001') {
-                throw new ServiceUnavailableException('La base de données est injoignable. Le serveur redémarre peut-être.');
+        } catch (error: unknown) {
+            if (error instanceof HttpException) {
+                throw error;
             }
+            const prisma = error as { code?: string; message?: string };
+            if (prisma.code === 'P1001') {
+                throw new ServiceUnavailableException(
+                    'La base de données est injoignable. Le serveur redémarre peut-être.',
+                );
+            }
+            console.error(
+                'Erreur Login:',
+                prisma.code ?? 'non-Prisma',
+                prisma.message ?? (error instanceof Error ? error.message : error),
+            );
             throw error;
         }
     }

@@ -75,20 +75,25 @@ let AuthService = class AuthService {
             const user = await this.prisma.user.findUnique({
                 where: { email: dto.email },
             });
+            const unauthorized = () => new common_1.UnauthorizedException('Identifiants incorrects.');
             if (!user)
-                throw new common_1.NotFoundException('Utilisateur introuvable');
+                throw unauthorized();
             const passwordMatches = await argon2.verify(user.password, dto.password);
             if (!passwordMatches)
-                throw new common_1.ForbiddenException('Identifiants incorrects');
+                throw unauthorized();
             const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);
             await this.saveRefreshToken(user.id, tokens.refreshToken);
             return tokens;
         }
         catch (error) {
-            console.error('Erreur Login:', error.code);
-            if (error.code === 'P1001') {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            const prisma = error;
+            if (prisma.code === 'P1001') {
                 throw new common_1.ServiceUnavailableException('La base de données est injoignable. Le serveur redémarre peut-être.');
             }
+            console.error('Erreur Login:', prisma.code ?? 'non-Prisma', prisma.message ?? (error instanceof Error ? error.message : error));
             throw error;
         }
     }
