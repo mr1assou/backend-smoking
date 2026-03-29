@@ -13,8 +13,12 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
+    const corsOrigin = process.env.CORS_ORIGIN?.trim();
+    if (!corsOrigin) {
+        throw new Error('CORS_ORIGIN must be set in .env');
+    }
     app.enableCors({
-        origin: true,
+        origin: corsOrigin,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
     });
