@@ -1,60 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
+import { SYSTEM_PROMPT } from './prompts/system-prompt';
+
+export type ChatTurn = { role: 'user' | 'assistant'; content: string };
 
 @Injectable()
 export class AiService {
-    private genAI: GoogleGenerativeAI;
-    private model: any;
+    private openai: OpenAI | null;
 
-    constructor(
-        private prisma: PrismaService,
-        private config: ConfigService,
-    ) {
-        const apiKey = this.config.get<string>('GEMINI_API_KEY');
-        if (!apiKey || apiKey === "INSERT_YOUR_GEMINI_API_KEY_HERE") {
-            // Handle missing API key gracefully during dev
-            console.warn('GEMINI_API_KEY is not configured. AI suggestions will fail.');
-            this.genAI = new GoogleGenerativeAI('placeholder');
-        } else {
-            this.genAI = new GoogleGenerativeAI(apiKey);
+    constructor(private config: ConfigService) {
+        const openaiKey = this.config.get<string>('OPENAI_API_KEY')?.trim();
+        this.openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
+        if (!this.openai) {
+            console.warn('OPENAI_API_KEY is not configured. POST /ai/chat will fail.');
         }
-        this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     }
 
-    async getReplacementSuggestions(assetId: string) {
-        const asset = await this.prisma.asset.findUnique({
-            where: { id: assetId },
-            include: { category: true, supplier: true },
+    async chatWithHistory(turns: ChatTurn[]): Promise<string> {
+        if (!this.openai) {
+            throw new ServiceUnavailableException(
+                'OpenAI is not configured. Set OPENAI_API_KEY in the environment.',
+            );
+        }
+        if (turns.length === 0) {
+            throw new BadRequestException('messages must not be empty');
+        }
+        if (turns[0].role !== 'user') {
+            throw new BadRequestException('messages must start with a user turn');
+        }
+        if (turns[turns.length - 1].role !== 'user') {
+            throw new BadRequestException('messages must end with a user turn');
+        }
+        for (let i = 0; i < turns.length; i++) {
+            const want: 'user' | 'assistant' = i % 2 === 0 ? 'user' : 'assistant';
+            if (turns[i].role !== want) {
+                throw new BadRequestException(
+                    'messages must alternate user / assistant, starting with user',
+                );
+            }
+        }
+
+        const model =
+            this.config.get<string>('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
+
+        const systemPrompt = SYSTEM_PROMPT.trim();
+
+        const thread = turns.map((t) => ({
+            role: t.role,
+            content: t.content,
+        })) as OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+
+        const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
+        if (systemPrompt.length > 0) {
+            messages.push({ role: 'system', content: systemPrompt });
+        }
+        messages.push(...thread);
+
+        const completion = await this.openai.chat.completions.create({
+            model,
+            messages,
         });
-
-        if (!asset) throw new NotFoundException('Asset not found');
-
-        const suppliers = await this.prisma.supplier.findMany();
-        const suppliersList = suppliers.map(s => s.name).join(', ');
-
-        const prompt = `
-        En tant qu'expert en gestion d'actifs hôteliers pour le Royal Mansour, analyse cet actif en fin de vie :
-        - Nom : ${asset.name}
-        - Catégorie : ${asset.category.name}
-        - Marque actuelle : ${asset.brand}
-        - Prix d'achat initial : ${asset.price} EUR
-        - Date d'achat : ${asset.purchase_date.toDateString()}
-
-        Nos fournisseurs enregistrés sont : ${suppliersList}.
-
-        Propose 3 alternatives modernes et haut de gamme pour remplacer cet actif. 
-        Pour chaque alternative, précise :
-        1. Modèle et Marque suggérés.
-        2. Avantages (écologique, technologique, design).
-        3. Lequel de nos fournisseurs est le plus apte à fournir cet article.
-        
-        Réponds en format JSON structuré.
-        `;
-
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        return JSON.parse(response.text());
+        const text = completion.choices[0]?.message?.content;
+        return typeof text === 'string' ? text : '';
     }
 }

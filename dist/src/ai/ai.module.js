@@ -9,13 +9,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AiModule = void 0;
 const common_1 = require("@nestjs/common");
 const ai_service_1 = require("./ai.service");
-const prisma_module_1 = require("../prisma/prisma.module");
+const ai_controller_1 = require("./ai.controller");
 let AiModule = class AiModule {
 };
 exports.AiModule = AiModule;
 exports.AiModule = AiModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        controllers: [ai_controller_1.AiController],
         providers: [ai_service_1.AiService],
         exports: [ai_service_1.AiService],
     })

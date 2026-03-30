@@ -1,10 +1,11 @@
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
+export type ChatTurn = {
+    role: 'user' | 'assistant';
+    content: string;
+};
 export declare class AiService {
-    private prisma;
     private config;
-    private genAI;
-    private model;
-    constructor(prisma: PrismaService, config: ConfigService);
-    getReplacementSuggestions(assetId: string): Promise<any>;
+    private openai;
+    constructor(config: ConfigService);
+    chatWithHistory(turns: ChatTurn[]): Promise<string>;
 }
