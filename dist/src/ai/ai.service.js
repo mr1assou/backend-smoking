@@ -48,7 +48,7 @@ let AiService = class AiService {
             }
         }
         const model = this.config.get('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
-        const systemPrompt = system_prompt_1.SYSTEM_PROMPT.trim();
+        const systemPrompt = (0, system_prompt_1.buildSystemPrompt)().trim();
         const thread = turns.map((t) => ({
             role: t.role,
             content: t.content,

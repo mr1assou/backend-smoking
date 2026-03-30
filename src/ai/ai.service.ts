@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { SYSTEM_PROMPT } from './prompts/system-prompt';
+import { buildSystemPrompt } from './prompts/system-prompt';
 
 export type ChatTurn = { role: 'user' | 'assistant'; content: string };
 
@@ -44,7 +44,7 @@ export class AiService {
         const model =
             this.config.get<string>('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
 
-        const systemPrompt = SYSTEM_PROMPT.trim();
+        const systemPrompt = buildSystemPrompt().trim();
 
         const thread = turns.map((t) => ({
             role: t.role,

@@ -1,1 +1,1 @@
-export declare const SYSTEM_PROMPT = "";
+export declare function buildSystemPrompt(): string;
