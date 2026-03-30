@@ -23,8 +23,7 @@ let AiController = class AiController {
         this.aiService = aiService;
     }
     async chat(dto) {
-        const reply = await this.aiService.chatWithHistory(dto.messages);
-        return { reply };
+        return this.aiService.chatWithHistory(dto.messages);
     }
 };
 exports.AiController = AiController;

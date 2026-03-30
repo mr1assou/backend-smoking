@@ -11,7 +11,6 @@ export class AiController {
     @Post('chat')
     @HttpCode(HttpStatus.OK)
     async chat(@Body() dto: ChatDto) {
-        const reply = await this.aiService.chatWithHistory(dto.messages);
-        return { reply };
+        return this.aiService.chatWithHistory(dto.messages);
     }
 }
