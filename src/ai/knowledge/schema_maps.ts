@@ -47,7 +47,7 @@ export const simpleSchemaMap: Record<string, SimpleTable> = {
         description: 'Tracked item (RFID tag optional); category, supplier, location, status.',
         fields: {
             id: 'uuid (PK)',
-            tag_id: 'string? (unique)',
+            tag_id: 'string? (unique) — RFID / tag identifier; user “RFID” means this field, not id',
             name: 'string',
             category_id: 'uuid → Category',
             brand: 'string',
