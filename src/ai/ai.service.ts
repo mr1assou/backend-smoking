@@ -9,7 +9,6 @@ import {
     agent3SqlGenerationSystem,
     agent5CorrectionSystem,
     agentClassifierSystem,
-    agentChatInScopeSystem,
 } from './prompts/agent-prompts';
 import { buildSystemPrompt } from './prompts/system-prompt';
 import { extractSqlFence, guardReadOnlySelect } from './utils/sql-guard';
@@ -76,10 +75,6 @@ export class AiService {
             intent = 'data';
         }
         if (intent === 'chat') {
-            const inScope = this.isConversationMetaRequest(lastUser) || (await this.classifyChatInScope(model, lastUser));
-            if (!inScope) {
-                return { type: 'text', message: "I can't help with that.", meta: { intent: 'chat' } };
-            }
             const message = await this.callLLM(model, buildSystemPrompt(), turns, 0.65);
             return { type: 'text', message, meta: { intent: 'chat' } };
         }
@@ -95,16 +90,6 @@ export class AiService {
             return o.intent === 'data' ? 'data' : 'chat';
         } catch {
             return 'chat';
-        }
-    }
-
-    private async classifyChatInScope(model: string, lastUserMessage: string): Promise<boolean> {
-        const raw = await this.jsonModelText(model, agentChatInScopeSystem, lastUserMessage, 0.1);
-        try {
-            const o = JSON.parse(raw) as { scope?: string };
-            return o.scope === 'in_scope';
-        } catch {
-            return false;
         }
     }
 
@@ -254,32 +239,6 @@ export class AiService {
         return false;
     }
 
-    private isConversationMetaRequest(text: string): boolean {
-        const q = text.toLowerCase();
-        return (
-            q.includes('last message') ||
-            q.includes('last messages') ||
-            q.includes('previous message') ||
-            q.includes('previous answer') ||
-            q.includes('summarize our conversation') ||
-            q.includes('summarize the conversation') ||
-            q.includes('what did i ask') ||
-            q.includes('what did i say') ||
-            q.includes('repeat your answer') ||
-            q.includes('repeat your last answer') ||
-            q.includes('résume') ||
-            q.includes('resume la conversation') ||
-            q.includes('dernier message') ||
-            q.includes('derniers messages') ||
-            q.includes('message précédent') ||
-            q.includes('message precedent') ||
-            q.includes('ce que j ai dit') ||
-            q.includes('ce que j’ai dit') ||
-            q.includes('ta réponse précédente') ||
-            q.includes('ta reponse precedente')
-        );
-    }
-
     private async summarizeDataAnswer(
         model: string,
         userQuestion: string,
@@ -301,7 +260,6 @@ export class AiService {
         const completion = await this.openai!.chat.completions.create({
             model,
             messages,
-            max_tokens: 1024,
             temperature,
             response_format: { type: 'json_object' },
         });
@@ -316,7 +274,6 @@ export class AiService {
         const completion = await this.openai!.chat.completions.create({
             model,
             messages,
-            max_tokens: 4096,
             temperature,
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';
@@ -341,7 +298,6 @@ export class AiService {
         const completion = await this.openai!.chat.completions.create({
             model,
             messages,
-            max_tokens: 4096,
             temperature,
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';

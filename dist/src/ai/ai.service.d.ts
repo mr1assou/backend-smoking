@@ -30,11 +30,9 @@ export declare class AiService {
     constructor(config: ConfigService, prisma: PrismaService);
     chatWithHistory(turns: ChatTurn[]): Promise<ChatResult>;
     private classifyIntent;
-    private classifyChatInScope;
     private runDataPipeline;
     private isBudgetOrReplacementQuestion;
     private isSensitiveRequest;
-    private isConversationMetaRequest;
     private summarizeDataAnswer;
     private jsonModelText;
     private callSingleUser;

@@ -56,10 +56,6 @@ let AiService = AiService_1 = class AiService {
             intent = 'data';
         }
         if (intent === 'chat') {
-            const inScope = this.isConversationMetaRequest(lastUser) || (await this.classifyChatInScope(model, lastUser));
-            if (!inScope) {
-                return { type: 'text', message: "I can't help with that.", meta: { intent: 'chat' } };
-            }
             const message = await this.callLLM(model, (0, system_prompt_1.buildSystemPrompt)(), turns, 0.65);
             return { type: 'text', message, meta: { intent: 'chat' } };
         }
@@ -74,16 +70,6 @@ let AiService = AiService_1 = class AiService {
         }
         catch {
             return 'chat';
-        }
-    }
-    async classifyChatInScope(model, lastUserMessage) {
-        const raw = await this.jsonModelText(model, agent_prompts_1.agentChatInScopeSystem, lastUserMessage, 0.1);
-        try {
-            const o = JSON.parse(raw);
-            return o.scope === 'in_scope';
-        }
-        catch {
-            return false;
         }
     }
     async runDataPipeline(model, userQuestion) {
@@ -194,29 +180,6 @@ let AiService = AiService_1 = class AiService {
         }
         return false;
     }
-    isConversationMetaRequest(text) {
-        const q = text.toLowerCase();
-        return (q.includes('last message') ||
-            q.includes('last messages') ||
-            q.includes('previous message') ||
-            q.includes('previous answer') ||
-            q.includes('summarize our conversation') ||
-            q.includes('summarize the conversation') ||
-            q.includes('what did i ask') ||
-            q.includes('what did i say') ||
-            q.includes('repeat your answer') ||
-            q.includes('repeat your last answer') ||
-            q.includes('résume') ||
-            q.includes('resume la conversation') ||
-            q.includes('dernier message') ||
-            q.includes('derniers messages') ||
-            q.includes('message précédent') ||
-            q.includes('message precedent') ||
-            q.includes('ce que j ai dit') ||
-            q.includes('ce que j’ai dit') ||
-            q.includes('ta réponse précédente') ||
-            q.includes('ta reponse precedente'));
-    }
     async summarizeDataAnswer(model, userQuestion, plan, sql, data) {
         const preview = JSON.stringify(data).slice(0, 3500);
         const system = `You summarize query results for the user. Be brief, natural language, same language as the user's question when obvious. Do not repeat raw JSON; highlight counts or key facts.`;
@@ -231,7 +194,6 @@ let AiService = AiService_1 = class AiService {
         const completion = await this.openai.chat.completions.create({
             model,
             messages,
-            max_tokens: 1024,
             temperature,
             response_format: { type: 'json_object' },
         });
@@ -245,7 +207,6 @@ let AiService = AiService_1 = class AiService {
         const completion = await this.openai.chat.completions.create({
             model,
             messages,
-            max_tokens: 4096,
             temperature,
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';
@@ -260,7 +221,6 @@ let AiService = AiService_1 = class AiService {
         const completion = await this.openai.chat.completions.create({
             model,
             messages,
-            max_tokens: 4096,
             temperature,
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';

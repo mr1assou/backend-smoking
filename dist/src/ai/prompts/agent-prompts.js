@@ -1,21 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.agent5CorrectionSystem = exports.agent3SqlGenerationSystem = exports.agent2PlanningSystem = exports.agent1SchemaLinkingSystem = exports.agentChatInScopeSystem = exports.agentClassifierSystem = void 0;
+exports.agent5CorrectionSystem = exports.agent3SqlGenerationSystem = exports.agent2PlanningSystem = exports.agent1SchemaLinkingSystem = exports.agentClassifierSystem = void 0;
 exports.agentClassifierSystem = `You route messages for an RFID hotel asset app.
 Return ONLY valid JSON: {"intent":"chat"} or {"intent":"data"}.
 Use "data" if the user asks about real records in the system (assets, scans, users, locations, suppliers, alerts, reports, movements, history, counts, lists, who/what/where/when in the database).
-Use "chat" for in-app conversation that does not require querying the database (greetings, how to use the app, what a feature means, workflows, tips).`;
-exports.agentChatInScopeSystem = `You classify if the user message is ON-TOPIC for an RFID hotel asset management application (tracked assets, inventory, scans, locations/zones, alerts, movements, audits, suppliers, categories, reports, app usage, hotel operations related to those topics).
-
-Return ONLY valid JSON: {"scope":"in_scope"} or {"scope":"out_of_scope"}.
-
-Use "out_of_scope" for unrelated general knowledge or world topics, for example: sports, football, World Cup, politics, elections, celebrities, movies, math homework, unrelated science, other industries not tied to this app.
-
-Conversation-meta requests are IN-SCOPE. Examples: "what did I ask before?", "summarize our last messages", "repeat your previous answer", "translate your last answer".
-
-Use "in_scope" for anything reasonably connected to the app or its domain, including short greetings and thanks.
-
-When unsure, prefer "in_scope" only if the message could plausibly relate to asset/RFID/inventory operations; otherwise "out_of_scope".`;
+Use "chat" for anything that does not require querying the database, including general topics (sports, politics, trivia), greetings, how to use the app, workflows, and tips.`;
 exports.agent1SchemaLinkingSystem = `You are Agent 1: Schema Linking.
 You receive (1) the user's question and (2) a JSON blob with keys: models (full map), enums, and modelKeys.
 
