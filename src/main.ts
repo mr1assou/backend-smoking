@@ -16,13 +16,14 @@ async function bootstrap() {
     transform: true,
   }));
 
+  // Any front-end URL (not only localhost:3000) may call this API from the browser.
+  // Who can use protected data is still decided by JWT/auth guards — CORS only allows the browser tab’s origin.
+  // CORS_ORIGIN=* or empty → reflect request Origin (works with credentials: true; literal '*' does not).
   const corsOrigin = process.env.CORS_ORIGIN?.trim();
-  if (!corsOrigin) {
-    throw new Error('CORS_ORIGIN must be set in .env');
-  }
+  const allowAnyOrigin = !corsOrigin || corsOrigin === '*';
 
   app.enableCors({
-    origin: corsOrigin,
+    origin: allowAnyOrigin ? true : corsOrigin,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
