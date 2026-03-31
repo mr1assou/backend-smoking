@@ -74,12 +74,17 @@ let AiService = AiService_1 = class AiService {
     }
     async runDataPipeline(model, userQuestion) {
         const fullSchemaPayload = (0, schema_context_1.serializeFullSchemaForAgents)();
-        const linkingRaw = await this.jsonModelText(model, agent_prompts_1.agent1SchemaLinkingSystem, `User question:\n${userQuestion}\n\nfullSchema:\n${fullSchemaPayload}`, 0.15);
+        const linkingRaw = await this.jsonModelText(model, agent_prompts_1.agent1SchemaLinkingSystem, `User question:\n${userQuestion}\n\nfullSchema:\n${fullSchemaPayload}`, 0.0);
         const { models: linkedModels, rationale } = parseLinkingJson(linkingRaw);
         const { filtered, usedFallback } = (0, schema_context_1.resolveFilteredSchema)(linkedModels);
         const filteredPayload = JSON.stringify({ models: filtered, enums: schema_maps_1.simpleEnums }, null, 2);
-        const plan = await this.callSingleUser(model, agent_prompts_1.agent2PlanningSystem, `User question:\n${userQuestion}\n\nFiltered schema:\n${filteredPayload}`, 0.25);
-        let sqlText = await this.callSingleUser(model, agent_prompts_1.agent3SqlGenerationSystem, `User question:\n${userQuestion}\n\nFiltered schema:\n${filteredPayload}\n\nExecution plan:\n${plan}`, 0.2);
+        const discoveredValues = await this.discoverDistinctValues(filtered);
+        const discoveredValuesPayload = JSON.stringify(discoveredValues, null, 2);
+        const valueMappingRaw = await this.jsonModelText(model, agent_prompts_1.agent15ValueMappingSystem, `User question:\n${userQuestion}\n\nFiltered schema:\n${filteredPayload}\n\nDiscovered values:\n${discoveredValuesPayload}`, 0.0);
+        const valueMapping = parseJsonSafe(valueMappingRaw);
+        const valueMappingPayload = JSON.stringify(valueMapping ?? {}, null, 2);
+        const plan = await this.callSingleUser(model, agent_prompts_1.agent2PlanningSystem, `User question:\n${userQuestion}\n\nFiltered schema:\n${filteredPayload}\n\nDiscovered values:\n${discoveredValuesPayload}\n\nValue mapping:\n${valueMappingPayload}`, 0.0);
+        let sqlText = await this.callSingleUser(model, agent_prompts_1.agent3SqlGenerationSystem, `User question:\n${userQuestion}\n\nFiltered schema:\n${filteredPayload}\n\nDiscovered values:\n${discoveredValuesPayload}\n\nValue mapping:\n${valueMappingPayload}\n\nExecution plan:\n${plan}`, 0.0);
         let sql = (0, sql_guard_1.extractSqlFence)(sqlText) ?? sqlText.trim();
         let attempts = 0;
         let lastError;
@@ -91,7 +96,7 @@ let AiService = AiService_1 = class AiService {
                 this.logger.warn(`SQL guard rejected: ${guard.error}`);
                 if (attempts >= MAX_SQL_RETRIES)
                     break;
-                sqlText = await this.callSingleUser(model, agent_prompts_1.agent5CorrectionSystem, `User question:\n${userQuestion}\n\nPlan:\n${plan}\n\nRejected SQL:\n${sql}\n\nGuard error:\n${guard.error}`, 0.15);
+                sqlText = await this.callSingleUser(model, agent_prompts_1.agent5CorrectionSystem, `User question:\n${userQuestion}\n\nDiscovered values:\n${discoveredValuesPayload}\n\nValue mapping:\n${valueMappingPayload}\n\nPlan:\n${plan}\n\nRejected SQL:\n${sql}\n\nGuard error:\n${guard.error}`, 0.0);
                 sql = (0, sql_guard_1.extractSqlFence)(sqlText) ?? sqlText.trim();
                 continue;
             }
@@ -111,6 +116,7 @@ let AiService = AiService_1 = class AiService {
                         agent1_rationale: rationale,
                         agent1_fallback: usedFallback,
                         agent2_plan: plan,
+                        agent15_value_mapping: valueMapping ?? undefined,
                         agent4_guard_notes: guard.notes,
                         attempts,
                     },
@@ -121,7 +127,7 @@ let AiService = AiService_1 = class AiService {
                 this.logger.warn(`SQL execution failed (attempt ${attempts}): ${lastError}`);
                 if (attempts >= MAX_SQL_RETRIES)
                     break;
-                sqlText = await this.callSingleUser(model, agent_prompts_1.agent5CorrectionSystem, `User question:\n${userQuestion}\n\nPlan:\n${plan}\n\nFailed SQL:\n${guard.sql}\n\nDatabase error:\n${lastError}`, 0.15);
+                sqlText = await this.callSingleUser(model, agent_prompts_1.agent5CorrectionSystem, `User question:\n${userQuestion}\n\nDiscovered values:\n${discoveredValuesPayload}\n\nValue mapping:\n${valueMappingPayload}\n\nPlan:\n${plan}\n\nFailed SQL:\n${guard.sql}\n\nDatabase error:\n${lastError}`, 0.0);
                 sql = (0, sql_guard_1.extractSqlFence)(sqlText) ?? sqlText.trim();
             }
         }
@@ -138,6 +144,7 @@ let AiService = AiService_1 = class AiService {
                 agent1_rationale: rationale,
                 agent1_fallback: usedFallback,
                 agent2_plan: plan,
+                agent15_value_mapping: valueMapping ?? undefined,
                 attempts,
                 last_error: lastError,
             },
@@ -184,7 +191,33 @@ let AiService = AiService_1 = class AiService {
         const preview = JSON.stringify(data).slice(0, 3500);
         const system = `You summarize query results for the user. Be brief, natural language, same language as the user's question when obvious. Do not repeat raw JSON; highlight counts or key facts.`;
         const user = `Question: ${userQuestion}\n\nPlan (reference):\n${plan.slice(0, 2000)}\n\nResult preview:\n${preview}`;
-        return this.callSingleUser(model, system, user, 0.4);
+        return this.callSingleUser(model, system, user, 0.2);
+    }
+    async discoverDistinctValues(filteredModels) {
+        const out = {};
+        for (const [, model] of Object.entries(filteredModels)) {
+            const table = model.table;
+            const columns = Object.entries(model.fields)
+                .filter(([, desc]) => /Status|Type|Role|\|/i.test(desc))
+                .map(([field]) => field);
+            if (columns.length === 0)
+                continue;
+            out[table] = {};
+            for (const col of columns) {
+                try {
+                    const rows = await this.prisma.$queryRawUnsafe(`SELECT DISTINCT "${col}"::text AS value FROM "${table}" WHERE "${col}" IS NOT NULL ORDER BY 1 LIMIT 50`);
+                    out[table][col] = rows
+                        .map((r) => (typeof r.value === 'string' ? r.value : String(r.value)))
+                        .filter((v) => v.length > 0);
+                }
+                catch (e) {
+                    this.logger.warn(`Value discovery failed for ${table}.${col}: ${e instanceof Error ? e.message : String(e)}`);
+                }
+            }
+            if (Object.keys(out[table]).length === 0)
+                delete out[table];
+        }
+        return out;
     }
     async jsonModelText(model, system, user, temperature) {
         const messages = [
@@ -241,6 +274,14 @@ function parseLinkingJson(raw) {
     }
     catch {
         return { models: [] };
+    }
+}
+function parseJsonSafe(raw) {
+    try {
+        return JSON.parse(raw);
+    }
+    catch {
+        return undefined;
     }
 }
 function serializeQueryResult(data) {

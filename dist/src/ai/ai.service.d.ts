@@ -17,6 +17,7 @@ export interface ChatResult {
         agent1_rationale?: string;
         agent1_fallback?: boolean;
         agent2_plan?: string;
+        agent15_value_mapping?: unknown;
         agent4_guard_notes?: string;
         attempts?: number;
         last_error?: string;
@@ -34,6 +35,7 @@ export declare class AiService {
     private isBudgetOrReplacementQuestion;
     private isSensitiveRequest;
     private summarizeDataAnswer;
+    private discoverDistinctValues;
     private jsonModelText;
     private callSingleUser;
     private callLLM;
