@@ -21,7 +21,7 @@ async function main() {
         },
     });
 
-    const auditEmail = 'audit@royalmansour.ma';
+     const auditEmail = 'audit@royalmansour.ma';
     await prisma.user.upsert({
         where: { email: auditEmail },
         update: {},
