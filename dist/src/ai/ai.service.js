@@ -16,7 +16,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AiService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const sdk_1 = __importDefault(require("@anthropic-ai/sdk"));
 const openai_1 = __importDefault(require("openai"));
 const schema_context_1 = require("./knowledge/schema-context");
 const schema_maps_1 = require("./knowledge/schema_maps");
@@ -30,48 +29,24 @@ let AiService = AiService_1 = class AiService {
     config;
     prisma;
     logger = new common_1.Logger(AiService_1.name);
-    provider;
-    anthropic;
     openai;
     constructor(config, prisma) {
         this.config = config;
         this.prisma = prisma;
-        const claudeKey = this.config.get('Claude_API_KEY')?.trim() ??
-            this.config.get('ANTHROPIC_API_KEY')?.trim();
         const openaiKey = this.config.get('OPENAI_API_KEY')?.trim();
-        if (claudeKey) {
-            this.anthropic = new sdk_1.default({ apiKey: claudeKey });
-            this.openai = null;
-            this.provider = 'anthropic';
+        this.openai = openaiKey ? new openai_1.default({ apiKey: openaiKey }) : null;
+        if (!this.openai) {
+            this.logger.warn('OPENAI_API_KEY is not configured.');
         }
-        else if (openaiKey) {
-            this.openai = new openai_1.default({ apiKey: openaiKey });
-            this.anthropic = null;
-            this.provider = 'openai';
-        }
-        else {
-            this.anthropic = null;
-            this.openai = null;
-            this.provider = null;
-        }
-        if (!this.provider) {
-            this.logger.warn('No LLM configured. Set Claude_API_KEY (or ANTHROPIC_API_KEY) or OPENAI_API_KEY.');
-        }
-    }
-    getChatModel() {
-        if (this.provider === 'anthropic') {
-            return this.config.get('Claude_MODEL')?.trim() || 'claude-opus-4-6';
-        }
-        return this.config.get('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
     }
     async chatWithHistory(turns) {
-        if (!this.provider) {
-            throw new common_1.ServiceUnavailableException('No LLM configured. Set Claude_API_KEY and Claude_MODEL (or OPENAI_API_KEY) in the environment.');
+        if (!this.openai) {
+            throw new common_1.ServiceUnavailableException('OpenAI is not configured. Set OPENAI_API_KEY in the environment.');
         }
         if (turns.length === 0) {
             throw new common_1.BadRequestException('messages must not be empty');
         }
-        const model = this.getChatModel();
+        const model = this.config.get('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
         const lastUser = [...turns].reverse().find((t) => t.role === 'user')?.content?.trim() ?? '';
         if (this.isSensitiveRequest(lastUser)) {
             return { type: 'text', message: "I can't help with that.", meta: { intent: 'chat' } };
@@ -245,12 +220,6 @@ let AiService = AiService_1 = class AiService {
         return out;
     }
     async jsonModelText(model, system, user, temperature) {
-        if (this.provider === 'anthropic') {
-            const sys = system +
-                '\n\nRespond with a single valid JSON object only. No markdown fences, no text outside the JSON.';
-            const text = await this.anthropicMessages(model, sys, user, temperature);
-            return text || '{}';
-        }
         const messages = [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -264,9 +233,6 @@ let AiService = AiService_1 = class AiService {
         return completion.choices[0]?.message?.content?.trim() ?? '{}';
     }
     async callSingleUser(model, system, user, temperature) {
-        if (this.provider === 'anthropic') {
-            return this.anthropicMessages(model, system, user, temperature);
-        }
         const messages = [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -279,9 +245,6 @@ let AiService = AiService_1 = class AiService {
         return completion.choices[0]?.message?.content?.trim() ?? '';
     }
     async callLLM(model, systemPrompt, turns, temperature) {
-        if (this.provider === 'anthropic') {
-            return this.anthropicCallWithHistory(model, systemPrompt, turns, temperature);
-        }
         const cleanedSystemPrompt = systemPrompt.trim();
         const messages = [];
         if (cleanedSystemPrompt.length > 0) {
@@ -295,31 +258,6 @@ let AiService = AiService_1 = class AiService {
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';
     }
-    async anthropicMessages(model, system, user, temperature) {
-        const res = await this.anthropic.messages.create({
-            model,
-            max_tokens: 8192,
-            system,
-            messages: [{ role: 'user', content: user }],
-            temperature,
-        });
-        return anthropicTextContent(res);
-    }
-    async anthropicCallWithHistory(model, systemPrompt, turns, temperature) {
-        const system = systemPrompt.trim();
-        let msgs = turns.map((t) => ({ role: t.role, content: t.content }));
-        if (msgs.length > 0 && msgs[0].role === 'assistant') {
-            msgs = [{ role: 'user', content: '(context)\n' + msgs[0].content }, ...msgs.slice(1)];
-        }
-        const res = await this.anthropic.messages.create({
-            model,
-            max_tokens: 8192,
-            ...(system.length > 0 ? { system } : {}),
-            messages: msgs,
-            temperature,
-        });
-        return anthropicTextContent(res);
-    }
 };
 exports.AiService = AiService;
 exports.AiService = AiService = AiService_1 = __decorate([
@@ -327,13 +265,6 @@ exports.AiService = AiService = AiService_1 = __decorate([
     __metadata("design:paramtypes", [config_1.ConfigService,
         prisma_service_1.PrismaService])
 ], AiService);
-function anthropicTextContent(res) {
-    return res.content
-        .filter((b) => b.type === 'text')
-        .map((b) => b.text)
-        .join('')
-        .trim();
-}
 function parseLinkingJson(raw) {
     try {
         const o = JSON.parse(raw);

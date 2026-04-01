@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { serializeFullSchemaForAgents, resolveFilteredSchema } from './knowledge/schema-context';
 import { simpleEnums } from './knowledge/schema_maps';
@@ -41,59 +40,31 @@ export interface ChatResult {
 const MAX_SQL_RETRIES = 3;
 const SQL_MAX_LIMIT = 100;
 
-type LlmProvider = 'anthropic' | 'openai';
-
 @Injectable()
 export class AiService {
     private readonly logger = new Logger(AiService.name);
-    private readonly provider: LlmProvider | null;
-    private anthropic: Anthropic | null;
     private openai: OpenAI | null;
 
     constructor(
         private config: ConfigService,
         private prisma: PrismaService,
     ) {
-        const claudeKey =
-            this.config.get<string>('Claude_API_KEY')?.trim() ??
-            this.config.get<string>('ANTHROPIC_API_KEY')?.trim();
         const openaiKey = this.config.get<string>('OPENAI_API_KEY')?.trim();
-        if (claudeKey) {
-            this.anthropic = new Anthropic({ apiKey: claudeKey });
-            this.openai = null;
-            this.provider = 'anthropic';
-        } else if (openaiKey) {
-            this.openai = new OpenAI({ apiKey: openaiKey });
-            this.anthropic = null;
-            this.provider = 'openai';
-        } else {
-            this.anthropic = null;
-            this.openai = null;
-            this.provider = null;
+        this.openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
+        if (!this.openai) {
+            this.logger.warn('OPENAI_API_KEY is not configured.');
         }
-        if (!this.provider) {
-            this.logger.warn('No LLM configured. Set Claude_API_KEY (or ANTHROPIC_API_KEY) or OPENAI_API_KEY.');
-        }
-    }
-
-    private getChatModel(): string {
-        if (this.provider === 'anthropic') {
-            return this.config.get<string>('Claude_MODEL')?.trim() || 'claude-opus-4-6';
-        }
-        return this.config.get<string>('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
     }
 
     async chatWithHistory(turns: ChatTurn[]): Promise<ChatResult> {
-        if (!this.provider) {
-            throw new ServiceUnavailableException(
-                'No LLM configured. Set Claude_API_KEY and Claude_MODEL (or OPENAI_API_KEY) in the environment.',
-            );
+        if (!this.openai) {
+            throw new ServiceUnavailableException('OpenAI is not configured. Set OPENAI_API_KEY in the environment.');
         }
         if (turns.length === 0) {
             throw new BadRequestException('messages must not be empty');
         }
 
-        const model = this.getChatModel();
+        const model = this.config.get<string>('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
         const lastUser = [...turns].reverse().find((t) => t.role === 'user')?.content?.trim() ?? '';
 
         if (this.isSensitiveRequest(lastUser)) {
@@ -332,13 +303,6 @@ export class AiService {
     }
 
     private async jsonModelText(model: string, system: string, user: string, temperature: number): Promise<string> {
-        if (this.provider === 'anthropic') {
-            const sys =
-                system +
-                '\n\nRespond with a single valid JSON object only. No markdown fences, no text outside the JSON.';
-            const text = await this.anthropicMessages(model, sys, user, temperature);
-            return text || '{}';
-        }
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -353,9 +317,6 @@ export class AiService {
     }
 
     private async callSingleUser(model: string, system: string, user: string, temperature: number): Promise<string> {
-        if (this.provider === 'anthropic') {
-            return this.anthropicMessages(model, system, user, temperature);
-        }
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -374,9 +335,6 @@ export class AiService {
         turns: { role: 'user' | 'assistant'; content: string }[],
         temperature: number,
     ): Promise<string> {
-        if (this.provider === 'anthropic') {
-            return this.anthropicCallWithHistory(model, systemPrompt, turns, temperature);
-        }
         const cleanedSystemPrompt = systemPrompt.trim();
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
         if (cleanedSystemPrompt.length > 0) {
@@ -394,51 +352,6 @@ export class AiService {
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';
     }
-
-    private async anthropicMessages(
-        model: string,
-        system: string,
-        user: string,
-        temperature: number,
-    ): Promise<string> {
-        const res = await this.anthropic!.messages.create({
-            model,
-            max_tokens: 8192,
-            system,
-            messages: [{ role: 'user', content: user }],
-            temperature,
-        });
-        return anthropicTextContent(res);
-    }
-
-    private async anthropicCallWithHistory(
-        model: string,
-        systemPrompt: string,
-        turns: { role: 'user' | 'assistant'; content: string }[],
-        temperature: number,
-    ): Promise<string> {
-        const system = systemPrompt.trim();
-        let msgs = turns.map((t) => ({ role: t.role as 'user' | 'assistant', content: t.content }));
-        if (msgs.length > 0 && msgs[0].role === 'assistant') {
-            msgs = [{ role: 'user', content: '(context)\n' + msgs[0].content }, ...msgs.slice(1)];
-        }
-        const res = await this.anthropic!.messages.create({
-            model,
-            max_tokens: 8192,
-            ...(system.length > 0 ? { system } : {}),
-            messages: msgs,
-            temperature,
-        });
-        return anthropicTextContent(res);
-    }
-}
-
-function anthropicTextContent(res: Anthropic.Messages.Message): string {
-    return res.content
-        .filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text')
-        .map((b) => b.text)
-        .join('')
-        .trim();
 }
 
 function parseLinkingJson(raw: string): { models: string[]; rationale?: string } {

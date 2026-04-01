@@ -27,11 +27,8 @@ export declare class AiService {
     private config;
     private prisma;
     private readonly logger;
-    private readonly provider;
-    private anthropic;
     private openai;
     constructor(config: ConfigService, prisma: PrismaService);
-    private getChatModel;
     chatWithHistory(turns: ChatTurn[]): Promise<ChatResult>;
     private classifyIntent;
     private runDataPipeline;
@@ -42,6 +39,4 @@ export declare class AiService {
     private jsonModelText;
     private callSingleUser;
     private callLLM;
-    private anthropicMessages;
-    private anthropicCallWithHistory;
 }
