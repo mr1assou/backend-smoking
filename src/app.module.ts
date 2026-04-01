@@ -28,6 +28,7 @@ import { InventoryModule } from './inventory/inventory.module';
     AlertsModule,
     FilesModule,
     InventoryModule,
+    
   ],
 })
 export class AppModule {}
