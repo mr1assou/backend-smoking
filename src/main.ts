@@ -35,7 +35,7 @@ async function bootstrap() {
     res.json({ message: 'Welcome to Hotel Royal Manssour API! 🏨' });
   });
 
-  // Render (and other hosts) set PORT; local dev defaults to 3001
+  // Render (and other hosts) set PORT; local dev defaults to  3001
   const port = parseInt(process.env.PORT ?? '3001', 10);
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: ${await app.getUrl()}`);
