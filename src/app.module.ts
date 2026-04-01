@@ -11,6 +11,7 @@ import { AiModule } from './ai/ai.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { FilesModule } from './files/files.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { InventoryModule } from './inventory/inventory.module';
     AlertsModule,
     FilesModule,
     InventoryModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}
