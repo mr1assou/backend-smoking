@@ -52,11 +52,11 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 function postgresUrlWithoutSslMode(connectionString) {
     try {
-        const u = new URL(connectionString.replace(/^postgresql:/i, "https:"));
-        u.searchParams.delete("sslmode");
-        u.searchParams.delete("uselibpqcompat");
-        let out = u.toString().replace(/^https:/i, "postgresql:");
-        out = out.replace(/\?$/, "");
+        const u = new URL(connectionString.replace(/^postgresql:/i, 'https:'));
+        u.searchParams.delete('sslmode');
+        u.searchParams.delete('uselibpqcompat');
+        let out = u.toString().replace(/^https:/i, 'postgresql:');
+        out = out.replace(/\?$/, '');
         return out;
     }
     catch {
@@ -64,14 +64,13 @@ function postgresUrlWithoutSslMode(connectionString) {
     }
 }
 function tlsVerifyDisabledExplicit() {
-    const raw = process.env.DATABASE_SSL_REJECT_UNAUTHORIZED?.trim().toLowerCase() ??
-        "";
-    return raw === "false" || raw === "0" || raw === "no";
+    const raw = process.env.DATABASE_SSL_REJECT_UNAUTHORIZED?.trim().toLowerCase() ?? '';
+    return raw === 'false' || raw === '0' || raw === 'no';
 }
 function findPackageRoot(startDir) {
     let dir = startDir;
     for (let i = 0; i < 8; i++) {
-        if (fs.existsSync(path.join(dir, "package.json"))) {
+        if (fs.existsSync(path.join(dir, 'package.json'))) {
             return dir;
         }
         const parent = path.dirname(dir);
@@ -84,8 +83,11 @@ function findPackageRoot(startDir) {
 }
 function loadCaPem(sslCaConfig) {
     const trimmed = sslCaConfig.trim();
-    if (trimmed.includes("-----BEGIN")) {
-        return { pem: trimmed.replace(/\\n/g, "\n"), source: "DATABASE_SSL_CA (inline PEM)" };
+    if (trimmed.includes('-----BEGIN')) {
+        return {
+            pem: trimmed.replace(/\\n/g, '\n'),
+            source: 'DATABASE_SSL_CA (inline PEM)',
+        };
     }
     const root = findPackageRoot(__dirname);
     const candidates = [
@@ -94,20 +96,21 @@ function loadCaPem(sslCaConfig) {
     ];
     for (const caPath of candidates) {
         if (fs.existsSync(caPath)) {
-            return { pem: fs.readFileSync(caPath, "utf-8"), source: caPath };
+            return { pem: fs.readFileSync(caPath, 'utf-8'), source: caPath };
         }
     }
-    throw new Error(`DATABASE_SSL_CA file not found. Tried: ${candidates.join(", ")} (cwd=${process.cwd()})`);
+    throw new Error(`DATABASE_SSL_CA file not found. Tried: ${candidates.join(', ')} (cwd=${process.cwd()})`);
 }
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     config;
     driverPool;
     constructor(config) {
-        const connectionString = config.get("DATABASE_URL")?.trim() || process.env.DATABASE_URL?.trim();
+        const connectionString = config.get('DATABASE_URL')?.trim() ||
+            process.env.DATABASE_URL?.trim();
         if (!connectionString) {
-            throw new Error("DATABASE_URL is not set");
+            throw new Error('DATABASE_URL is not set');
         }
-        const sslCa = config.get("DATABASE_SSL_CA")?.trim() ||
+        const sslCa = config.get('DATABASE_SSL_CA')?.trim() ||
             process.env.DATABASE_SSL_CA?.trim();
         const isAivenHost = /\.aivencloud\.com/i.test(connectionString);
         const skipTlsVerify = !sslCa && (tlsVerifyDisabledExplicit() || isAivenHost);
@@ -119,17 +122,19 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
                 rejectUnauthorized: true,
                 ca: pem,
             };
-            if (process.env.NODE_ENV !== "test") {
+            if (process.env.NODE_ENV !== 'test') {
                 console.warn(`[PrismaService] Postgres TLS: CA from ${source} (${pem.length} chars)`);
             }
         }
         else if (skipTlsVerify) {
             poolConfig.connectionString = postgresUrlWithoutSslMode(connectionString);
             poolConfig.ssl = { rejectUnauthorized: false };
-            if (process.env.NODE_ENV !== "test") {
-                console.warn("[PrismaService] Postgres TLS: rejectUnauthorized=false" +
-                    (isAivenHost ? " (Aiven host detected)" : " (DATABASE_SSL_REJECT_UNAUTHORIZED)") +
-                    ". Use DATABASE_SSL_CA for full verification when possible.");
+            if (process.env.NODE_ENV !== 'test') {
+                console.warn('[PrismaService] Postgres TLS: rejectUnauthorized=false' +
+                    (isAivenHost
+                        ? ' (Aiven host detected)'
+                        : ' (DATABASE_SSL_REJECT_UNAUTHORIZED)') +
+                    '. Use DATABASE_SSL_CA for full verification when possible.');
             }
         }
         else {

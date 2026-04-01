@@ -1,6 +1,6 @@
-import { OnModuleInit, OnModuleDestroy } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
-import { ConfigService } from "@nestjs/config";
+import { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 export declare class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
     private config;
     private readonly driverPool;

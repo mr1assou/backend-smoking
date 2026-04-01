@@ -56,7 +56,7 @@ let AlertsService = class AlertsService {
     }
     async create(createAlertDto, imageFile) {
         const { asset_id, comment, location_id, status } = createAlertDto;
-        let { photo_url } = createAlertDto;
+        const { photo_url } = createAlertDto;
         const type = createAlertDto.type || status;
         if (asset_id) {
             const existingAlert = await this.prisma.alert.findFirst({

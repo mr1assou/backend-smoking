@@ -63,7 +63,7 @@ let AuthService = class AuthService {
             data: {
                 email: dto.email,
                 password: hashedPassword,
-                name: dto.name
+                name: dto.name,
             },
         });
         const tokens = await this.generateTokens(user.id, user.email, user.role, user.name);

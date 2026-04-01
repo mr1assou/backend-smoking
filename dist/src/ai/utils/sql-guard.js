@@ -13,7 +13,10 @@ function guardReadOnlySelect(raw, maxLimit = 100) {
     }
     s = withoutTrailingSemi;
     if (!/^\s*(select|with)\b/is.test(s)) {
-        return { ok: false, error: 'Only SELECT or WITH…SELECT queries are allowed' };
+        return {
+            ok: false,
+            error: 'Only SELECT or WITH…SELECT queries are allowed',
+        };
     }
     if (FORBIDDEN.test(s)) {
         return { ok: false, error: 'Forbidden keyword or pattern detected' };
@@ -28,10 +31,16 @@ function enforceLimitClause(sql, max) {
     }
     const n = parseInt(m[1], 10);
     if (Number.isNaN(n) || n < 1) {
-        return { sql: sql.replace(/\blimit\s+\d+/i, `LIMIT ${max}`), notes: `Replaced invalid LIMIT with ${max}.` };
+        return {
+            sql: sql.replace(/\blimit\s+\d+/i, `LIMIT ${max}`),
+            notes: `Replaced invalid LIMIT with ${max}.`,
+        };
     }
     if (n > max) {
-        return { sql: sql.replace(/\blimit\s+\d+/i, `LIMIT ${max}`), notes: `Capped LIMIT from ${n} to ${max}.` };
+        return {
+            sql: sql.replace(/\blimit\s+\d+/i, `LIMIT ${max}`),
+            notes: `Capped LIMIT from ${n} to ${max}.`,
+        };
     }
     return { sql, notes: 'LIMIT present and within cap.' };
 }

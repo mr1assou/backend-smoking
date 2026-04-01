@@ -1,1 +1,1 @@
-{"version":3,"file":"create-session.dto.js","sourceRoot":"","sources":["../../../../src/inventory/dto/create-session.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAyC;AAEzC,MAAa,gBAAgB;IAEzB,WAAW,CAAS;CACvB;AAHD,4CAGC;AADG;IADC,IAAA,wBAAM,GAAE;;qDACW"}
+{"version":3,"file":"create-session.dto.js","sourceRoot":"","sources":["../../../../src/inventory/dto/create-session.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAyC;AAEzC,MAAa,gBAAgB;IAE3B,WAAW,CAAS;CACrB;AAHD,4CAGC;AADC;IADC,IAAA,wBAAM,GAAE;;qDACW"}

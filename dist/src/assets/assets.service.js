@@ -113,7 +113,7 @@ let AssetsService = class AssetsService {
                 },
             },
         });
-        return assets.map(asset => this.mapToOutput(asset));
+        return assets.map((asset) => this.mapToOutput(asset));
     }
     async findOrphans(query) {
         const where = { tag_id: null };
@@ -158,11 +158,15 @@ let AssetsService = class AssetsService {
         const trimmedTag = tagId.trim();
         if (!trimmedTag)
             throw new common_1.BadRequestException('tag_id est requis');
-        const existing = await this.prisma.asset.findUnique({ where: { tag_id: trimmedTag } });
+        const existing = await this.prisma.asset.findUnique({
+            where: { tag_id: trimmedTag },
+        });
         if (existing) {
             throw new common_1.ConflictException(`Le tag "${trimmedTag}" est déjà associé à l'actif "${existing.name}"`);
         }
-        const asset = await this.prisma.asset.findUnique({ where: { id: assetId } });
+        const asset = await this.prisma.asset.findUnique({
+            where: { id: assetId },
+        });
         if (!asset)
             throw new common_1.NotFoundException('Actif introuvable');
         if (asset.tag_id) {
@@ -193,7 +197,9 @@ let AssetsService = class AssetsService {
             for (const table of tables) {
                 await this.prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`);
             }
-            return { message: 'Données réinitialisées avec succès (utilisateurs conservés)' };
+            return {
+                message: 'Données réinitialisées avec succès (utilisateurs conservés)',
+            };
         }
         catch (error) {
             console.error('Erreur lors du Reset:', error);
@@ -202,7 +208,9 @@ let AssetsService = class AssetsService {
     }
     async create(dto) {
         if (dto.tag_id) {
-            const existing = await this.prisma.asset.findUnique({ where: { tag_id: dto.tag_id } });
+            const existing = await this.prisma.asset.findUnique({
+                where: { tag_id: dto.tag_id },
+            });
             if (existing) {
                 throw new common_1.ConflictException('Ce tag RFID est déjà associé à un actif');
             }
@@ -220,7 +228,9 @@ let AssetsService = class AssetsService {
             throw new common_1.BadRequestException('category_id ou category est requis');
         let locationId = dto.location_id;
         if (!locationId && dto.location) {
-            const loc = await this.prisma.location.findFirst({ where: { name: dto.location } });
+            const loc = await this.prisma.location.findFirst({
+                where: { name: dto.location },
+            });
             if (!loc)
                 throw new common_1.BadRequestException(`Localisation "${dto.location}" introuvable`);
             locationId = loc.id;
@@ -229,16 +239,23 @@ let AssetsService = class AssetsService {
             throw new common_1.BadRequestException('location_id ou location est requis');
         let supplierId = dto.supplier_id;
         if (!supplierId && dto.supplier) {
-            const sup = await this.prisma.supplier.findFirst({ where: { name: dto.supplier } });
+            const sup = await this.prisma.supplier.findFirst({
+                where: { name: dto.supplier },
+            });
             if (!sup)
                 throw new common_1.BadRequestException(`Fournisseur "${dto.supplier}" introuvable`);
             supplierId = sup.id;
         }
         if (!supplierId) {
-            let defaultSupplier = await this.prisma.supplier.findFirst({ where: { name: 'Maroc Bureau' } });
+            let defaultSupplier = await this.prisma.supplier.findFirst({
+                where: { name: 'Maroc Bureau' },
+            });
             if (!defaultSupplier) {
                 defaultSupplier = await this.prisma.supplier.create({
-                    data: { name: 'Maroc Bureau', contact_email: 'contact@marocbureau.ma' },
+                    data: {
+                        name: 'Maroc Bureau',
+                        contact_email: 'contact@marocbureau.ma',
+                    },
                 });
             }
             supplierId = defaultSupplier.id;
@@ -269,7 +286,9 @@ let AssetsService = class AssetsService {
                 brand: dto.brand || 'Générique',
                 model: dto.model || 'Standard',
                 supplier_id: supplierId,
-                purchase_date: dto.purchase_date ? new Date(dto.purchase_date) : new Date(),
+                purchase_date: dto.purchase_date
+                    ? new Date(dto.purchase_date)
+                    : new Date(),
                 price: dto.price ?? 0,
                 warranty_end: dto.warranty_end ? new Date(dto.warranty_end) : null,
                 location_id: locationId,
@@ -294,24 +313,30 @@ let AssetsService = class AssetsService {
             errors: [],
             total: data.length,
         };
-        let mainHotel = await this.prisma.location.findFirst({ where: { type: 'HOTEL' } });
+        let mainHotel = await this.prisma.location.findFirst({
+            where: { type: 'HOTEL' },
+        });
         if (!mainHotel) {
             mainHotel = await this.prisma.location.create({
                 data: { name: 'Royal Mansour Marrakech', type: 'HOTEL' },
             });
         }
-        let defaultSupplier = await this.prisma.supplier.findFirst({ where: { name: 'Maroc Bureau' } });
+        let defaultSupplier = await this.prisma.supplier.findFirst({
+            where: { name: 'Maroc Bureau' },
+        });
         if (!defaultSupplier) {
             defaultSupplier = await this.prisma.supplier.create({
                 data: { name: 'Maroc Bureau', contact_email: 'contact@marocbureau.ma' },
             });
         }
-        const admin = await this.prisma.user.findFirst({ where: { role: 'ADMIN' } });
+        const admin = await this.prisma.user.findFirst({
+            where: { role: 'ADMIN' },
+        });
         for (const [index, row] of data.entries()) {
             try {
                 const rawRow = row;
                 const r = {};
-                Object.keys(rawRow).forEach(key => {
+                Object.keys(rawRow).forEach((key) => {
                     r[key.toLowerCase().trim()] = rawRow[key];
                 });
                 const name = (r['nom'] || r['name'])?.toString()?.trim();
@@ -321,12 +346,20 @@ let AssetsService = class AssetsService {
                 }
                 const raw_tag = r['id (tag rfid)'] || r['tag_id'] || r['rfid'] || r['id'];
                 const tag_id = raw_tag?.toString()?.trim() || null;
-                const category_name = (r['catégorie'] || r['categorie'] || r['category'])?.toString()?.trim() || 'Mobilier';
-                const location_name = (r['localisation'] || r['location'] || r['emplacement'])?.toString()?.trim() || 'Entrepôt';
-                const price = parseFloat(r["prix d'achat"] || r['prix'] || r['purchase_price']) || 0;
-                const purchase_year = parseInt(r["année d'achat"] || r['annee'] || r['purchase_year']) || new Date().getFullYear();
+                const category_name = (r['catégorie'] || r['categorie'] || r['category'])
+                    ?.toString()
+                    ?.trim() || 'Mobilier';
+                const location_name = (r['localisation'] || r['location'] || r['emplacement'])
+                    ?.toString()
+                    ?.trim() || 'Entrepôt';
+                const price = parseFloat(r["prix d'achat"] || r['prix'] || r['purchase_price']) ||
+                    0;
+                const purchase_year = parseInt(r["année d'achat"] || r['annee'] || r['purchase_year']) ||
+                    new Date().getFullYear();
                 const brand = (r['marque'] || r['brand'])?.toString()?.trim() || 'Générique';
-                const status_raw = (r['état'] || r['etat'] || r['status'])?.toString()?.trim();
+                const status_raw = (r['état'] || r['etat'] || r['status'])
+                    ?.toString()
+                    ?.trim();
                 const status = this.mapStatus(status_raw);
                 await this.prisma.$transaction(async (tx) => {
                     const category = await tx.category.upsert({
@@ -334,10 +367,16 @@ let AssetsService = class AssetsService {
                         update: {},
                         create: { name: category_name },
                     });
-                    let location = await tx.location.findFirst({ where: { name: location_name } });
+                    let location = await tx.location.findFirst({
+                        where: { name: location_name },
+                    });
                     if (!location) {
                         location = await tx.location.create({
-                            data: { name: location_name, type: 'ZONE', parent_id: mainHotel?.id },
+                            data: {
+                                name: location_name,
+                                type: 'ZONE',
+                                parent_id: mainHotel?.id,
+                            },
                         });
                     }
                     const purchaseDate = new Date(purchase_year, 0, 1);
@@ -387,7 +426,10 @@ let AssetsService = class AssetsService {
                 summary.success++;
             }
             catch (error) {
-                summary.errors.push({ line: index + 2, message: error.message ?? String(error) });
+                summary.errors.push({
+                    line: index + 2,
+                    message: error.message ?? String(error),
+                });
             }
         }
         return summary;
@@ -423,9 +465,7 @@ let AssetsService = class AssetsService {
             [client_1.AssetStatus.TO_REPLACE]: 'rose',
         };
         const price = Number(asset.price);
-        const depreciationRate = price > 0
-            ? Math.round(Math.min(100, (1 - netValue / price) * 100))
-            : 0;
+        const depreciationRate = price > 0 ? Math.round(Math.min(100, (1 - netValue / price) * 100)) : 0;
         return {
             id: asset.id,
             tag_id: asset.tag_id ?? null,
@@ -451,7 +491,9 @@ let AssetsService = class AssetsService {
             movements: (asset.movements ?? []).map((m) => ({
                 id: m.id,
                 date: m.moved_at,
-                label: m.from_location_id ? "Déplacement d'actif" : 'Achat et réception - Entrepôt',
+                label: m.from_location_id
+                    ? "Déplacement d'actif"
+                    : 'Achat et réception - Entrepôt',
                 location: m.to_location?.name ?? 'Inconnu',
                 from: m.from_location?.name,
                 user: m.user?.name ?? 'Système',
@@ -474,9 +516,16 @@ let AssetsService = class AssetsService {
     getTemplate() {
         const xlsx = require('xlsx');
         const headers = [
-            "ID (TAG RFID)", "Nom", "Catégorie", "État",
-            "Prix d'achat", "Localisation", "Valeur nette",
-            "Dernier Scan", "Marque", "Année d'achat",
+            'ID (TAG RFID)',
+            'Nom',
+            'Catégorie',
+            'État',
+            "Prix d'achat",
+            'Localisation',
+            'Valeur nette',
+            'Dernier Scan',
+            'Marque',
+            "Année d'achat",
         ];
         const worksheet = xlsx.utils.aoa_to_sheet([headers]);
         const workbook = xlsx.utils.book_new();
