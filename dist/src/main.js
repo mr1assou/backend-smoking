@@ -14,11 +14,9 @@ async function bootstrap() {
         transform: true,
     }));
     const corsOrigin = process.env.CORS_ORIGIN?.trim();
-    if (!corsOrigin) {
-        throw new Error('CORS_ORIGIN must be set in .env');
-    }
+    const allowAnyOrigin = !corsOrigin || corsOrigin === '*';
     app.enableCors({
-        origin: corsOrigin,
+        origin: allowAnyOrigin ? true : corsOrigin,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
     });
@@ -27,7 +25,8 @@ async function bootstrap() {
     app.getHttpAdapter().get('/', (req, res) => {
         res.json({ message: 'Welcome to Hotel Royal Manssour API! 🏨' });
     });
-    await app.listen(3001, '0.0.0.0');
+    const port = parseInt(process.env.PORT ?? '3001', 10);
+    await app.listen(port, '0.0.0.0');
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

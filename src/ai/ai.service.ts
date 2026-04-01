@@ -156,7 +156,7 @@ export class AiService {
             }
 
             try {
-                const rows = await this.prisma.$queryRawUnsafe<unknown[]>(guard.sql);
+                const rows = await this.prisma.queryReadOnlySql(guard.sql);
                 const data = serializeQueryResult(rows);
                 const message = await this.summarizeDataAnswer(model, userQuestion, plan, guard.sql, data);
                 return {
@@ -177,7 +177,7 @@ export class AiService {
                     },
                 };
             } catch (e) {
-                lastError = e instanceof Error ? e.message : String(e);
+                lastError = formatPostgresErrorForAgent(e);
                 this.logger.warn(`SQL execution failed (attempt ${attempts}): ${lastError}`);
                 if (attempts >= MAX_SQL_RETRIES) break;
                 sqlText = await this.callSingleUser(
@@ -285,7 +285,7 @@ export class AiService {
             out[table] = {};
             for (const col of columns) {
                 try {
-                    const rows = await this.prisma.$queryRawUnsafe<Array<{ value: unknown }>>(
+                    const rows = await this.prisma.queryReadOnlySql(
                         `SELECT DISTINCT "${col}"::text AS value FROM "${table}" WHERE "${col}" IS NOT NULL ORDER BY 1 LIMIT 50`,
                     );
                     out[table][col] = rows
@@ -352,6 +352,18 @@ export class AiService {
         });
         return completion.choices[0]?.message?.content?.trim() ?? '';
     }
+}
+
+function formatPostgresErrorForAgent(e: unknown): string {
+    if (e && typeof e === 'object') {
+        const o = e as { message?: string; code?: string; detail?: string; hint?: string };
+        const parts = [o.code, o.message, o.detail, o.hint].filter(
+            (x): x is string => typeof x === 'string' && x.length > 0,
+        );
+        if (parts.length > 0) return parts.join(' | ');
+    }
+    if (e instanceof Error) return e.message;
+    return String(e);
 }
 
 function parseLinkingJson(raw: string): { models: string[]; rationale?: string } {

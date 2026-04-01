@@ -65,6 +65,9 @@ function loadCaPem(sslCaConfig: string): { pem: string; source: string } {
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  /** Same pool as PrismaPg — use for raw SELECTs where $queryRawUnsafe hits adapter/engine error-mapping bugs. */
+  private readonly driverPool: Pool;
+
   constructor(private config: ConfigService) {
     const connectionString =
       config.get<string>("DATABASE_URL")?.trim() || process.env.DATABASE_URL?.trim();
@@ -108,10 +111,20 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
 
     const pool = new Pool(poolConfig);
-    const adapter = new PrismaPg(pool);
-    super({ adapter });
+    super({ adapter: new PrismaPg(pool) });
+    this.driverPool = pool;
   }
-  
+
+  /**
+   * Run a read-only SELECT already validated by the app (e.g. AI SQL guard).
+   * Prefer this over $queryRawUnsafe for generated SQL: pg returns clear errors (e.g. invalid uuid),
+   * avoiding Prisma adapter `InvalidInputValue` deserialization issues.
+   */
+  async queryReadOnlySql(sql: string): Promise<Record<string, unknown>[]> {
+    const res = await this.driverPool.query(sql);
+    return res.rows as Record<string, unknown>[];
+  }
+
   async onModuleInit() {
     await this.$connect();
   }

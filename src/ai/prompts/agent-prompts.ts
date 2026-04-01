@@ -41,6 +41,13 @@ You receive the user question and a FILTERED database schema (JSON: models + enu
 
 Domain: RFID / tag / badge / puce (asset) = column assets.tag_id (text, optional). Filter with ILIKE or substring match when the user gives a partial number. Do not confuse tag_id with assets.id (UUID PK).
 
+**UUID columns (critical):** Primary keys and FKs such as assets.id, assets.category_id, assets.location_id, categories.id are PostgreSQL UUID type.
+- NEVER use WHERE id = 44 (integer) or WHERE id = '44' for a UUID column — PostgreSQL rejects it.
+- If the user says "asset 44", "actif 44", or a short number without a full UUID (8-4-4-4-12 hex), treat it as a tag or name fragment, not PK equality:
+  - Prefer a.tag_id ILIKE '%44%' OR a.name ILIKE '%44%'
+  - Or substring on UUID text: a.id::text ILIKE '%44%'
+- Only use exact equality on id when the user gave a full UUID string.
+
 Hard constraint: for categorical filters, use ONLY values provided in discovered_values or value_mapping.
 Never guess alternatives like switching between DAMAGED and TO_REPLACE unless value_mapping/discovered_values supports it.
 
@@ -62,6 +69,7 @@ You output a single PostgreSQL SELECT query (WITH…SELECT allowed if needed).
 Rules:
 - Use real table names from the schema JSON "table" field (snake_case: users, assets, locations, categories, suppliers, scans, alerts, reports, asset_history, asset_movements).
 - RFID / tag / badge / puce in user language maps to assets.tag_id. Example filter for "tag contains 5": WHERE a.tag_id IS NOT NULL AND a.tag_id ILIKE '%5%'. Use assets.id only when the user asks for internal UUID id.
+- UUID rule: never WHERE assets.id = 44 or = '44'. Short numbers like 44 mean tag_id or name ILIKE, or id::text ILIKE '%44%'. Full UUID only for exact = on uuid columns.
 - Categorical filters MUST use only values from discovered_values / value_mapping. Do not invent enum values.
 - Read-only: SELECT only. No INSERT/UPDATE/DELETE/DDL.
 - Include LIMIT at most 100 (prefer LIMIT 50 for large lists unless user needs more).
@@ -82,4 +90,5 @@ Return ONLY a corrected query in the same format:
 ...fixed query...
 \`\`\`
 
-Rules: single SELECT (or WITH…SELECT), same table names as before, LIMIT ≤ 100, read-only. Preserve mapping: RFID/tag language → assets.tag_id.`;
+Rules: single SELECT (or WITH…SELECT), same table names as before, LIMIT ≤ 100, read-only. Preserve mapping: RFID/tag language → assets.tag_id.
+If the error mentions invalid input syntax for type uuid, replace integer/string PK filters with tag_id ILIKE, name ILIKE, or id::text ILIKE as appropriate.`;
