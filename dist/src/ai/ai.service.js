@@ -126,7 +126,7 @@ let AiService = AiService_1 = class AiService {
                 continue;
             }
             try {
-                const rows = await this.prisma.queryReadOnlySql(guard.sql);
+                const rows = await this.prisma.$queryRawUnsafe(guard.sql);
                 const data = serializeQueryResult(rows);
                 const message = await this.summarizeDataAnswer(model, userQuestion, plan, guard.sql, data);
                 return {
@@ -148,7 +148,7 @@ let AiService = AiService_1 = class AiService {
                 };
             }
             catch (e) {
-                lastError = formatPostgresErrorForAgent(e);
+                lastError = e instanceof Error ? e.message : String(e);
                 this.logger.warn(`SQL execution failed (attempt ${attempts}): ${lastError}`);
                 if (attempts >= MAX_SQL_RETRIES)
                     break;
@@ -230,7 +230,7 @@ let AiService = AiService_1 = class AiService {
             out[table] = {};
             for (const col of columns) {
                 try {
-                    const rows = await this.prisma.queryReadOnlySql(`SELECT DISTINCT "${col}"::text AS value FROM "${table}" WHERE "${col}" IS NOT NULL ORDER BY 1 LIMIT 50`);
+                    const rows = await this.prisma.$queryRawUnsafe(`SELECT DISTINCT "${col}"::text AS value FROM "${table}" WHERE "${col}" IS NOT NULL ORDER BY 1 LIMIT 50`);
                     out[table][col] = rows
                         .map((r) => (typeof r.value === 'string' ? r.value : String(r.value)))
                         .filter((v) => v.length > 0);
@@ -333,17 +333,6 @@ function anthropicTextContent(res) {
         .map((b) => b.text)
         .join('')
         .trim();
-}
-function formatPostgresErrorForAgent(e) {
-    if (e && typeof e === 'object') {
-        const o = e;
-        const parts = [o.code, o.message, o.detail, o.hint].filter((x) => typeof x === 'string' && x.length > 0);
-        if (parts.length > 0)
-            return parts.join(' | ');
-    }
-    if (e instanceof Error)
-        return e.message;
-    return String(e);
 }
 function parseLinkingJson(raw) {
     try {

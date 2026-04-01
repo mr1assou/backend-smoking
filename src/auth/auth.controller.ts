@@ -18,7 +18,7 @@ import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Post('signup')
   async signup(
@@ -45,7 +45,10 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   async refresh(
-    @Req() req: Request & { user: { sub: string; email: string; refreshToken: string } },
+    @Req()
+    req: Request & {
+      user: { sub: string; email: string; refreshToken: string };
+    },
     @Res({ passthrough: true }) res: Response,
   ) {
     const { accessToken, refreshToken } = await this.authService.refresh(

@@ -4,8 +4,8 @@ import { AssetsController } from './assets.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-    imports: [PrismaModule],
-    providers: [AssetsService],
-    controllers: [AssetsController],
+  imports: [PrismaModule],
+  providers: [AssetsService],
+  controllers: [AssetsController],
 })
-export class AssetsModule { }
+export class AssetsModule {}

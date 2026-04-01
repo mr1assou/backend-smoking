@@ -1,69 +1,75 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateAssetDto {
-    @IsString()
-    @IsNotEmpty()
-    tag_id: string;
+  @IsString()
+  @IsNotEmpty()
+  tag_id: string;
 
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    // Catégorie : UUID direct OU nom texte libre (findOrCreate)
-    @IsUUID()
-    @IsOptional()
-    category_id?: string;
+  // Catégorie : UUID direct OU nom texte libre (findOrCreate)
+  @IsUUID()
+  @IsOptional()
+  category_id?: string;
 
-    @IsString()
-    @IsOptional()
-    category?: string;
+  @IsString()
+  @IsOptional()
+  category?: string;
 
-    // Localisation : UUID direct OU nom texte libre
-    @IsUUID()
-    @IsOptional()
-    location_id?: string;
+  // Localisation : UUID direct OU nom texte libre
+  @IsUUID()
+  @IsOptional()
+  location_id?: string;
 
-    @IsString()
-    @IsOptional()
-    location?: string;
+  @IsString()
+  @IsOptional()
+  location?: string;
 
-    // Fournisseur : UUID direct OU nom texte libre
-    @IsUUID()
-    @IsOptional()
-    supplier_id?: string;
+  // Fournisseur : UUID direct OU nom texte libre
+  @IsUUID()
+  @IsOptional()
+  supplier_id?: string;
 
-    @IsString()
-    @IsOptional()
-    supplier?: string;
+  @IsString()
+  @IsOptional()
+  supplier?: string;
 
-    // Statut : string libre — le service mappe vers AssetStatus
-    @IsString()
-    @IsOptional()
-    status?: string;
+  // Statut : string libre — le service mappe vers AssetStatus
+  @IsString()
+  @IsOptional()
+  status?: string;
 
-    @IsNumber()
-    @IsOptional()
-    price?: number;
+  @IsNumber()
+  @IsOptional()
+  price?: number;
 
-    @IsString()
-    @IsOptional()
-    brand?: string;
+  @IsString()
+  @IsOptional()
+  brand?: string;
 
-    @IsString()
-    @IsOptional()
-    model?: string;
+  @IsString()
+  @IsOptional()
+  model?: string;
 
-    // Dates en string libre — new Date() gère tous les formats ISO
-    @IsString()
-    @IsOptional()
-    purchase_date?: string;
+  // Dates en string libre — new Date() gère tous les formats ISO
+  @IsString()
+  @IsOptional()
+  purchase_date?: string;
 
-    @IsString()
-    @IsOptional()
-    warranty_end?: string;
+  @IsString()
+  @IsOptional()
+  warranty_end?: string;
 
-    // Image : base64 ou URL
-    @IsString()
-    @IsOptional()
-    image_url?: string;
+  // Image : base64 ou URL
+  @IsString()
+  @IsOptional()
+  image_url?: string;
 }

@@ -21,7 +21,7 @@ export class FilesService {
     try {
       // Nettoyer la chaîne base64 (enlever le préfixe data:image/jpeg;base64, si présent)
       const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '');
-      
+
       const fileName = `${uuidv4()}.jpg`;
       const filePath = path.join(this.uploadPath, fileName);
 
@@ -32,7 +32,9 @@ export class FilesService {
       return `/uploads/${fileName}`;
     } catch (error) {
       console.error('FilesService Error:', error);
-      throw new InternalServerErrorException("Erreur lors de l'enregistrement de l'image.");
+      throw new InternalServerErrorException(
+        "Erreur lors de l'enregistrement de l'image.",
+      );
     }
   }
 }

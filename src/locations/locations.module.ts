@@ -4,9 +4,9 @@ import { LocationsController } from './locations.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-    imports: [PrismaModule],
-    providers: [LocationsService],
-    controllers: [LocationsController],
-    exports: [LocationsService],
+  imports: [PrismaModule],
+  providers: [LocationsService],
+  controllers: [LocationsController],
+  exports: [LocationsService],
 })
-export class LocationsModule { }
+export class LocationsModule {}

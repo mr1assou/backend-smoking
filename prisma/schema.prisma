@@ -47,6 +47,12 @@ enum AlertStatus {
   RESOLVED
 }
 
+enum TagClassification {
+  EXPECTED
+  UNEXPECTED
+  UNKNOWN
+}
+
 // --- Modèles ---
 
 model User {
@@ -62,6 +68,7 @@ model User {
   reports            Report[]
   history            AssetHistory[]
   movements          AssetMovement[]
+  inventorySessions  InventorySession[]
 
   @@map("users")
 }
@@ -90,6 +97,7 @@ model Asset {
   alerts        Alert[]
   history       AssetHistory[]
   movements     AssetMovement[]
+  inventoryTags InventoryTag[]
 
   @@map("assets")
 }
@@ -108,6 +116,7 @@ model Location {
   alerts    Alert[]
   movements AssetMovement[] @relation("ToLocation")
   from_movements AssetMovement[] @relation("FromLocation")
+  inventorySessions InventorySession[]
 
   @@map("locations")
 }
@@ -195,6 +204,7 @@ model AssetMovement {
   to_location_id   String   @db.Uuid
   user_id          String   @db.Uuid
   scan_id          String?  @db.Uuid
+  session_id       String?  @db.Uuid
   moved_at         DateTime @default(now())
 
   asset            Asset    @relation(fields: [asset_id], references: [id])
@@ -202,6 +212,57 @@ model AssetMovement {
   to_location      Location  @relation("ToLocation", fields: [to_location_id], references: [id])
   user             User      @relation(fields: [user_id], references: [id])
   scan             Scan?     @relation(fields: [scan_id], references: [id])
+  session          InventorySession? @relation(fields: [session_id], references: [id])
 
+  @@index([session_id])
   @@map("asset_movements")
+}
+
+// --- Inventory Session & Tags ---
+
+model InventorySession {
+  id               String    @id @default(uuid()) @db.Uuid
+  user_id          String    @db.Uuid
+  location_id      String    @db.Uuid
+  started_at       DateTime  @default(now())
+  ended_at         DateTime?
+  last_scan_at     DateTime?
+
+  // Counters — computed on session close
+  total_scanned    Int       @default(0)
+  total_expected   Int       @default(0)
+  found_count      Int       @default(0)
+  missing_count    Int       @default(0)
+  unexpected_count Int       @default(0)
+  unknown_count    Int       @default(0)
+  movement_count   Int       @default(0)
+
+  user             User      @relation(fields: [user_id], references: [id])
+  location         Location  @relation(fields: [location_id], references: [id])
+  tags             InventoryTag[]
+  movements        AssetMovement[]
+
+  @@index([user_id])
+  @@index([location_id])
+  @@index([started_at(sort: Desc)])
+  @@map("inventory_sessions")
+}
+
+model InventoryTag {
+  id              String            @id @default(uuid()) @db.Uuid
+  session_id      String            @db.Uuid
+  epc_code        String
+  asset_id        String?           @db.Uuid
+  classification  TagClassification
+  rssi            Int?
+  scanned_at      DateTime          @default(now())
+
+  session         InventorySession  @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  asset           Asset?            @relation(fields: [asset_id], references: [id])
+
+  @@unique([session_id, epc_code])
+  @@index([session_id])
+  @@index([asset_id])
+  @@index([classification])
+  @@map("inventory_tags")
 }

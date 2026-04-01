@@ -10,6 +10,8 @@ import { LocationsModule } from './locations/locations.module';
 import { AiModule } from './ai/ai.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { FilesModule } from './files/files.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { FilesModule } from './files/files.module';
     AiModule,
     AlertsModule,
     FilesModule,
+    InventoryModule,
+    AnalyticsModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
