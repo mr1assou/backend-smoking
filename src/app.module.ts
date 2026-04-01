@@ -30,4 +30,4 @@ import { InventoryModule } from './inventory/inventory.module';
     InventoryModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

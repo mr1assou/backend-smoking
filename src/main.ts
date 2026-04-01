@@ -8,13 +8,15 @@ async function bootstrap() {
   mkdirSync('uploads', { recursive: true });
 
   const app = await NestFactory.create(AppModule);
-  
+
   // Validation globale des DTOs
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Any front-end URL (not only localhost:3000) may call this API from the browser.
   // Who can use protected data is still decided by JWT/auth guards — CORS only allows the browser tab’s origin.

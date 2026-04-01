@@ -1,6 +1,16 @@
 import {
-    Controller, Get, Param, UseGuards, Patch, Delete, Body,
-    Post, UseInterceptors, UploadedFile, Res, Query,
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  Patch,
+  Delete,
+  Body,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  Query,
 } from '@nestjs/common';
 import { AssetsService } from './assets.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -15,108 +25,106 @@ import { Response } from 'express';
 @Controller('assets')
 @UseGuards(JwtGuard, RolesGuard)
 export class AssetsController {
-    constructor(private readonly assetsService: AssetsService) { }
+  constructor(private readonly assetsService: AssetsService) {}
 
-    // ── Template Excel ─────────────────────────────────────────────────────────
+  // ── Template Excel ─────────────────────────────────────────────────────────
 
-    @Public()
-    @Get('template')
-    async getTemplate(@Res() res: Response) {
-        const buffer = this.assetsService.getTemplate();
-        res.set({
-            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition': 'attachment; filename="Template_AssetIQ.xlsx"',
-            'Content-Length': buffer.length,
-        });
-        res.end(buffer);
-    }
+  @Public()
+  @Get('template')
+  async getTemplate(@Res() res: Response) {
+    const buffer = this.assetsService.getTemplate();
+    res.set({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="Template_AssetIQ.xlsx"',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
+  }
 
-    // ── Import Excel ───────────────────────────────────────────────────────────
+  // ── Import Excel ───────────────────────────────────────────────────────────
 
-    @Post('import')
-    @Roles(UserRole.ADMIN)
-    @UseInterceptors(FileInterceptor('file'))
-    async import(@UploadedFile() file: any) {
-        console.log('Import Excel reçu');
-        return this.assetsService.importAssets(file.buffer);
-    }
+  @Post('import')
+  @Roles(UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
+  async import(@UploadedFile() file: any) {
+    console.log('Import Excel reçu');
+    return this.assetsService.importAssets(file.buffer);
+  }
 
-    // ── Reset BD ───────────────────────────────────────────────────────────────
+  // ── Reset BD ───────────────────────────────────────────────────────────────
 
-    @Delete('reset')
-    @Roles(UserRole.ADMIN)
-    async reset() {
-        return this.assetsService.resetAll();
-    }
+  @Delete('reset')
+  @Roles(UserRole.ADMIN)
+  async reset() {
+    return this.assetsService.resetAll();
+  }
 
-    // ── Actifs sans tag (en attente d'enrôlement) ──────────────────────────────
+  // ── Actifs sans tag (en attente d'enrôlement) ──────────────────────────────
 
-    @Get('untagged')
-    async findUntagged() {
-        return this.assetsService.findUntagged();
-    }
+  @Get('untagged')
+  async findUntagged() {
+    return this.assetsService.findUntagged();
+  }
 
-    // ── Actifs orphelins avec recherche (utilisé par le mobile) ────────────────
+  // ── Actifs orphelins avec recherche (utilisé par le mobile) ────────────────
 
-    @Get('orphans')
-    async findOrphans(@Query('q') q?: string) {
-        return this.assetsService.findOrphans(q);
-    }
+  @Get('orphans')
+  async findOrphans(@Query('q') q?: string) {
+    return this.assetsService.findOrphans(q);
+  }
 
-    // ── Catégories ─────────────────────────────────────────────────────────────
+  // ── Catégories ─────────────────────────────────────────────────────────────
 
-    @Public()
-    @Get('categories')
-    async getCategories() {
-        return this.assetsService.getCategories();
-    }
+  @Public()
+  @Get('categories')
+  async getCategories() {
+    return this.assetsService.getCategories();
+  }
 
-    // ── Recherche par Tag RFID ─────────────────────────────────────────────────
+  // ── Recherche par Tag RFID ─────────────────────────────────────────────────
 
-    @Get('tag/:tagId')
-    async getByTag(@Param('tagId') tagId: string) {
-        console.log('Recherche par TAG RFID:', tagId);
-        return this.assetsService.findByTag(tagId);
-    }
+  @Get('tag/:tagId')
+  async getByTag(@Param('tagId') tagId: string) {
+    console.log('Recherche par TAG RFID:', tagId);
+    return this.assetsService.findByTag(tagId);
+  }
 
-    // ── Création manuelle ──────────────────────────────────────────────────────
+  // ── Création manuelle ──────────────────────────────────────────────────────
 
-    @Post()
-    @Roles(UserRole.ADMIN)
-    async create(@Body() dto: CreateAssetDto) {
-        return this.assetsService.create(dto);
-    }
+  @Post()
+  @Roles(UserRole.ADMIN)
+  async create(@Body() dto: CreateAssetDto) {
+    return this.assetsService.create(dto);
+  }
 
-    // ── Liste complète ─────────────────────────────────────────────────────────
+  // ── Liste complète ─────────────────────────────────────────────────────────
 
-    @Get()
-    async findAll() {
-        return this.assetsService.findAll();
-    }
+  @Get()
+  async findAll() {
+    return this.assetsService.findAll();
+  }
 
-    // ── Enrôlement : associer un tag RFID à un actif existant ─────────────────
-    // PATCH /assets/:id/enroll  { tag_id: "RFID-XXX" }
+  // ── Enrôlement : associer un tag RFID à un actif existant ─────────────────
+  // PATCH /assets/:id/enroll  { tag_id: "RFID-XXX" }
 
-    @Patch(':id/enroll')
-    async enroll(
-        @Param('id') id: string,
-        @Body('tag_id') tagId: string,
-    ) {
-        return this.assetsService.enrollTag(id, tagId);
-    }
+  @Patch(':id/enroll')
+  async enroll(@Param('id') id: string, @Body('tag_id') tagId: string) {
+    return this.assetsService.enrollTag(id, tagId);
+  }
 
-    // ── Fiche actif ────────────────────────────────────────────────────────────
+  // ── Fiche actif ────────────────────────────────────────────────────────────
 
-    @Get(':id')
-    async findOne(@Param('id') id: string) {
-        return this.assetsService.findOne(id);
-    }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.assetsService.findOne(id);
+  }
 
-    // ── Suppression ────────────────────────────────────────────────────────────
+  // ── Suppression ────────────────────────────────────────────────────────────
 
-    @Delete(':id')
-    @Roles(UserRole.ADMIN)
-    async remove(@Param('id') id: string) {
-        return { message: 'Asset deleted by admin' };
-    }
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  async remove(@Param('id') id: string) {
+    return { message: 'Asset deleted by admin' };
+  }
 }
