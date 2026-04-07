@@ -132,7 +132,7 @@ exports.simpleSchemaMap = {
             id: 'uuid (PK)',
             asset_id: 'uuid? → Asset',
             location_id: 'uuid? → Location',
-            type: 'AlertType — DAMAGED | REPAIR | REPLACE | NOT_SCANNED',
+            type: 'AlertType — DAMAGED | BROKEN | REPAIR | REPLACE | NOT_SCANNED',
             status: 'AlertStatus — OPEN | RESOLVED',
             created_at: 'DateTime',
             comment: 'string?',
@@ -203,7 +203,7 @@ exports.simpleEnums = {
     UserRole: ['ADMIN', 'AUDITOR'],
     AssetStatus: ['GOOD', 'DAMAGED', 'REPAIR', 'BROKEN', 'TO_REPLACE'],
     LocationType: ['HOTEL', 'FLOOR', 'ZONE', 'SUBZONE'],
-    AlertType: ['DAMAGED', 'REPAIR', 'REPLACE', 'NOT_SCANNED'],
+    AlertType: ['DAMAGED', 'BROKEN', 'REPAIR', 'REPLACE', 'NOT_SCANNED'],
     AlertStatus: ['OPEN', 'RESOLVED'],
 };
 //# sourceMappingURL=schema_maps.js.map

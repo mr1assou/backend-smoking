@@ -86,14 +86,17 @@ let ScansService = class ScansService {
                     },
                 });
             }
-            if (dto.status === 'TO_REPLACE' || dto.status === 'DAMAGED') {
+            if (dto.status === 'TO_REPLACE' || dto.status === 'DAMAGED' || dto.status === 'BROKEN') {
+                const alertTypeMap = {
+                    TO_REPLACE: client_1.AlertType.REPLACE,
+                    DAMAGED: client_1.AlertType.DAMAGED,
+                    BROKEN: client_1.AlertType.BROKEN,
+                };
                 await tx.alert.create({
                     data: {
                         asset_id: asset.id,
                         location_id: dto.location_id,
-                        type: dto.status === 'TO_REPLACE'
-                            ? client_1.AlertType.REPLACE
-                            : client_1.AlertType.DAMAGED,
+                        type: alertTypeMap[dto.status] ?? client_1.AlertType.DAMAGED,
                         status: client_1.AlertStatus.OPEN,
                         comment: dto.comment,
                         photo_url: photoUrl,
