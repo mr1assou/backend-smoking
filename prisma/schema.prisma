@@ -37,6 +37,7 @@ enum LocationType {
 
 enum AlertType {
   DAMAGED
+  BROKEN
   REPAIR
   REPLACE
   NOT_SCANNED

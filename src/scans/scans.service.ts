@@ -119,18 +119,20 @@ export class ScansService {
       }
 
       // C. CRÉATION DE L'ALERTE AVEC CONSTAT (Photo + Commentaire)
-      if (dto.status === 'TO_REPLACE' || dto.status === 'DAMAGED') {
+      if (dto.status === 'TO_REPLACE' || dto.status === 'DAMAGED' || dto.status === 'BROKEN') {
+        const alertTypeMap: Record<string, AlertType> = {
+          TO_REPLACE: AlertType.REPLACE,
+          DAMAGED: AlertType.DAMAGED,
+          BROKEN: AlertType.BROKEN,
+        };
         await tx.alert.create({
           data: {
             asset_id: asset.id,
             location_id: dto.location_id,
-            type:
-              dto.status === 'TO_REPLACE'
-                ? AlertType.REPLACE
-                : AlertType.DAMAGED,
+            type: alertTypeMap[dto.status] ?? AlertType.DAMAGED,
             status: AlertStatus.OPEN,
             comment: dto.comment,
-            photo_url: photoUrl, // Utilisation de l'URL retournée par FilesService
+            photo_url: photoUrl,
           },
         });
       }
