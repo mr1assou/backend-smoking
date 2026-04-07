@@ -53,6 +53,7 @@ const ai_module_1 = require("./ai/ai.module");
 const alerts_module_1 = require("./alerts/alerts.module");
 const files_module_1 = require("./files/files.module");
 const inventory_module_1 = require("./inventory/inventory.module");
+const analytics_module_1 = require("./analytics/analytics.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -73,6 +74,7 @@ exports.AppModule = AppModule = __decorate([
             alerts_module_1.AlertsModule,
             files_module_1.FilesModule,
             inventory_module_1.InventoryModule,
+            analytics_module_1.AnalyticsModule,
         ],
     })
 ], AppModule);
