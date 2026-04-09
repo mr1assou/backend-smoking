@@ -113,6 +113,14 @@ export class AssetsController {
     return this.assetsService.enrollTag(id, tagId);
   }
 
+  // ── Mise à jour générale d'un actif ───────────────────────────────────────
+
+  @Patch(':id')
+  @Roles(UserRole.ADMIN)
+  async update(@Param('id') id: string, @Body() body: any) {
+    return this.assetsService.updateAsset(id, body);
+  }
+
   // ── Fiche actif ────────────────────────────────────────────────────────────
 
   @Get(':id')
@@ -125,6 +133,6 @@ export class AssetsController {
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
-    return { message: 'Asset deleted by admin' };
+    return this.assetsService.removeAsset(id);
   }
 }

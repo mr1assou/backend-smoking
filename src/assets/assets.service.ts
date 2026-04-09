@@ -168,6 +168,89 @@ export class AssetsService {
     return this.mapToOutput(updated);
   }
 
+  async updateAsset(id: string, dto: any): Promise<any> {
+    const asset = await this.prisma.asset.findUnique({ where: { id } });
+    if (!asset) throw new NotFoundException(`Actif avec l'id ${id} introuvable`);
+
+    // Vérification unicité tag_id si modifié
+    if (dto.tag_id && dto.tag_id !== asset.tag_id) {
+      const existing = await this.prisma.asset.findUnique({
+        where: { tag_id: dto.tag_id },
+      });
+      if (existing && existing.id !== id) {
+        throw new ConflictException(
+          `Le tag "${dto.tag_id}" est déjà associé à l'actif "${existing.name}"`,
+        );
+      }
+    }
+
+    // Résolution catégorie par nom
+    let categoryId: string | undefined;
+    if (dto.category) {
+      const cat = await this.prisma.category.upsert({
+        where: { name: dto.category.trim() },
+        update: {},
+        create: { name: dto.category.trim() },
+      });
+      categoryId = cat.id;
+    }
+
+    // Résolution localisation par nom
+    let locationId: string | undefined;
+    if (dto.location) {
+      const loc = await this.prisma.location.findFirst({
+        where: { name: dto.location },
+      });
+      if (!loc) {
+        throw new BadRequestException(
+          `Localisation "${dto.location}" introuvable`,
+        );
+      }
+      locationId = loc.id;
+    }
+
+    const data: any = {};
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.tag_id !== undefined) data.tag_id = dto.tag_id;
+    if (dto.brand !== undefined) data.brand = dto.brand;
+    if (dto.model !== undefined) data.model = dto.model;
+    if (dto.status !== undefined) data.status = this.mapStatus(dto.status);
+    if (dto.price !== undefined) data.price = dto.price;
+    if (dto.purchase_date !== undefined)
+      data.purchase_date = new Date(dto.purchase_date);
+    if (dto.warranty_end !== undefined)
+      data.warranty_end = dto.warranty_end ? new Date(dto.warranty_end) : null;
+    if (categoryId !== undefined) data.category_id = categoryId;
+    if (dto.category_id !== undefined) data.category_id = dto.category_id;
+    if (locationId !== undefined) data.location_id = locationId;
+    if (dto.location_id !== undefined) data.location_id = dto.location_id;
+    if (dto.image_url !== undefined) data.image_url = dto.image_url;
+
+    const updated = await this.prisma.asset.update({
+      where: { id },
+      data,
+      include: { category: true, location: true, supplier: true },
+    });
+
+    return this.mapToOutput(updated);
+  }
+
+  async removeAsset(id: string): Promise<any> {
+    const asset = await this.prisma.asset.findUnique({ where: { id } });
+    if (!asset) throw new NotFoundException(`Actif avec l'id ${id} introuvable`);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.inventoryTag.deleteMany({ where: { asset_id: id } });
+      await tx.assetMovement.deleteMany({ where: { asset_id: id } });
+      await tx.scan.deleteMany({ where: { asset_id: id } });
+      await tx.alert.deleteMany({ where: { asset_id: id } });
+      await tx.assetHistory.deleteMany({ where: { asset_id: id } });
+      await tx.asset.delete({ where: { id } });
+    });
+
+    return { message: 'Actif supprimé', id, name: asset.name };
+  }
+
   async resetAll() {
     const tables = [
       'asset_movements',
@@ -577,3 +660,4 @@ export class AssetsService {
     return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }
 }
+
