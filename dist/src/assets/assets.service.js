@@ -644,3 +644,4 @@ exports.AssetsService = AssetsService = __decorate([
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], AssetsService);
 //# sourceMappingURL=assets.service.js.map
+
