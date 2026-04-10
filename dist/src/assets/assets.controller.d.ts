@@ -24,7 +24,7 @@ export declare class AssetsController {
     getByTag(tagId: string): Promise<any>;
     create(dto: CreateAssetDto): Promise<any>;
     findAll(): Promise<any[]>;
-    enroll(id: string, tagId: string): Promise<any>;
+    enroll(id: string, tagId: string, locationId?: string): Promise<any>;
     update(id: string, body: UpdateAssetDto): Promise<any>;
     findOne(id: string): Promise<any>;
     remove(id: string): Promise<any>;

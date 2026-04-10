@@ -7,7 +7,7 @@ export declare class AssetsService {
     findAll(): Promise<any[]>;
     findOrphans(query?: string): Promise<any[]>;
     findUntagged(): Promise<any[]>;
-    enrollTag(assetId: string, tagId: string): Promise<any>;
+    enrollTag(assetId: string, tagId: string, locationId?: string): Promise<any>;
     updateAsset(id: string, dto: any): Promise<any>;
     removeAsset(id: string): Promise<any>;
     resetAll(): Promise<{

@@ -161,7 +161,7 @@ let AssetsService = class AssetsService {
             created_at: asset.created_at,
         }));
     }
-    async enrollTag(assetId, tagId) {
+    async enrollTag(assetId, tagId, locationId) {
         const trimmedTag = tagId.trim();
         if (!trimmedTag)
             throw new common_1.BadRequestException('tag_id est requis');
@@ -179,12 +179,16 @@ let AssetsService = class AssetsService {
         if (asset.tag_id) {
             throw new common_1.ConflictException(`Cet actif possède déjà le tag "${asset.tag_id}"`);
         }
+        const updateData = { tag_id: trimmedTag };
+        if (locationId) {
+            updateData.location_id = locationId;
+        }
         const updated = await this.prisma.asset.update({
             where: { id: assetId },
-            data: { tag_id: trimmedTag },
+            data: updateData,
             include: { category: true, location: true, supplier: true },
         });
-        console.log(`Tag "${trimmedTag}" enrôlé sur l'actif "${updated.name}" (${assetId})`);
+        console.log(`Tag "${trimmedTag}" enrôlé sur l'actif "${updated.name}" (${assetId}) | location: ${updated.location?.name ?? 'inchangée'}`);
         return this.mapToOutput(updated);
     }
     async updateAsset(id, dto) {
@@ -435,9 +439,10 @@ let AssetsService = class AssetsService {
                 const category_name = (r['catégorie'] || r['categorie'] || r['category'])
                     ?.toString()
                     ?.trim() || 'Mobilier';
-                const location_name = (r['localisation'] || r['location'] || r['emplacement'])
+                const location_raw = (r['localisation'] || r['location'] || r['emplacement'])
                     ?.toString()
-                    ?.trim() || 'Entrepôt';
+                    ?.trim();
+                const location_name = location_raw || null;
                 const price = parseFloat(r["prix d'achat"] || r['prix'] || r['purchase_price']) ||
                     0;
                 const purchase_year = parseInt(r["année d'achat"] || r['annee'] || r['purchase_year']) ||
@@ -453,13 +458,14 @@ let AssetsService = class AssetsService {
                         update: {},
                         create: { name: category_name },
                     });
+                    const locName = location_name || 'En attente d\'affectation';
                     let location = await tx.location.findFirst({
-                        where: { name: location_name },
+                        where: { name: locName },
                     });
                     if (!location) {
                         location = await tx.location.create({
                             data: {
-                                name: location_name,
+                                name: locName,
                                 type: 'ZONE',
                                 parent_id: mainHotel?.id,
                             },
@@ -613,7 +619,20 @@ let AssetsService = class AssetsService {
             'Marque',
             "Année d'achat",
         ];
-        const worksheet = xlsx.utils.aoa_to_sheet([headers]);
+        const example = [
+            '',
+            'Chaise Louis XV',
+            'Mobilier',
+            'Bon état',
+            '5000',
+            '',
+            '',
+            '',
+            'Roche Bobois',
+            '2024',
+        ];
+        const worksheet = xlsx.utils.aoa_to_sheet([headers, example]);
+        worksheet['!cols'] = headers.map((h) => ({ wch: Math.max(h.length + 2, 16) }));
         const workbook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(workbook, worksheet, 'Template');
         return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });

@@ -63,8 +63,8 @@ let AssetsController = class AssetsController {
     async findAll() {
         return this.assetsService.findAll();
     }
-    async enroll(id, tagId) {
-        return this.assetsService.enrollTag(id, tagId);
+    async enroll(id, tagId, locationId) {
+        return this.assetsService.enrollTag(id, tagId, locationId);
     }
     async update(id, body) {
         return this.assetsService.updateAsset(id, body);
@@ -146,8 +146,9 @@ __decorate([
     (0, common_1.Patch)(':id/enroll'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)('tag_id')),
+    __param(2, (0, common_1.Body)('location_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "enroll", null);
 __decorate([

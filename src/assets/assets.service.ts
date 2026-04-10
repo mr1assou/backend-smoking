@@ -138,7 +138,7 @@ export class AssetsService {
   }
 
   // Associe un tag RFID à un actif existant (enrôlement terrain)
-  async enrollTag(assetId: string, tagId: string): Promise<any> {
+  async enrollTag(assetId: string, tagId: string, locationId?: string): Promise<any> {
     const trimmedTag = tagId.trim();
     if (!trimmedTag) throw new BadRequestException('tag_id est requis');
 
@@ -163,14 +163,20 @@ export class AssetsService {
       );
     }
 
+    // Mise à jour du tag + localisation si fournie
+    const updateData: Record<string, unknown> = { tag_id: trimmedTag };
+    if (locationId) {
+      updateData.location_id = locationId;
+    }
+
     const updated = await this.prisma.asset.update({
       where: { id: assetId },
-      data: { tag_id: trimmedTag },
+      data: updateData,
       include: { category: true, location: true, supplier: true },
     });
 
     console.log(
-      `Tag "${trimmedTag}" enrôlé sur l'actif "${updated.name}" (${assetId})`,
+      `Tag "${trimmedTag}" enrôlé sur l'actif "${updated.name}" (${assetId}) | location: ${updated.location?.name ?? 'inchangée'}`,
     );
     return this.mapToOutput(updated);
   }

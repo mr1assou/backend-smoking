@@ -107,11 +107,15 @@ export class AssetsController {
   }
 
   // ── Enrôlement : associer un tag RFID à un actif existant ─────────────────
-  // PATCH /assets/:id/enroll  { tag_id: "RFID-XXX" }
+  // PATCH /assets/:id/enroll  { tag_id: "RFID-XXX", location_id?: "uuid" }
 
   @Patch(':id/enroll')
-  async enroll(@Param('id') id: string, @Body('tag_id') tagId: string) {
-    return this.assetsService.enrollTag(id, tagId);
+  async enroll(
+    @Param('id') id: string,
+    @Body('tag_id') tagId: string,
+    @Body('location_id') locationId?: string,
+  ) {
+    return this.assetsService.enrollTag(id, tagId, locationId);
   }
 
   // ── Mise à jour générale d'un actif ───────────────────────────────────────
