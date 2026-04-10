@@ -26,15 +26,15 @@ export class AnalyticsService {
     });
 
     // Resolve category names in one query
-    const categoryIds = byCategory.map(r => r.category_id);
+    const categoryIds = byCategory.map((r) => r.category_id);
     const categories = await this.prisma.category.findMany({
       where: { id: { in: categoryIds } },
       select: { id: true, name: true },
     });
-    const catMap = new Map(categories.map(c => [c.id, c.name]));
+    const catMap = new Map(categories.map((c) => [c.id, c.name]));
 
     const categorySummary = byCategory
-      .map(r => ({
+      .map((r) => ({
         category: catMap.get(r.category_id) ?? 'Inconnu',
         count: r._count,
         acquisition: Number(r._sum.price ?? 0),
@@ -47,7 +47,7 @@ export class AnalyticsService {
       _sum: { price: true },
       _count: true,
     });
-    const statusSummary = byStatus.map(r => ({
+    const statusSummary = byStatus.map((r) => ({
       status: r.status,
       count: r._count,
       value: Number(r._sum.price ?? 0),
@@ -59,15 +59,15 @@ export class AnalyticsService {
       _sum: { price: true },
       _count: true,
     });
-    const locationIds = byLocation.map(r => r.location_id);
+    const locationIds = byLocation.map((r) => r.location_id);
     const locations = await this.prisma.location.findMany({
       where: { id: { in: locationIds } },
       select: { id: true, name: true },
     });
-    const locMap = new Map(locations.map(l => [l.id, l.name]));
+    const locMap = new Map(locations.map((l) => [l.id, l.name]));
 
     const locationSummary = byLocation
-      .map(r => ({
+      .map((r) => ({
         location: locMap.get(r.location_id) ?? 'Inconnu',
         count: r._count,
         value: Number(r._sum.price ?? 0),
@@ -76,7 +76,7 @@ export class AnalyticsService {
 
     // 5. Replacement budget (TO_REPLACE assets * 10%)
     const replaceValue = statusSummary
-      .filter(s => s.status === 'TO_REPLACE')
+      .filter((s) => s.status === 'TO_REPLACE')
       .reduce((sum, s) => sum + s.value, 0);
 
     return {
@@ -98,7 +98,8 @@ export class AnalyticsService {
 
     // 1. Scans per day — last 14 days (raw SQL for date_trunc)
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-    const scansPerDay: { day: string; count: number }[] = await this.prisma.$queryRaw`
+    const scansPerDay: { day: string; count: number }[] = await this.prisma
+      .$queryRaw`
       SELECT date_trunc('day', scanned_at)::date AS day,
              COUNT(*)::int                        AS count
       FROM   scans
@@ -114,13 +115,13 @@ export class AnalyticsService {
       orderBy: { _count: { location_id: 'desc' } },
       take: 10,
     });
-    const locIds = byLocation.map(r => r.location_id);
+    const locIds = byLocation.map((r) => r.location_id);
     const locs = await this.prisma.location.findMany({
       where: { id: { in: locIds } },
       select: { id: true, name: true },
     });
-    const lMap = new Map(locs.map(l => [l.id, l.name]));
-    const scansByLocation = byLocation.map(r => ({
+    const lMap = new Map(locs.map((l) => [l.id, l.name]));
+    const scansByLocation = byLocation.map((r) => ({
       location: lMap.get(r.location_id) ?? 'Inconnu',
       count: r._count,
     }));
@@ -131,9 +132,10 @@ export class AnalyticsService {
       select: { asset_id: true },
       distinct: ['asset_id'],
     });
-    const coverageRate = totalAssets > 0
-      ? Math.round((scannedAssets.length / totalAssets) * 100)
-      : 0;
+    const coverageRate =
+      totalAssets > 0
+        ? Math.round((scannedAssets.length / totalAssets) * 100)
+        : 0;
 
     // 4. Recent movements (last 20)
     const recentMovements = await this.prisma.assetMovement.findMany({
@@ -146,7 +148,7 @@ export class AnalyticsService {
         user: { select: { name: true } },
       },
     });
-    const movements = recentMovements.map(m => ({
+    const movements = recentMovements.map((m) => ({
       asset: m.asset.name,
       from: m.from_location?.name ?? 'Entrepôt',
       to: m.to_location.name,
@@ -155,7 +157,8 @@ export class AnalyticsService {
     }));
 
     // 5. Movement flow aggregation
-    const flowRaw: { from_name: string; to_name: string; count: number }[] = await this.prisma.$queryRaw`
+    const flowRaw: { from_name: string; to_name: string; count: number }[] =
+      await this.prisma.$queryRaw`
       SELECT COALESCE(fl.name, 'Entrepôt') AS from_name,
              tl.name                        AS to_name,
              COUNT(*)::int                  AS count
@@ -175,7 +178,7 @@ export class AnalyticsService {
       scansPerDay,
       scansByLocation,
       movements,
-      flows: flowRaw.map(f => ({
+      flows: flowRaw.map((f) => ({
         from: f.from_name,
         to: f.to_name,
         count: f.count,
@@ -194,12 +197,17 @@ export class AnalyticsService {
       _count: true,
     });
     const totalAssets = byStatus.reduce((s, r) => s + r._count, 0);
-    const goodCount = byStatus.find(r => r.status === 'GOOD')?._count ?? 0;
-    const healthRate = totalAssets > 0 ? Math.round((goodCount / totalAssets) * 100) : 0;
+    const goodCount = byStatus.find((r) => r.status === 'GOOD')?._count ?? 0;
+    const healthRate =
+      totalAssets > 0 ? Math.round((goodCount / totalAssets) * 100) : 0;
 
     // 2. Anomaly rate by location (single raw query)
-    const anomalyByZone: { location: string; total: number; anomalies: number; rate: number }[] =
-      await this.prisma.$queryRaw`
+    const anomalyByZone: {
+      location: string;
+      total: number;
+      anomalies: number;
+      rate: number;
+    }[] = await this.prisma.$queryRaw`
         SELECT l.name                                      AS location,
                COUNT(*)::int                               AS total,
                COUNT(*) FILTER (WHERE a.status != 'GOOD')::int AS anomalies,
@@ -233,7 +241,8 @@ export class AnalyticsService {
 
     const totalExpected = sessions._sum.total_expected ?? 0;
     const totalFound = sessions._sum.found_count ?? 0;
-    const foundRate = totalExpected > 0 ? Math.round((totalFound / totalExpected) * 100) : 0;
+    const foundRate =
+      totalExpected > 0 ? Math.round((totalFound / totalExpected) * 100) : 0;
 
     // 4. Sessions per location (top 8)
     const sessionsByLoc = await this.prisma.inventorySession.groupBy({
@@ -243,14 +252,14 @@ export class AnalyticsService {
       orderBy: { _count: { location_id: 'desc' } },
       take: 8,
     });
-    const sessLocIds = sessionsByLoc.map(r => r.location_id);
+    const sessLocIds = sessionsByLoc.map((r) => r.location_id);
     const sessLocs = await this.prisma.location.findMany({
       where: { id: { in: sessLocIds } },
       select: { id: true, name: true },
     });
-    const slMap = new Map(sessLocs.map(l => [l.id, l.name]));
+    const slMap = new Map(sessLocs.map((l) => [l.id, l.name]));
 
-    const sessionSummary = sessionsByLoc.map(r => ({
+    const sessionSummary = sessionsByLoc.map((r) => ({
       location: slMap.get(r.location_id) ?? 'Inconnu',
       sessions: r._count,
       avgScanned: Math.round(r._avg.total_scanned ?? 0),
@@ -270,7 +279,10 @@ export class AnalyticsService {
     return {
       totalAssets,
       healthRate,
-      statusBreakdown: byStatus.map(r => ({ status: r.status, count: r._count })),
+      statusBreakdown: byStatus.map((r) => ({
+        status: r.status,
+        count: r._count,
+      })),
       anomalyByZone,
       inventory: {
         totalSessions: sessions._count,
@@ -298,29 +310,36 @@ export class AnalyticsService {
   async getCompliance() {
     // 1. Tag coverage
     const totalAssets = await this.prisma.asset.count();
-    const tagged = await this.prisma.asset.count({ where: { tag_id: { not: null } } });
+    const tagged = await this.prisma.asset.count({
+      where: { tag_id: { not: null } },
+    });
     const untagged = totalAssets - tagged;
-    const tagRate = totalAssets > 0 ? Math.round((tagged / totalAssets) * 100) : 0;
+    const tagRate =
+      totalAssets > 0 ? Math.round((tagged / totalAssets) * 100) : 0;
 
     // 2. Scan coverage
     const scannedDistinct = await this.prisma.scan.findMany({
       select: { asset_id: true },
       distinct: ['asset_id'],
     });
-    const scanRate = totalAssets > 0
-      ? Math.round((scannedDistinct.length / totalAssets) * 100)
-      : 0;
+    const scanRate =
+      totalAssets > 0
+        ? Math.round((scannedDistinct.length / totalAssets) * 100)
+        : 0;
 
     // 3. Alert stats (groupBy status + type)
     const alertsByStatus = await this.prisma.alert.groupBy({
       by: ['status'],
       _count: true,
     });
-    const openAlerts = alertsByStatus.find(r => r.status === 'OPEN')?._count ?? 0;
-    const resolvedAlerts = alertsByStatus.find(r => r.status === 'RESOLVED')?._count ?? 0;
-    const resolveRate = (openAlerts + resolvedAlerts) > 0
-      ? Math.round((resolvedAlerts / (openAlerts + resolvedAlerts)) * 100)
-      : 100;
+    const openAlerts =
+      alertsByStatus.find((r) => r.status === 'OPEN')?._count ?? 0;
+    const resolvedAlerts =
+      alertsByStatus.find((r) => r.status === 'RESOLVED')?._count ?? 0;
+    const resolveRate =
+      openAlerts + resolvedAlerts > 0
+        ? Math.round((resolvedAlerts / (openAlerts + resolvedAlerts)) * 100)
+        : 100;
 
     const alertsByType = await this.prisma.alert.groupBy({
       by: ['type'],
@@ -329,11 +348,17 @@ export class AnalyticsService {
     });
 
     // 4. Compliance score (weighted: tag 40%, scan 35%, resolve 25%)
-    const complianceScore = Math.round(tagRate * 0.4 + scanRate * 0.35 + resolveRate * 0.25);
+    const complianceScore = Math.round(
+      tagRate * 0.4 + scanRate * 0.35 + resolveRate * 0.25,
+    );
 
     // 5. Non-compliant by location (raw query for speed)
-    const ncByLocation: { location: string; untagged: number; not_scanned: number; damaged: number }[] =
-      await this.prisma.$queryRaw`
+    const ncByLocation: {
+      location: string;
+      untagged: number;
+      not_scanned: number;
+      damaged: number;
+    }[] = await this.prisma.$queryRaw`
         SELECT l.name AS location,
                COUNT(*) FILTER (WHERE a.tag_id IS NULL)::int                        AS untagged,
                COUNT(*) FILTER (WHERE NOT EXISTS (
@@ -362,7 +387,7 @@ export class AnalyticsService {
         location: { select: { name: true } },
       },
     });
-    const log = auditLog.map(a => ({
+    const log = auditLog.map((a) => ({
       id: a.id,
       date: a.created_at,
       type: a.type,
@@ -394,7 +419,10 @@ export class AnalyticsService {
       resolveRate,
       compliant,
       nonCompliant: totalAssets - compliant,
-      alertsByType: alertsByType.map(r => ({ type: r.type, count: r._count })),
+      alertsByType: alertsByType.map((r) => ({
+        type: r.type,
+        count: r._count,
+      })),
       ncByLocation,
       auditLog: log,
     };

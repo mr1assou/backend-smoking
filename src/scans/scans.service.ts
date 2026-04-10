@@ -119,7 +119,11 @@ export class ScansService {
       }
 
       // C. CRÉATION DE L'ALERTE AVEC CONSTAT (Photo + Commentaire)
-      if (dto.status === 'TO_REPLACE' || dto.status === 'DAMAGED' || dto.status === 'BROKEN') {
+      if (
+        dto.status === 'TO_REPLACE' ||
+        dto.status === 'DAMAGED' ||
+        dto.status === 'BROKEN'
+      ) {
         const alertTypeMap: Record<string, AlertType> = {
           TO_REPLACE: AlertType.REPLACE,
           DAMAGED: AlertType.DAMAGED,

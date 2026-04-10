@@ -40,11 +40,15 @@ export class InventoryService {
         // Supprimer les tags de la session
         await tx.inventoryTag.deleteMany({ where: { session_id: session.id } });
         // Supprimer les mouvements liés
-        await tx.assetMovement.deleteMany({ where: { session_id: session.id } });
+        await tx.assetMovement.deleteMany({
+          where: { session_id: session.id },
+        });
         // Supprimer la session elle-même
         await tx.inventorySession.delete({ where: { id: session.id } });
       });
-      this.logger.log(`Session ${session.id.slice(0, 8)} supprimée (démarrée ${session.started_at.toISOString()})`);
+      this.logger.log(
+        `Session ${session.id.slice(0, 8)} supprimée (démarrée ${session.started_at.toISOString()})`,
+      );
     }
   }
 

@@ -170,7 +170,8 @@ export class AssetsService {
 
   async updateAsset(id: string, dto: any): Promise<any> {
     const asset = await this.prisma.asset.findUnique({ where: { id } });
-    if (!asset) throw new NotFoundException(`Actif avec l'id ${id} introuvable`);
+    if (!asset)
+      throw new NotFoundException(`Actif avec l'id ${id} introuvable`);
 
     // Vérification unicité tag_id si modifié
     if (dto.tag_id && dto.tag_id !== asset.tag_id) {
@@ -237,7 +238,8 @@ export class AssetsService {
 
   async removeAsset(id: string): Promise<any> {
     const asset = await this.prisma.asset.findUnique({ where: { id } });
-    if (!asset) throw new NotFoundException(`Actif avec l'id ${id} introuvable`);
+    if (!asset)
+      throw new NotFoundException(`Actif avec l'id ${id} introuvable`);
 
     await this.prisma.$transaction(async (tx) => {
       await tx.inventoryTag.deleteMany({ where: { asset_id: id } });
@@ -660,4 +662,3 @@ export class AssetsService {
     return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }
 }
-
