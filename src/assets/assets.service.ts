@@ -465,10 +465,11 @@ export class AssetsService {
           (r['catégorie'] || r['categorie'] || r['category'])
             ?.toString()
             ?.trim() || 'Mobilier';
-        const location_name =
+        const location_raw =
           (r['localisation'] || r['location'] || r['emplacement'])
             ?.toString()
-            ?.trim() || 'Entrepôt';
+            ?.trim();
+        const location_name: string | null = location_raw || null;
         const price =
           parseFloat(r["prix d'achat"] || r['prix'] || r['purchase_price']) ||
           0;
@@ -489,13 +490,14 @@ export class AssetsService {
             create: { name: category_name },
           });
 
+          const locName = location_name || 'En attente d\'affectation';
           let location = await tx.location.findFirst({
-            where: { name: location_name },
+            where: { name: locName },
           });
           if (!location) {
             location = await tx.location.create({
               data: {
-                name: location_name,
+                name: locName,
                 type: 'ZONE',
                 parent_id: mainHotel?.id,
               },
@@ -663,7 +665,24 @@ export class AssetsService {
       'Marque',
       "Année d'achat",
     ];
-    const worksheet = xlsx.utils.aoa_to_sheet([headers]);
+    // Ligne d'exemple — TAG RFID et Localisation vides (optionnels)
+    const example = [
+      '',                    // TAG RFID — vide (sera enrôlé par le mobile)
+      'Chaise Louis XV',     // Nom
+      'Mobilier',            // Catégorie
+      'Bon état',            // État
+      '5000',                // Prix d'achat
+      '',                    // Localisation — vide (sera affectée par l'auditeur)
+      '',                    // Valeur nette (calculée auto)
+      '',                    // Dernier Scan (calculé auto)
+      'Roche Bobois',        // Marque
+      '2024',                // Année d'achat
+    ];
+    const worksheet = xlsx.utils.aoa_to_sheet([headers, example]);
+
+    // Largeurs de colonnes
+    worksheet['!cols'] = headers.map((h: string) => ({ wch: Math.max(h.length + 2, 16) }));
+
     const workbook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Template');
     return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
