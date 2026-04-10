@@ -119,6 +119,7 @@ export class InventoryService {
   async submitTags(sessionId: string, dto: SubmitTagsDto, userId: string) {
     const session = await this.prisma.inventorySession.findUnique({
       where: { id: sessionId },
+      include: { location: { select: { id: true, name: true } } },
     });
     if (!session) {
       throw new NotFoundException(`Session ${sessionId} not found`);
@@ -240,6 +241,27 @@ export class InventoryService {
           where: { id: { in: movedAssetIds } },
           data: { location_id: session.location_id },
         });
+
+        // 4e. Créer des notices MOVEMENT dans les alertes
+        // Résoudre les noms des anciennes localisations
+        const fromLocIds = [...new Set(movements.map(m => m.from_location_id).filter(Boolean))] as string[];
+        const fromLocs = await tx.location.findMany({
+          where: { id: { in: fromLocIds } },
+          select: { id: true, name: true },
+        });
+        const fromLocMap = new Map(fromLocs.map(l => [l.id, l.name]));
+        const sessionLocName = session.location.name;
+
+        await tx.alert.createMany({
+          data: movements.map(m => ({
+            asset_id: m.asset_id!,
+            location_id: session.location_id,
+            type: 'MOVEMENT' as const,
+            status: 'RESOLVED' as const,
+            comment: `Mouvement détecté lors de l'inventaire : ${fromLocMap.get(m.from_location_id!) || 'Inconnu'} → ${sessionLocName}`,
+          })),
+        });
+        this.logger.log(`${movements.length} notice(s) de mouvement créée(s)`);
       }
 
       // AssetHistory is created once per asset at session close (not per batch)

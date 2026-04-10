@@ -41,6 +41,7 @@ enum AlertType {
   REPAIR
   REPLACE
   NOT_SCANNED
+  MOVEMENT
 }
 
 enum AlertStatus {
