@@ -182,22 +182,21 @@ export class InventoryService {
         };
       }
 
-      const isExpected = asset.location_id === session.location_id;
+      // Reconnu = tag trouvé dans la DB (peu importe la localisation)
       return {
         epc,
-        classification: isExpected
-          ? TagClassification.EXPECTED
-          : TagClassification.UNEXPECTED,
+        classification: TagClassification.EXPECTED,
         asset_id: asset.id,
         asset_name: asset.name,
-        from_location_id: asset.location_id, // Frozen snapshot
+        from_location_id: asset.location_id,
         rssi: rssiMap.get(epc) ?? null,
       };
     });
 
     // ── Step 4: Bulk insert + side effects in transaction ───────────
+    // Mouvement = asset reconnu mais dans une location différente de la session
     const movements = classified.filter(
-      (t) => t.classification === TagClassification.UNEXPECTED && t.asset_id,
+      (t) => t.asset_id && t.from_location_id !== session.location_id,
     );
 
     const knownAssetIds = classified
@@ -281,10 +280,11 @@ export class InventoryService {
 
     const countMap = new Map(counts.map((c) => [c.classification, c._count]));
 
-    const foundCount = countMap.get(TagClassification.EXPECTED) ?? 0;
-    const unexpectedCount = countMap.get(TagClassification.UNEXPECTED) ?? 0;
+    const foundCount =
+      (countMap.get(TagClassification.EXPECTED) ?? 0) +
+      (countMap.get(TagClassification.UNEXPECTED) ?? 0); // UNEXPECTED legacy → reconnu aussi
     const unknownCount = countMap.get(TagClassification.UNKNOWN) ?? 0;
-    const totalScanned = foundCount + unexpectedCount + unknownCount;
+    const totalScanned = foundCount + unknownCount;
     const missingCount = session.total_expected - foundCount;
 
     // Exact count: movements linked to THIS session
@@ -315,7 +315,7 @@ export class InventoryService {
         total_scanned: totalScanned,
         found_count: foundCount,
         missing_count: Math.max(0, missingCount),
-        unexpected_count: unexpectedCount,
+        unexpected_count: 0,
         unknown_count: unknownCount,
         movement_count: movementCount,
       },
@@ -332,7 +332,7 @@ export class InventoryService {
         total_expected: session.total_expected,
         found: foundCount,
         missing: Math.max(0, missingCount),
-        unexpected: unexpectedCount,
+        unexpected: 0,
         unknown: unknownCount,
         movements: movementCount,
         duration_seconds: Math.round(

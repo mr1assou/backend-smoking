@@ -37,6 +37,10 @@ let InventoryController = class InventoryController {
     async closeSession(id) {
         return this.inventoryService.closeSession(id);
     }
+    async findActive(req) {
+        const userId = req.user.id || req.user.sub;
+        return this.inventoryService.findActiveSessions(userId);
+    }
     async findAll() {
         return this.inventoryService.findAll();
     }
@@ -72,6 +76,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "closeSession", null);
+__decorate([
+    (0, common_1.Get)('sessions/active'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.AUDITOR, client_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "findActive", null);
 __decorate([
     (0, common_1.Get)('sessions'),
     (0, roles_decorator_1.Roles)(client_1.UserRole.AUDITOR, client_1.UserRole.ADMIN),

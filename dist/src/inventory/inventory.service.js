@@ -8,15 +8,51 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var InventoryService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InventoryService = void 0;
 const common_1 = require("@nestjs/common");
+const schedule_1 = require("@nestjs/schedule");
 const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
-let InventoryService = class InventoryService {
+let InventoryService = InventoryService_1 = class InventoryService {
     prisma;
+    logger = new common_1.Logger(InventoryService_1.name);
     constructor(prisma) {
         this.prisma = prisma;
+    }
+    async cleanupStaleSessions() {
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        const stale = await this.prisma.inventorySession.findMany({
+            where: { ended_at: null, started_at: { lt: oneHourAgo } },
+            select: { id: true, started_at: true },
+        });
+        if (stale.length === 0)
+            return;
+        this.logger.log(`Nettoyage de ${stale.length} session(s) abandonnée(s)`);
+        for (const session of stale) {
+            await this.prisma.$transaction(async (tx) => {
+                await tx.inventoryTag.deleteMany({ where: { session_id: session.id } });
+                await tx.assetMovement.deleteMany({
+                    where: { session_id: session.id },
+                });
+                await tx.inventorySession.delete({ where: { id: session.id } });
+            });
+            this.logger.log(`Session ${session.id.slice(0, 8)} supprimée (démarrée ${session.started_at.toISOString()})`);
+        }
+    }
+    async findActiveSessions(userId) {
+        const where = { ended_at: null };
+        if (userId)
+            where.user_id = userId;
+        return this.prisma.inventorySession.findMany({
+            where,
+            orderBy: { started_at: 'desc' },
+            include: {
+                user: { select: { id: true, name: true } },
+                location: { select: { id: true, name: true, type: true } },
+            },
+        });
     }
     async createSession(dto, userId) {
         const location = await this.prisma.location.findUnique({
@@ -88,19 +124,16 @@ let InventoryService = class InventoryService {
                     rssi: rssiMap.get(epc) ?? null,
                 };
             }
-            const isExpected = asset.location_id === session.location_id;
             return {
                 epc,
-                classification: isExpected
-                    ? client_1.TagClassification.EXPECTED
-                    : client_1.TagClassification.UNEXPECTED,
+                classification: client_1.TagClassification.EXPECTED,
                 asset_id: asset.id,
                 asset_name: asset.name,
                 from_location_id: asset.location_id,
                 rssi: rssiMap.get(epc) ?? null,
             };
         });
-        const movements = classified.filter((t) => t.classification === client_1.TagClassification.UNEXPECTED && t.asset_id);
+        const movements = classified.filter((t) => t.asset_id && t.from_location_id !== session.location_id);
         const knownAssetIds = classified
             .filter((t) => t.asset_id)
             .map((t) => t.asset_id);
@@ -161,10 +194,10 @@ let InventoryService = class InventoryService {
             _count: true,
         });
         const countMap = new Map(counts.map((c) => [c.classification, c._count]));
-        const foundCount = countMap.get(client_1.TagClassification.EXPECTED) ?? 0;
-        const unexpectedCount = countMap.get(client_1.TagClassification.UNEXPECTED) ?? 0;
+        const foundCount = (countMap.get(client_1.TagClassification.EXPECTED) ?? 0) +
+            (countMap.get(client_1.TagClassification.UNEXPECTED) ?? 0);
         const unknownCount = countMap.get(client_1.TagClassification.UNKNOWN) ?? 0;
-        const totalScanned = foundCount + unexpectedCount + unknownCount;
+        const totalScanned = foundCount + unknownCount;
         const missingCount = session.total_expected - foundCount;
         const movementCount = await this.prisma.assetMovement.count({
             where: { session_id: sessionId },
@@ -190,7 +223,7 @@ let InventoryService = class InventoryService {
                 total_scanned: totalScanned,
                 found_count: foundCount,
                 missing_count: Math.max(0, missingCount),
-                unexpected_count: unexpectedCount,
+                unexpected_count: 0,
                 unknown_count: unknownCount,
                 movement_count: movementCount,
             },
@@ -206,7 +239,7 @@ let InventoryService = class InventoryService {
                 total_expected: session.total_expected,
                 found: foundCount,
                 missing: Math.max(0, missingCount),
-                unexpected: unexpectedCount,
+                unexpected: 0,
                 unknown: unknownCount,
                 movements: movementCount,
                 duration_seconds: Math.round((updated.ended_at.getTime() - updated.started_at.getTime()) / 1000),
@@ -251,7 +284,13 @@ let InventoryService = class InventoryService {
     }
 };
 exports.InventoryService = InventoryService;
-exports.InventoryService = InventoryService = __decorate([
+__decorate([
+    (0, schedule_1.Cron)(schedule_1.CronExpression.EVERY_10_MINUTES),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryService.prototype, "cleanupStaleSessions", null);
+exports.InventoryService = InventoryService = InventoryService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], InventoryService);

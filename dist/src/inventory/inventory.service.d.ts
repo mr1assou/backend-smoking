@@ -3,7 +3,34 @@ import { CreateSessionDto } from './dto/create-session.dto';
 import { SubmitTagsDto } from './dto/submit-tags.dto';
 export declare class InventoryService {
     private prisma;
+    private readonly logger;
     constructor(prisma: PrismaService);
+    cleanupStaleSessions(): Promise<void>;
+    findActiveSessions(userId?: string): Promise<({
+        user: {
+            id: string;
+            name: string;
+        };
+        location: {
+            id: string;
+            name: string;
+            type: import(".prisma/client").$Enums.LocationType;
+        };
+    } & {
+        id: string;
+        location_id: string;
+        user_id: string;
+        started_at: Date;
+        ended_at: Date | null;
+        last_scan_at: Date | null;
+        total_scanned: number;
+        total_expected: number;
+        found_count: number;
+        missing_count: number;
+        unexpected_count: number;
+        unknown_count: number;
+        movement_count: number;
+    })[]>;
     createSession(dto: CreateSessionDto, userId: string): Promise<{
         sessionId: string;
         location: string;

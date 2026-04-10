@@ -47,9 +47,16 @@ let AiService = AiService_1 = class AiService {
             throw new common_1.BadRequestException('messages must not be empty');
         }
         const model = this.config.get('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
-        const lastUser = [...turns].reverse().find((t) => t.role === 'user')?.content?.trim() ?? '';
+        const lastUser = [...turns]
+            .reverse()
+            .find((t) => t.role === 'user')
+            ?.content?.trim() ?? '';
         if (this.isSensitiveRequest(lastUser)) {
-            return { type: 'text', message: "I can't help with that.", meta: { intent: 'chat' } };
+            return {
+                type: 'text',
+                message: "I can't help with that.",
+                meta: { intent: 'chat' },
+            };
         }
         let intent = await this.classifyIntent(model, lastUser);
         if (intent === 'chat' && this.isBudgetOrReplacementQuestion(lastUser)) {
@@ -163,26 +170,46 @@ let AiService = AiService_1 = class AiService {
             q.includes('dépense') ||
             q.includes('depense') ||
             (q.includes('cost') && q.includes('repair')) ||
-            (q.includes('cost') && (q.includes('replace') || q.includes('replacement'))));
+            (q.includes('cost') &&
+                (q.includes('replace') || q.includes('replacement'))));
     }
     isSensitiveRequest(text) {
         const q = text.toLowerCase();
-        if (q.includes('schema') || q.includes('schemas') || q.includes('prisma') || q.includes('database schema')) {
+        if (q.includes('schema') ||
+            q.includes('schemas') ||
+            q.includes('prisma') ||
+            q.includes('database schema')) {
             return true;
         }
-        if (q.includes('table ') || q.includes('tables') || q.includes('column') || q.includes('columns') || q.includes('field') || q.includes('fields')) {
+        if (q.includes('table ') ||
+            q.includes('tables') ||
+            q.includes('column') ||
+            q.includes('columns') ||
+            q.includes('field') ||
+            q.includes('fields')) {
             return true;
         }
-        if (q.includes('password') || q.includes('mdp') || q.includes('mot de passe') || q.includes('mot-de-passe')) {
+        if (q.includes('password') ||
+            q.includes('mdp') ||
+            q.includes('mot de passe') ||
+            q.includes('mot-de-passe')) {
             return true;
         }
-        if (q.includes('hashed') || q.includes('refresh token') || q.includes('hashedrefreshtoken')) {
+        if (q.includes('hashed') ||
+            q.includes('refresh token') ||
+            q.includes('hashedrefreshtoken')) {
             return true;
         }
-        if (q.includes('api key') || q.includes('secret') || q.includes('credential') || q.includes('credentials')) {
+        if (q.includes('api key') ||
+            q.includes('secret') ||
+            q.includes('credential') ||
+            q.includes('credentials')) {
             return true;
         }
-        if (q.includes('env') || q.includes('.env') || q.includes('database_url') || q.includes('authorization')) {
+        if (q.includes('env') ||
+            q.includes('.env') ||
+            q.includes('database_url') ||
+            q.includes('authorization')) {
             return true;
         }
         return false;
@@ -207,7 +234,7 @@ let AiService = AiService_1 = class AiService {
                 try {
                     const rows = await this.prisma.$queryRawUnsafe(`SELECT DISTINCT "${col}"::text AS value FROM "${table}" WHERE "${col}" IS NOT NULL ORDER BY 1 LIMIT 50`);
                     out[table][col] = rows
-                        .map((r) => (typeof r.value === 'string' ? r.value : String(r.value)))
+                        .map((r) => typeof r.value === 'string' ? r.value : String(r.value))
                         .filter((v) => v.length > 0);
                 }
                 catch (e) {
@@ -250,7 +277,10 @@ let AiService = AiService_1 = class AiService {
         if (cleanedSystemPrompt.length > 0) {
             messages.push({ role: 'system', content: cleanedSystemPrompt });
         }
-        messages.push(...turns.map((t) => ({ role: t.role, content: t.content })));
+        messages.push(...turns.map((t) => ({
+            role: t.role,
+            content: t.content,
+        })));
         const completion = await this.openai.chat.completions.create({
             model,
             messages,
@@ -269,8 +299,13 @@ function parseLinkingJson(raw) {
     try {
         const o = JSON.parse(raw);
         const arr = o.models ?? o.relevantModels;
-        const models = Array.isArray(arr) ? arr.filter((x) => typeof x === 'string') : [];
-        return { models, rationale: typeof o.rationale === 'string' ? o.rationale : undefined };
+        const models = Array.isArray(arr)
+            ? arr.filter((x) => typeof x === 'string')
+            : [];
+        return {
+            models,
+            rationale: typeof o.rationale === 'string' ? o.rationale : undefined,
+        };
     }
     catch {
         return { models: [] };
@@ -290,7 +325,9 @@ function serializeQueryResult(data) {
             return value.toString();
         if (value instanceof Date)
             return value.toISOString();
-        if (value && typeof value === 'object' && value.constructor?.name === 'Decimal') {
+        if (value &&
+            typeof value === 'object' &&
+            value.constructor?.name === 'Decimal') {
             return String(value);
         }
         return value;

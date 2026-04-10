@@ -86,7 +86,9 @@ let ScansService = class ScansService {
                     },
                 });
             }
-            if (dto.status === 'TO_REPLACE' || dto.status === 'DAMAGED' || dto.status === 'BROKEN') {
+            if (dto.status === 'TO_REPLACE' ||
+                dto.status === 'DAMAGED' ||
+                dto.status === 'BROKEN') {
                 const alertTypeMap = {
                     TO_REPLACE: client_1.AlertType.REPLACE,
                     DAMAGED: client_1.AlertType.DAMAGED,

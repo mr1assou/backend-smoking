@@ -21,6 +21,7 @@ const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const public_decorator_1 = require("../auth/decorators/public.decorator");
 const client_1 = require("@prisma/client");
 const create_asset_dto_1 = require("./dto/create-asset.dto");
+const update_asset_dto_1 = require("./dto/update-asset.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 let AssetsController = class AssetsController {
     assetsService;
@@ -65,11 +66,14 @@ let AssetsController = class AssetsController {
     async enroll(id, tagId) {
         return this.assetsService.enrollTag(id, tagId);
     }
+    async update(id, body) {
+        return this.assetsService.updateAsset(id, body);
+    }
     async findOne(id) {
         return this.assetsService.findOne(id);
     }
     async remove(id) {
-        return { message: 'Asset deleted by admin' };
+        return this.assetsService.removeAsset(id);
     }
 };
 exports.AssetsController = AssetsController;
@@ -146,6 +150,15 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "enroll", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, roles_decorator_1.Roles)(client_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_asset_dto_1.UpdateAssetDto]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "update", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

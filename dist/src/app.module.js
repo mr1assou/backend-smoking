@@ -52,6 +52,7 @@ const locations_module_1 = require("./locations/locations.module");
 const ai_module_1 = require("./ai/ai.module");
 const alerts_module_1 = require("./alerts/alerts.module");
 const files_module_1 = require("./files/files.module");
+const schedule_1 = require("@nestjs/schedule");
 const inventory_module_1 = require("./inventory/inventory.module");
 const analytics_module_1 = require("./analytics/analytics.module");
 let AppModule = class AppModule {
@@ -65,6 +66,7 @@ exports.AppModule = AppModule = __decorate([
                 rootPath: path.join(process.cwd(), 'uploads'),
                 serveRoot: '/uploads',
             }),
+            schedule_1.ScheduleModule.forRoot(),
             prisma_module_1.PrismaModule,
             auth_module_1.AuthModule,
             assets_module_1.AssetsModule,

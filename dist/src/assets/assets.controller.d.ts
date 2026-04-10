@@ -1,5 +1,6 @@
 import { AssetsService } from './assets.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
+import { UpdateAssetDto } from './dto/update-asset.dto';
 import { Response } from 'express';
 export declare class AssetsController {
     private readonly assetsService;
@@ -24,8 +25,7 @@ export declare class AssetsController {
     create(dto: CreateAssetDto): Promise<any>;
     findAll(): Promise<any[]>;
     enroll(id: string, tagId: string): Promise<any>;
+    update(id: string, body: UpdateAssetDto): Promise<any>;
     findOne(id: string): Promise<any>;
-    remove(id: string): Promise<{
-        message: string;
-    }>;
+    remove(id: string): Promise<any>;
 }

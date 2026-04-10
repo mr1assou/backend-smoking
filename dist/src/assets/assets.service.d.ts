@@ -8,6 +8,8 @@ export declare class AssetsService {
     findOrphans(query?: string): Promise<any[]>;
     findUntagged(): Promise<any[]>;
     enrollTag(assetId: string, tagId: string): Promise<any>;
+    updateAsset(id: string, dto: any): Promise<any>;
+    removeAsset(id: string): Promise<any>;
     resetAll(): Promise<{
         message: string;
     }>;

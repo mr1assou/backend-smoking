@@ -54,6 +54,31 @@ export declare class InventoryController {
             duration_seconds: number;
         };
     }>;
+    findActive(req: any): Promise<({
+        user: {
+            id: string;
+            name: string;
+        };
+        location: {
+            id: string;
+            name: string;
+            type: import(".prisma/client").$Enums.LocationType;
+        };
+    } & {
+        id: string;
+        location_id: string;
+        user_id: string;
+        started_at: Date;
+        ended_at: Date | null;
+        last_scan_at: Date | null;
+        total_scanned: number;
+        total_expected: number;
+        found_count: number;
+        missing_count: number;
+        unexpected_count: number;
+        unknown_count: number;
+        movement_count: number;
+    })[]>;
     findAll(): Promise<({
         user: {
             id: string;
