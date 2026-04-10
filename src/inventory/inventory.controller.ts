@@ -49,6 +49,14 @@ export class InventoryController {
     return this.inventoryService.closeSession(id);
   }
 
+  // GET /inventory/sessions/active — Sessions en cours (pour le mobile)
+  @Get('sessions/active')
+  @Roles(UserRole.AUDITOR, UserRole.ADMIN)
+  async findActive(@Request() req: any) {
+    const userId = req.user.id || req.user.sub;
+    return this.inventoryService.findActiveSessions(userId);
+  }
+
   // GET /inventory/sessions
   @Get('sessions')
   @Roles(UserRole.AUDITOR, UserRole.ADMIN)

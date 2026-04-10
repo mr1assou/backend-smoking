@@ -10,6 +10,7 @@ import { LocationsModule } from './locations/locations.module';
 import { AiModule } from './ai/ai.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { FilesModule } from './files/files.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { InventoryModule } from './inventory/inventory.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 
@@ -20,6 +21,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
       rootPath: path.join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
     AssetsModule,

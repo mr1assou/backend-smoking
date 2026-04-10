@@ -1,9 +1,11 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { TagClassification } from '@prisma/client';
 import { CreateSessionDto } from './dto/create-session.dto';
@@ -11,7 +13,56 @@ import { SubmitTagsDto } from './dto/submit-tags.dto';
 
 @Injectable()
 export class InventoryService {
+  private readonly logger = new Logger(InventoryService.name);
+
   constructor(private prisma: PrismaService) {}
+
+  // ─────────────────────────────────────────────────────────────────────
+  // CRON: Nettoyer les sessions abandonnées (> 1h sans clôture)
+  // Exécuté toutes les 15 minutes
+  // ─────────────────────────────────────────────────────────────────────
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async cleanupStaleSessions() {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+    // Sessions ouvertes démarrées il y a plus d'1h
+    const stale = await this.prisma.inventorySession.findMany({
+      where: { ended_at: null, started_at: { lt: oneHourAgo } },
+      select: { id: true, started_at: true },
+    });
+
+    if (stale.length === 0) return;
+
+    this.logger.log(`Nettoyage de ${stale.length} session(s) abandonnée(s)`);
+
+    for (const session of stale) {
+      await this.prisma.$transaction(async (tx) => {
+        // Supprimer les tags de la session
+        await tx.inventoryTag.deleteMany({ where: { session_id: session.id } });
+        // Supprimer les mouvements liés
+        await tx.assetMovement.deleteMany({ where: { session_id: session.id } });
+        // Supprimer la session elle-même
+        await tx.inventorySession.delete({ where: { id: session.id } });
+      });
+      this.logger.log(`Session ${session.id.slice(0, 8)} supprimée (démarrée ${session.started_at.toISOString()})`);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // GET /inventory/sessions/active — Sessions en cours pour l'auditeur
+  // ─────────────────────────────────────────────────────────────────────
+  async findActiveSessions(userId?: string) {
+    const where: Record<string, unknown> = { ended_at: null };
+    if (userId) where.user_id = userId;
+    return this.prisma.inventorySession.findMany({
+      where,
+      orderBy: { started_at: 'desc' },
+      include: {
+        user: { select: { id: true, name: true } },
+        location: { select: { id: true, name: true, type: true } },
+      },
+    });
+  }
 
   // ─────────────────────────────────────────────────────────────────────
   // POST /inventory/sessions
