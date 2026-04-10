@@ -56,7 +56,14 @@ export class AssetsService {
         category: true,
         location: true,
         supplier: true,
-        movements: true,
+        movements: {
+          include: {
+            from_location: true,
+            to_location: true,
+            user: true,
+          },
+          orderBy: { moved_at: 'desc' },
+        },
       },
     });
 
