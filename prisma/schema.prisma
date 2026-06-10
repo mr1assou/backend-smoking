@@ -1,17 +1,13 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider  = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
-
 
 model User {
   user_id            Int     @id @default(autoincrement())
@@ -19,5 +15,70 @@ model User {
   password           String
   hashedRefreshToken String?
 
+  quitReasons       String[] @default([])  
+  motivation        String?
+  priorQuitAttempts String?
+  primaryInterests  String[] @default([])
+
+  username       String?
+  sex            String?
+  country        String?
+  countryFlag    String?
+  currency       String?
+  quitDatePreset String?
+  quitDate       DateTime? @db.Timestamptz(3)
+  streakStart    DateTime? @db.Timestamptz(3)
+
+  cigarettesPerDay     Int?
+  cigarettesPerDayNote String?
+  packPrice            String?
+  yearsSmoking         String?
+  cigarettesPerPack    Int?
+
+  timezone String?
+
+  slipEvents   SlipEvent[]
+  quitAttempts QuitAttempt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("users")
+}
+
+model QuitAttempt {
+  attempt_id           Int       @id @default(autoincrement())
+  user_id              Int
+  user                 User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  attemptNumber        Int       @map("attempt_number")
+  startedAt            DateTime  @map("started_at") @db.Timestamptz(3)
+  endedAt              DateTime? @map("ended_at") @db.Timestamptz(3)
+  endOutcome           String?   @map("end_outcome")
+  durationSeconds      Int       @default(0) @map("duration_seconds")
+  cigarettesAvoided    Int       @default(0) @map("cigarettes_avoided")
+  moneySaved           Float     @default(0) @map("money_saved")
+  lifeMinutesGained    Int       @default(0) @map("life_minutes_gained")
+  slipCigarettesSmoked Int       @default(0) @map("slip_cigarettes_smoked")
+  closingSlipEvent     SlipEvent?
+
+  @@unique([user_id, attemptNumber])
+  @@map("quit_attempts")
+}
+
+model SlipEvent {
+  slip_event_id       Int       @id @default(autoincrement())
+  user_id             Int
+  user                User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  outcome             String
+  cigarettesCount     Int?
+  previousStreakStart DateTime? @db.Timestamptz(3)
+  previousQuitDate    DateTime? @map("previous_quit_date") @db.Timestamptz(3)
+  closedAttemptId     Int?      @unique @map("closed_attempt_id")
+  closedAttempt       QuitAttempt? @relation(fields: [closedAttemptId], references: [attempt_id], onDelete: SetNull)
+  newAttemptId        Int?      @map("new_attempt_id")
+  loggedAt            DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@index([user_id, loggedAt])
+
+  @@map("slip_events")
 }

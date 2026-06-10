@@ -1,0 +1,52 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StatsRepository = void 0;
+const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma/prisma.service");
+let StatsRepository = class StatsRepository {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    countSlipsSince(userId, since) {
+        return this.prisma.slipEvent.count({
+            where: { user_id: userId, loggedAt: { gte: since } },
+        });
+    }
+    countAllSlips(userId) {
+        return this.prisma.slipEvent.count({ where: { user_id: userId } });
+    }
+    listSlipEvents(userId) {
+        return this.prisma.slipEvent.findMany({
+            where: { user_id: userId },
+            select: {
+                slip_event_id: true,
+                outcome: true,
+                cigarettesCount: true,
+                loggedAt: true,
+                closedAttempt: {
+                    select: {
+                        attemptNumber: true,
+                        startedAt: true,
+                    },
+                },
+            },
+            orderBy: { loggedAt: 'desc' },
+        });
+    }
+};
+exports.StatsRepository = StatsRepository;
+exports.StatsRepository = StatsRepository = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+], StatsRepository);
+//# sourceMappingURL=stats.repository.js.map

@@ -1,98 +1,117 @@
 import {
-    ForbiddenException,
-    Injectable,
-    NotFoundException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
+import { randomBytes } from 'crypto';
+import * as argon2 from 'argon2';
+import { UsersService } from '../users/users.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import * as argon2 from 'argon2';
+import {
+  ACCESS_TOKEN_EXPIRES_IN,
+  REFRESH_TOKEN_EXPIRES_IN,
+} from './auth.constants';
+import { GoogleTokenService } from './google/google-token.service';
+
+export type GoogleAuthResult = {
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+  email: string;
+};
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private prisma: PrismaService,
-        private jwt: JwtService,
-        private config: ConfigService,
-    ) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
+    private readonly googleToken: GoogleTokenService,
+  ) {}
 
-    async signup(dto: SignupDto) {
-        const hashedPassword = await argon2.hash(dto.password);
+  async signup(dto: SignupDto) {
+    const hashedPassword = await argon2.hash(dto.password);
+    const user = await this.usersService.createWithHashedPassword(
+      dto.email,
+      hashedPassword,
+    );
+    return this.issueTokensForUser(user.user_id, user.email);
+  }
 
-        const user = await this.prisma.user.create({
-            data: { email: dto.email, password: hashedPassword },
-        });
+  /**
+   * Google = sign up or login: find by email → login; else create account → sign up.
+   */
+  async googleSignIn(idToken: string): Promise<GoogleAuthResult> {
+    const googleUser = await this.googleToken.verifyIdToken(idToken);
+    const email = googleUser.email.trim().toLowerCase();
 
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
-        return tokens;
-    }
+    const password = await argon2.hash(randomBytes(32).toString('hex'));
+    const { user, isNewUser } = await this.usersService.findOrCreateByEmail(
+      email,
+      password,
+    );
+    const tokens = await this.issueTokensForUser(user.user_id, user.email);
+    return { ...tokens, isNewUser, email: user.email };
+  }
 
-    async login(dto: LoginDto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
+  async login(dto: LoginDto) {
+    const user = await this.usersService.findByEmail(dto.email);
 
-        if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('User not found');
 
-        const passwordMatches = await argon2.verify(user.password, dto.password);
-        if (!passwordMatches) throw new ForbiddenException('Invalid credentials');
+    const passwordMatches = await argon2.verify(user.password, dto.password);
+    if (!passwordMatches) throw new ForbiddenException('Invalid credentials');
 
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
-        return tokens;
-    }
+    return this.issueTokensForUser(user.user_id, user.email);
+  }
 
-    async refresh(userId: number, refreshToken: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { user_id: userId },
-        });
+  async refresh(userId: number, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
 
-        if (!user || !user.hashedRefreshToken)
-            throw new ForbiddenException('Access denied');
+    if (!user || !user.hashedRefreshToken)
+      throw new ForbiddenException('Access denied');
 
-        const tokenMatches = await argon2.verify(
-            user.hashedRefreshToken,
-            refreshToken,
-        );
-        if (!tokenMatches) throw new ForbiddenException('Access denied');
+    const tokenMatches = await argon2.verify(
+      user.hashedRefreshToken,
+      refreshToken,
+    );
+    if (!tokenMatches) throw new ForbiddenException('Access denied');
 
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
-        return tokens;
-    }
+    return this.issueTokensForUser(user.user_id, user.email);
+  }
 
-    async logout(userId: number) {
-        await this.prisma.user.update({
-            where: { user_id: userId },
-            data: { hashedRefreshToken: null },
-        });
-    }
+  async logout(userId: number) {
+    await this.usersService.setRefreshTokenHash(userId, null);
+  }
 
-    private async generateTokens(userId: number, email: string) {
-        const payload = { sub: userId, email };
+  private async issueTokensForUser(userId: number, email: string) {
+    const tokens = await this.generateTokens(userId, email);
+    await this.saveRefreshToken(userId, tokens.refreshToken);
+    return tokens;
+  }
 
-        const [accessToken, refreshToken] = await Promise.all([
-            this.jwt.signAsync(payload, {
-                secret: this.config.get<string>('JWT_SECRET'),
-                expiresIn: '15m',
-            }),
-            this.jwt.signAsync(payload, {
-                secret: this.config.get<string>('JWT_REFRESH_SECRET'),
-                expiresIn: '7d',
-            }),
-        ]);
+  private async generateTokens(userId: number, email: string) {
+    const payload = { sub: userId, email };
 
-        return { accessToken, refreshToken };
-    }
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwt.signAsync(payload, {
+        secret: this.config.get<string>('JWT_SECRET'),
+        expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+      }),
+      this.jwt.signAsync(payload, {
+        secret: this.config.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+      }),
+    ]);
 
-    private async saveRefreshToken(userId: number, refreshToken: string) {
-        const hashed = await argon2.hash(refreshToken);
-        await this.prisma.user.update({
-            where: { user_id: userId },
-            data: { hashedRefreshToken: hashed },
-        });
-    }
+    return { accessToken, refreshToken };
+  }
+
+  private async saveRefreshToken(userId: number, refreshToken: string) {
+    const hashed = await argon2.hash(refreshToken);
+    await this.usersService.setRefreshTokenHash(userId, hashed);
+  }
 }

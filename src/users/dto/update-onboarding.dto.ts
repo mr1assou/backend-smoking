@@ -1,0 +1,111 @@
+import {
+  IsArray,
+  IsInt,
+  IsISO8601,
+  IsOptional,
+  IsString,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+class OnboardingStep1Dto {
+  @IsArray()
+  @IsString({ each: true })
+  quitReasons: string[];
+}
+
+class OnboardingStep2Dto {
+  @IsOptional()
+  @IsString()
+  motivation?: string;
+}
+
+class OnboardingStep3Dto {
+  @IsOptional()
+  @IsString()
+  priorQuitAttempts?: string;
+}
+
+class OnboardingStep4Dto {
+  @IsArray()
+  @IsString({ each: true })
+  primaryInterests: string[];
+}
+
+class OnboardingStep5Dto {
+  @IsString()
+  username: string;
+
+  @IsOptional()
+  @IsString()
+  sex?: string;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  countryFlag?: string;
+
+  @IsString()
+  currency: string;
+
+  @IsOptional()
+  @IsString()
+  quitDatePreset?: string;
+
+  /** UTC ISO-8601 instant, e.g. local quit-day midnight as `2026-06-08T00:00:00.000Z`. */
+  @IsOptional()
+  @IsISO8601()
+  quitDate?: string;
+}
+
+class OnboardingStep6Dto {
+  @IsInt()
+  @Min(1)
+  cigarettesPerDay: number;
+
+  @IsOptional()
+  @IsString()
+  cigarettesPerDayNote?: string;
+
+  @IsOptional()
+  @IsString()
+  packPrice?: string;
+
+  @IsOptional()
+  @IsString()
+  yearsSmoking?: string;
+
+  @IsInt()
+  @Min(1)
+  cigarettesPerPack: number;
+}
+
+export class UpdateOnboardingDto {
+  @ValidateNested()
+  @Type(() => OnboardingStep1Dto)
+  step1: OnboardingStep1Dto;
+
+  @ValidateNested()
+  @Type(() => OnboardingStep2Dto)
+  step2: OnboardingStep2Dto;
+
+  @ValidateNested()
+  @Type(() => OnboardingStep3Dto)
+  step3: OnboardingStep3Dto;
+
+  @ValidateNested()
+  @Type(() => OnboardingStep4Dto)
+  step4: OnboardingStep4Dto;
+
+  @ValidateNested()
+  @Type(() => OnboardingStep5Dto)
+  step5: OnboardingStep5Dto;
+
+  @ValidateNested()
+  @Type(() => OnboardingStep6Dto)
+  step6: OnboardingStep6Dto;
+}

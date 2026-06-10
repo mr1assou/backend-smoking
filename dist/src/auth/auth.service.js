@@ -46,85 +46,86 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
-const prisma_service_1 = require("../prisma/prisma.service");
+const crypto_1 = require("crypto");
 const argon2 = __importStar(require("argon2"));
+const users_service_1 = require("../users/users.service");
+const auth_constants_1 = require("./auth.constants");
+const google_token_service_1 = require("./google/google-token.service");
 let AuthService = class AuthService {
-    prisma;
+    usersService;
     jwt;
     config;
-    constructor(prisma, jwt, config) {
-        this.prisma = prisma;
+    googleToken;
+    constructor(usersService, jwt, config, googleToken) {
+        this.usersService = usersService;
         this.jwt = jwt;
         this.config = config;
+        this.googleToken = googleToken;
     }
     async signup(dto) {
         const hashedPassword = await argon2.hash(dto.password);
-        const user = await this.prisma.user.create({
-            data: { email: dto.email, password: hashedPassword },
-        });
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
-        return tokens;
+        const user = await this.usersService.createWithHashedPassword(dto.email, hashedPassword);
+        return this.issueTokensForUser(user.user_id, user.email);
+    }
+    async googleSignIn(idToken) {
+        const googleUser = await this.googleToken.verifyIdToken(idToken);
+        const email = googleUser.email.trim().toLowerCase();
+        const password = await argon2.hash((0, crypto_1.randomBytes)(32).toString('hex'));
+        const { user, isNewUser } = await this.usersService.findOrCreateByEmail(email, password);
+        const tokens = await this.issueTokensForUser(user.user_id, user.email);
+        return { ...tokens, isNewUser, email: user.email };
     }
     async login(dto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
+        const user = await this.usersService.findByEmail(dto.email);
         if (!user)
             throw new common_1.NotFoundException('User not found');
         const passwordMatches = await argon2.verify(user.password, dto.password);
         if (!passwordMatches)
             throw new common_1.ForbiddenException('Invalid credentials');
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
-        return tokens;
+        return this.issueTokensForUser(user.user_id, user.email);
     }
     async refresh(userId, refreshToken) {
-        const user = await this.prisma.user.findUnique({
-            where: { user_id: userId },
-        });
+        const user = await this.usersService.findById(userId);
         if (!user || !user.hashedRefreshToken)
             throw new common_1.ForbiddenException('Access denied');
         const tokenMatches = await argon2.verify(user.hashedRefreshToken, refreshToken);
         if (!tokenMatches)
             throw new common_1.ForbiddenException('Access denied');
-        const tokens = await this.generateTokens(user.user_id, user.email);
-        await this.saveRefreshToken(user.user_id, tokens.refreshToken);
-        return tokens;
+        return this.issueTokensForUser(user.user_id, user.email);
     }
     async logout(userId) {
-        await this.prisma.user.update({
-            where: { user_id: userId },
-            data: { hashedRefreshToken: null },
-        });
+        await this.usersService.setRefreshTokenHash(userId, null);
+    }
+    async issueTokensForUser(userId, email) {
+        const tokens = await this.generateTokens(userId, email);
+        await this.saveRefreshToken(userId, tokens.refreshToken);
+        return tokens;
     }
     async generateTokens(userId, email) {
         const payload = { sub: userId, email };
         const [accessToken, refreshToken] = await Promise.all([
             this.jwt.signAsync(payload, {
                 secret: this.config.get('JWT_SECRET'),
-                expiresIn: '15m',
+                expiresIn: auth_constants_1.ACCESS_TOKEN_EXPIRES_IN,
             }),
             this.jwt.signAsync(payload, {
                 secret: this.config.get('JWT_REFRESH_SECRET'),
-                expiresIn: '7d',
+                expiresIn: auth_constants_1.REFRESH_TOKEN_EXPIRES_IN,
             }),
         ]);
         return { accessToken, refreshToken };
     }
     async saveRefreshToken(userId, refreshToken) {
         const hashed = await argon2.hash(refreshToken);
-        await this.prisma.user.update({
-            where: { user_id: userId },
-            data: { hashedRefreshToken: hashed },
-        });
+        await this.usersService.setRefreshTokenHash(userId, hashed);
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+    __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        google_token_service_1.GoogleTokenService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

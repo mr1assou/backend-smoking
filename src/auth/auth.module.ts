@@ -1,17 +1,32 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { SlipEventsModule } from '../slip-events/slip-events.module';
+import { StatsModule } from '../stats/stats.module';
+import { UsersModule } from '../users/users.module';
+import { UsersController } from '../users/users.controller';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { GoogleOAuthService } from './google/google-oauth.service';
+import { GoogleTokenService } from './google/google-token.service';
 
 @Module({
     imports: [
         PassportModule,
-    JwtModule.register({}),
+        JwtModule.register({}),
+        UsersModule,
+        SlipEventsModule,
+        StatsModule,
     ],
-    controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
+    controllers: [AuthController, UsersController],
+    providers: [
+        AuthService,
+        GoogleTokenService,
+        GoogleOAuthService,
+        JwtStrategy,
+        JwtRefreshStrategy,
+    ],
 })
 export class AuthModule { }

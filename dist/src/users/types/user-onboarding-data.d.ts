@@ -1,0 +1,34 @@
+export type UserOnboardingData = {
+    quitReasons: string[];
+    motivation: string | null;
+    priorQuitAttempts: string | null;
+    primaryInterests: string[];
+    username: string | null;
+    sex: string | null;
+    country: string | null;
+    countryFlag: string | null;
+    currency: string | null;
+    quitDatePreset: string | null;
+    quitDate: Date | null;
+    streakStart: Date | null;
+    cigarettesPerDay: number | null;
+    cigarettesPerDayNote: string | null;
+    packPrice: string | null;
+    yearsSmoking: string | null;
+    cigarettesPerPack: number | null;
+};
+export type UserMeProfile = {
+    email: string;
+    username: string | null;
+    sex: string | null;
+    country: string | null;
+    countryFlag: string | null;
+    currency: string | null;
+    quitDatePreset: string | null;
+    quitDate: Date | null;
+    streakStart: Date | null;
+    cigarettesPerDay: number | null;
+    cigarettesPerPack: number | null;
+    packPrice: string | null;
+    timezone: string | null;
+};

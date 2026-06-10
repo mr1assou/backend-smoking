@@ -10,10 +10,16 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
+const slip_events_module_1 = require("../slip-events/slip-events.module");
+const stats_module_1 = require("../stats/stats.module");
+const users_module_1 = require("../users/users.module");
+const users_controller_1 = require("../users/users.controller");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const jwt_refresh_strategy_1 = require("./strategies/jwt-refresh.strategy");
+const google_oauth_service_1 = require("./google/google-oauth.service");
+const google_token_service_1 = require("./google/google-token.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -22,9 +28,18 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             passport_1.PassportModule,
             jwt_1.JwtModule.register({}),
+            users_module_1.UsersModule,
+            slip_events_module_1.SlipEventsModule,
+            stats_module_1.StatsModule,
         ],
-        controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, jwt_refresh_strategy_1.JwtRefreshStrategy],
+        controllers: [auth_controller_1.AuthController, users_controller_1.UsersController],
+        providers: [
+            auth_service_1.AuthService,
+            google_token_service_1.GoogleTokenService,
+            google_oauth_service_1.GoogleOAuthService,
+            jwt_strategy_1.JwtStrategy,
+            jwt_refresh_strategy_1.JwtRefreshStrategy,
+        ],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

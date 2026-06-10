@@ -11,15 +11,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const client_1 = require("@prisma/client");
 const adapter_pg_1 = require("@prisma/adapter-pg");
+const fs_1 = require("fs");
+const path_1 = require("path");
 const pg_1 = require("pg");
-const config_1 = require("@nestjs/config");
+function connectionStringWithoutSslParams(raw) {
+    const url = new URL(raw);
+    for (const key of ['sslmode', 'sslrootcert', 'sslcert', 'sslkey', 'uselibpqcompat']) {
+        url.searchParams.delete(key);
+    }
+    const tzFlag = '-c TimeZone=UTC';
+    const options = url.searchParams.get('options');
+    if (!options?.includes('TimeZone=')) {
+        url.searchParams.set('options', options ? `${options} ${tzFlag}` : tzFlag);
+    }
+    return url.toString();
+}
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     config;
     constructor(config) {
-        const connectionString = config.get('DATABASE_URL');
-        const pool = new pg_1.Pool({ connectionString });
+        const rawUrl = config.get('DATABASE_URL');
+        if (!rawUrl) {
+            throw new Error('DATABASE_URL is not set');
+        }
+        const caPath = config.get('DATABASE_CA_PATH') ??
+            (0, path_1.join)(process.cwd(), 'certs', 'ca.pem');
+        const pool = new pg_1.Pool({
+            connectionString: connectionStringWithoutSslParams(rawUrl),
+            ssl: {
+                ca: (0, fs_1.readFileSync)(caPath, 'utf8'),
+                rejectUnauthorized: true,
+            },
+        });
         const adapter = new adapter_pg_1.PrismaPg(pool);
         super({ adapter });
         this.config = config;
