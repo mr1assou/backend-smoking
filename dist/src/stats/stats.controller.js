@@ -21,21 +21,32 @@ let StatsController = class StatsController {
     constructor(statsService) {
         this.statsService = statsService;
     }
-    getStats(req) {
-        return this.statsService.getUserStats(req.user.userId);
+    getOverview(req) {
+        return this.statsService.getOverview(req.user.userId);
+    }
+    getAttempts(req) {
+        return this.statsService.getAttempts(req.user.userId);
     }
 };
 exports.StatsController = StatsController;
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
-    (0, common_1.Get)('stats'),
+    (0, common_1.Get)('overview'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], StatsController.prototype, "getStats", null);
+], StatsController.prototype, "getOverview", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('attempts'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], StatsController.prototype, "getAttempts", null);
 exports.StatsController = StatsController = __decorate([
-    (0, common_1.Controller)('auth/me'),
+    (0, common_1.Controller)('auth/me/stats'),
     __metadata("design:paramtypes", [stats_service_1.StatsService])
 ], StatsController);
 //# sourceMappingURL=stats.controller.js.map

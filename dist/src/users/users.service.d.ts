@@ -1,12 +1,15 @@
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
+import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersRepository } from './users.repository';
 export declare class UsersService {
     private readonly usersRepository;
     private readonly attemptsService;
-    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService);
+    private readonly storageService;
+    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService, storageService: StorageService);
     createWithHashedPassword(email: string, hashedPassword: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
     findById(userId: number): Promise<User | null>;
@@ -41,11 +44,17 @@ export declare class UsersService {
         yearsSmoking: string | null;
         cigarettesPerPack: number | null;
         timezone: string | null;
+        image_url: string | null;
+        last_offline_at: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;
+    updateProfileImage(userId: number, dto: UpdateProfileImageDto): Promise<{
+        image_url: string;
+    }>;
     setRefreshTokenHash(userId: number, hashedRefreshToken: string | null): Promise<void>;
     getMe(userId: number): Promise<{
+        userId: number;
         email: string;
         name: string | undefined;
         hasCompletedOnboarding: boolean;
@@ -60,6 +69,7 @@ export declare class UsersService {
         cigarettesPerPack: number | undefined;
         packPrice: string | undefined;
         timezone: string | undefined;
+        imageUrl: string | undefined;
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
     }>;

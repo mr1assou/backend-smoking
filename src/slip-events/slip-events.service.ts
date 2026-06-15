@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { toUtcIso, utcInstantNow } from '../common/utc-instant';
 import { UsersRepository } from '../users/users.repository';
 import { CreateSlipEventDto } from './dto/create-slip-event.dto';
-import { resolveSlipCigarettesCount } from './slip-cigarette-count';
+import { resolveSlipCigarettesCount } from './lib';
 import { SlipEventsRepository } from './slip-events.repository';
 
 @Injectable()

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { PresenceModule } from '../presence/presence.module';
 import { SlipEventsModule } from '../slip-events/slip-events.module';
 import { StatsModule } from '../stats/stats.module';
 import { UsersModule } from '../users/users.module';
@@ -16,6 +17,7 @@ import { GoogleTokenService } from './google/google-token.service';
     imports: [
         PassportModule,
         JwtModule.register({}),
+        PresenceModule,
         UsersModule,
         SlipEventsModule,
         StatsModule,

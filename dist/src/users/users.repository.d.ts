@@ -16,4 +16,6 @@ export declare class UsersRepository {
         email: string;
     }>;
     updateRefreshToken(userId: number, hashedRefreshToken: string | null): Promise<User>;
+    updateProfileImage(userId: number, imageUrl: string): Promise<User>;
+    updateLastOfflineAt(userId: number, at: Date): Promise<User>;
 }

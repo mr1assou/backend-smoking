@@ -13,7 +13,7 @@ exports.SlipEventsService = void 0;
 const common_1 = require("@nestjs/common");
 const utc_instant_1 = require("../common/utc-instant");
 const users_repository_1 = require("../users/users.repository");
-const slip_cigarette_count_1 = require("./slip-cigarette-count");
+const lib_1 = require("./lib");
 const slip_events_repository_1 = require("./slip-events.repository");
 let SlipEventsService = class SlipEventsService {
     slipEventsRepository;
@@ -29,7 +29,7 @@ let SlipEventsService = class SlipEventsService {
         const fallback = (0, utc_instant_1.utcInstantNow)();
         const previousStreakStart = user.streakStart ?? user.quitDate ?? fallback;
         const previousQuitDate = user.quitDate ?? previousStreakStart;
-        const cigarettesCount = (0, slip_cigarette_count_1.resolveSlipCigarettesCount)(dto.outcome, dto.cigarettesCount);
+        const cigarettesCount = (0, lib_1.resolveSlipCigarettesCount)(dto.outcome, dto.cigarettesCount);
         const { event, streakStart, quitDate, currentAttemptNumber } = await this.slipEventsRepository.createWithAttemptRotation({
             userId,
             outcome: dto.outcome,

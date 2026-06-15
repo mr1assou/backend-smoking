@@ -10,6 +10,7 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
+const presence_module_1 = require("../presence/presence.module");
 const slip_events_module_1 = require("../slip-events/slip-events.module");
 const stats_module_1 = require("../stats/stats.module");
 const users_module_1 = require("../users/users.module");
@@ -28,6 +29,7 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             passport_1.PassportModule,
             jwt_1.JwtModule.register({}),
+            presence_module_1.PresenceModule,
             users_module_1.UsersModule,
             slip_events_module_1.SlipEventsModule,
             stats_module_1.StatsModule,

@@ -36,6 +36,7 @@ let UsersRepository = class UsersRepository {
         return this.prisma.user.findUnique({
             where: { user_id: userId },
             select: {
+                user_id: true,
                 email: true,
                 username: true,
                 sex: true,
@@ -49,6 +50,7 @@ let UsersRepository = class UsersRepository {
                 cigarettesPerPack: true,
                 packPrice: true,
                 timezone: true,
+                image_url: true,
             },
         });
     }
@@ -81,6 +83,18 @@ let UsersRepository = class UsersRepository {
         return this.prisma.user.update({
             where: { user_id: userId },
             data: { hashedRefreshToken },
+        });
+    }
+    updateProfileImage(userId, imageUrl) {
+        return this.prisma.user.update({
+            where: { user_id: userId },
+            data: { image_url: imageUrl },
+        });
+    }
+    updateLastOfflineAt(userId, at) {
+        return this.prisma.user.update({
+            where: { user_id: userId },
+            data: { last_offline_at: at },
         });
     }
 };

@@ -36,9 +36,21 @@ model User {
   cigarettesPerPack    Int?
 
   timezone String?
+  image_url String?
+  last_offline_at DateTime? @map("last_offline_at") @db.Timestamptz(3)
 
   slipEvents   SlipEvent[]
   quitAttempts QuitAttempt[]
+  posts        Post[]
+  postComments      PostComment[]
+  postVotes         PostVote[]
+  postCommentVotes  PostCommentVote[]
+  commentRepliesTo  PostComment[] @relation("CommentReplyTo")
+
+  chatThreadsAsUserOne ChatThread[] @relation("ChatThreadUserOne")
+  chatThreadsAsUserTwo ChatThread[] @relation("ChatThreadUserTwo")
+  chatMessages         ChatMessage[]
+  chatThreadReads      ChatThreadRead[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -81,4 +93,165 @@ model SlipEvent {
   @@index([user_id, loggedAt])
 
   @@map("slip_events")
+}
+
+model Post {
+  post_id        Int      @id @default(autoincrement())
+  author_id      Int
+  author         User     @relation(fields: [author_id], references: [user_id], onDelete: Cascade)
+
+  title          String
+  description    String   @default("")
+  tag_id         String?
+
+  image_url      String?
+  image_frame    String?
+  image_crop     Json?
+
+  upvote_count   Int      @default(0)
+  downvote_count Int      @default(0)
+  share_count    Int      @default(0)
+  comment_count  Int      @default(0)
+
+  comments       PostComment[]
+  votes          PostVote[]
+
+  created_at     DateTime @default(now()) @db.Timestamptz(3)
+  updated_at     DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([created_at(sort: Desc)])
+  @@index([author_id, created_at(sort: Desc)])
+  @@map("posts")
+}
+
+model PostComment {
+  comment_id  Int      @id @default(autoincrement())
+  post_id     Int
+  post        Post     @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
+  author_id   Int
+  author      User     @relation(fields: [author_id], references: [user_id], onDelete: Cascade)
+
+  parent_comment_id Int?
+  parent_comment    PostComment?  @relation("CommentReplies", fields: [parent_comment_id], references: [comment_id], onDelete: Cascade)
+  replies           PostComment[] @relation("CommentReplies")
+
+  reply_to_user_id Int?
+  reply_to_user    User? @relation("CommentReplyTo", fields: [reply_to_user_id], references: [user_id], onDelete: SetNull)
+
+  text           String
+  upvote_count   Int      @default(0)
+  downvote_count Int      @default(0)
+
+  votes PostCommentVote[]
+
+  created_at  DateTime @default(now()) @db.Timestamptz(3)
+  updated_at  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([post_id, created_at(sort: Asc)])
+  @@index([post_id, parent_comment_id, created_at(sort: Asc)])
+  @@index([author_id])
+  @@map("post_comments")
+}
+
+model PostCommentVote {
+  comment_vote_id Int         @id @default(autoincrement())
+  comment_id      Int
+  comment         PostComment @relation(fields: [comment_id], references: [comment_id], onDelete: Cascade)
+  user_id         Int
+  user            User        @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  vote         String
+
+  created_at   DateTime @default(now()) @db.Timestamptz(3)
+  updated_at   DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([comment_id, user_id])
+  @@index([user_id])
+  @@map("post_comment_votes")
+}
+
+model PostVote {
+  post_vote_id Int      @id @default(autoincrement())
+  post_id      Int
+  post         Post     @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
+  user_id      Int
+  user         User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  vote         String
+
+  created_at   DateTime @default(now()) @db.Timestamptz(3)
+  updated_at   DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([post_id, user_id])
+  @@index([user_id])
+  @@map("post_votes")
+}
+
+/// One 1:1 conversation between two users (user_one_id is always the lower user_id).
+model ChatThread {
+  thread_id   Int      @id @default(autoincrement())
+  user_one_id Int      @map("user_one_id")
+  user_two_id Int      @map("user_two_id")
+  userOne     User     @relation("ChatThreadUserOne", fields: [user_one_id], references: [user_id], onDelete: Cascade)
+  userTwo     User     @relation("ChatThreadUserTwo", fields: [user_two_id], references: [user_id], onDelete: Cascade)
+
+  messages    ChatMessage[]
+  reads       ChatThreadRead[]
+
+  created_at  DateTime @default(now()) @db.Timestamptz(3)
+  updated_at  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([user_one_id, user_two_id])
+  @@index([user_one_id])
+  @@index([user_two_id])
+  @@index([user_one_id, updated_at(sort: Desc)])
+  @@index([user_two_id, updated_at(sort: Desc)])
+  @@map("chat_threads")
+}
+
+model ChatMessage {
+  message_id        Int        @id @default(autoincrement())
+  thread_id         Int        @map("thread_id")
+  thread            ChatThread @relation(fields: [thread_id], references: [thread_id], onDelete: Cascade)
+  sender_id         Int        @map("sender_id")
+  sender            User       @relation(fields: [sender_id], references: [user_id], onDelete: Cascade)
+
+  /// text | image | video | audio
+  message_type      String     @default("text") @map("message_type")
+  /// Text body or optional caption on media messages.
+  text              String?
+  /// Public R2 URL for image, video, or audio payloads.
+  media_url         String?    @map("media_url")
+  /// MIME type of the R2 object (e.g. image/jpeg, video/mp4, audio/m4a).
+  media_mime_type   String?    @map("media_mime_type")
+  /// Playback length for audio/video (milliseconds).
+  media_duration_ms Int?       @map("media_duration_ms")
+  /// Uploaded file size in bytes.
+  media_size_bytes  Int?       @map("media_size_bytes")
+
+  created_at        DateTime   @default(now()) @db.Timestamptz(3)
+
+  /// Paginate messages in a thread (newest first).
+  @@index([thread_id, created_at(sort: Desc)])
+  /// Count unread messages per thread for a recipient.
+  @@index([thread_id, sender_id, created_at(sort: Desc)])
+  @@index([sender_id])
+  @@index([message_type])
+  @@map("chat_messages")
+}
+
+/// Per-user read cursor in a thread — drives seen/unseen for both sides.
+model ChatThreadRead {
+  thread_read_id Int        @id @default(autoincrement())
+  thread_id      Int        @map("thread_id")
+  thread         ChatThread @relation(fields: [thread_id], references: [thread_id], onDelete: Cascade)
+  user_id        Int        @map("user_id")
+  user           User       @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  /// UTC instant of the last message this user has read in the thread.
+  last_read_at   DateTime   @default(now()) @map("last_read_at") @db.Timestamptz(3)
+
+  @@unique([thread_id, user_id])
+  @@index([user_id])
+  @@map("chat_thread_reads")
 }

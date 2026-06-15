@@ -4,7 +4,7 @@ import {
   computeAttemptImpact,
   parsePackPrice,
   type AttemptEconomics,
-} from '../stats/attempt-impact';
+} from '../stats/lib/attempt-impact';
 import { AttemptsRepository } from './attempts.repository';
 export type AttemptSummary = {
   attemptId: number;

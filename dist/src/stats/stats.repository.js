@@ -25,24 +25,6 @@ let StatsRepository = class StatsRepository {
     countAllSlips(userId) {
         return this.prisma.slipEvent.count({ where: { user_id: userId } });
     }
-    listSlipEvents(userId) {
-        return this.prisma.slipEvent.findMany({
-            where: { user_id: userId },
-            select: {
-                slip_event_id: true,
-                outcome: true,
-                cigarettesCount: true,
-                loggedAt: true,
-                closedAttempt: {
-                    select: {
-                        attemptNumber: true,
-                        startedAt: true,
-                    },
-                },
-            },
-            orderBy: { loggedAt: 'desc' },
-        });
-    }
 };
 exports.StatsRepository = StatsRepository;
 exports.StatsRepository = StatsRepository = __decorate([

@@ -20,6 +20,7 @@ export type UserOnboardingData = {
 };
 
 export type UserMeProfile = {
+  user_id: number;
   email: string;
   username: string | null;
   sex: string | null;
@@ -33,4 +34,5 @@ export type UserMeProfile = {
   cigarettesPerPack: number | null;
   packPrice: string | null;
   timezone: string | null;
+  image_url: string | null;
 };

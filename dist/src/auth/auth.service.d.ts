@@ -1,6 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
+import { PresenceService } from '../presence/presence.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleTokenService } from './google/google-token.service';
@@ -12,10 +13,11 @@ export type GoogleAuthResult = {
 };
 export declare class AuthService {
     private readonly usersService;
+    private readonly presenceService;
     private readonly jwt;
     private readonly config;
     private readonly googleToken;
-    constructor(usersService: UsersService, jwt: JwtService, config: ConfigService, googleToken: GoogleTokenService);
+    constructor(usersService: UsersService, presenceService: PresenceService, jwt: JwtService, config: ConfigService, googleToken: GoogleTokenService);
     signup(dto: SignupDto): Promise<{
         accessToken: string;
         refreshToken: string;

@@ -1,5 +1,5 @@
 import { QuitAttempt } from '@prisma/client';
-import { type AttemptEconomics } from '../stats/attempt-impact';
+import { type AttemptEconomics } from '../stats/lib/attempt-impact';
 import { AttemptsRepository } from './attempts.repository';
 export type AttemptSummary = {
     attemptId: number;
@@ -22,7 +22,7 @@ export declare class AttemptsService {
         cigarettesPerPack: number | null;
         packPrice: string | null;
     }): AttemptEconomics;
-    computeSnapshot(economics: AttemptEconomics, startedAt: Date, endedAt: Date, slipCigarettesSmoked: number): import("../stats/attempt-impact").AttemptImpactSnapshot;
+    computeSnapshot(economics: AttemptEconomics, startedAt: Date, endedAt: Date, slipCigarettesSmoked: number): import("../stats/lib/attempt-impact").AttemptImpactSnapshot;
     getActiveAttempt(userId: number): Promise<QuitAttempt | null>;
     listCompletedAttempts(userId: number): Promise<AttemptSummary[]>;
     toSummary(row: QuitAttempt): AttemptSummary;

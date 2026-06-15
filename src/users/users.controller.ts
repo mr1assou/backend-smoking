@@ -9,6 +9,7 @@ import {
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersService } from './users.service';
 
@@ -38,5 +39,14 @@ export class UsersController {
     @Body() dto: UpdateUserPreferencesDto,
   ) {
     return this.usersService.updatePreferences(req.user.userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('me/profile-image')
+  updateProfileImage(
+    @Req() req: Request & { user: { userId: number } },
+    @Body() dto: UpdateProfileImageDto,
+  ) {
+    return this.usersService.updateProfileImage(req.user.userId, dto);
   }
 }

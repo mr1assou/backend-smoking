@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersService } from './users.service';
 export declare class UsersController {
@@ -10,6 +11,7 @@ export declare class UsersController {
             userId: number;
         };
     }): Promise<{
+        userId: number;
         email: string;
         name: string | undefined;
         hasCompletedOnboarding: boolean;
@@ -24,6 +26,7 @@ export declare class UsersController {
         cigarettesPerPack: number | undefined;
         packPrice: string | undefined;
         timezone: string | undefined;
+        imageUrl: string | undefined;
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
     }>;
@@ -62,7 +65,16 @@ export declare class UsersController {
         yearsSmoking: string | null;
         cigarettesPerPack: number | null;
         timezone: string | null;
+        image_url: string | null;
+        last_offline_at: Date | null;
         createdAt: Date;
         updatedAt: Date;
+    }>;
+    updateProfileImage(req: Request & {
+        user: {
+            userId: number;
+        };
+    }, dto: UpdateProfileImageDto): Promise<{
+        image_url: string;
     }>;
 }

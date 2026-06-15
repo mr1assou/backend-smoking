@@ -13,13 +13,16 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_service_1 = require("../attempts/attempts.service");
 const utc_instant_1 = require("../common/utc-instant");
+const storage_service_1 = require("../storage/storage.service");
 const users_repository_1 = require("./users.repository");
 let UsersService = class UsersService {
     usersRepository;
     attemptsService;
-    constructor(usersRepository, attemptsService) {
+    storageService;
+    constructor(usersRepository, attemptsService, storageService) {
         this.usersRepository = usersRepository;
         this.attemptsService = attemptsService;
+        this.storageService = storageService;
     }
     async createWithHashedPassword(email, hashedPassword) {
         return this.usersRepository.createWithCredentials(email, hashedPassword);
@@ -53,6 +56,11 @@ let UsersService = class UsersService {
         }
         return this.usersRepository.updateDevicePreferences(userId, data);
     }
+    async updateProfileImage(userId, dto) {
+        this.storageService.assertOwnedProfileImageUrl(userId, dto.image_url);
+        await this.usersRepository.updateProfileImage(userId, dto.image_url);
+        return { image_url: dto.image_url };
+    }
     async setRefreshTokenHash(userId, hashedRefreshToken) {
         await this.usersRepository.updateRefreshToken(userId, hashedRefreshToken);
     }
@@ -65,6 +73,7 @@ let UsersService = class UsersService {
             ? await this.usersRepository.sumSlipCigarettesSince(userId, activeAttempt.startedAt)
             : 0;
         return {
+            userId: user.user_id,
             email: user.email,
             name: user.username ?? undefined,
             hasCompletedOnboarding: Boolean(user.username?.trim()),
@@ -79,6 +88,7 @@ let UsersService = class UsersService {
             cigarettesPerPack: user.cigarettesPerPack ?? undefined,
             packPrice: user.packPrice ?? undefined,
             timezone: user.timezone ?? undefined,
+            imageUrl: user.image_url ?? undefined,
             slipCigarettesTotal,
             currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
         };
@@ -120,6 +130,7 @@ exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_repository_1.UsersRepository,
-        attempts_service_1.AttemptsService])
+        attempts_service_1.AttemptsService,
+        storage_service_1.StorageService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

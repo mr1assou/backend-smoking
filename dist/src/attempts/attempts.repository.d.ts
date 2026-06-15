@@ -1,6 +1,6 @@
 import { QuitAttempt } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import type { AttemptImpactSnapshot } from '../stats/attempt-impact';
+import type { AttemptImpactSnapshot } from '../stats/lib/attempt-impact';
 export type CloseAttemptData = AttemptImpactSnapshot & {
     endedAt: Date;
     endOutcome: string;

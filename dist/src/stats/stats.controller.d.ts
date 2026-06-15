@@ -3,9 +3,14 @@ import { StatsService } from './stats.service';
 export declare class StatsController {
     private readonly statsService;
     constructor(statsService: StatsService);
-    getStats(req: Request & {
+    getOverview(req: Request & {
         user: {
             userId: number;
         };
-    }): Promise<import("./stats.service").UserStatsResponse>;
+    }): Promise<import("./types").StatsOverviewResponse>;
+    getAttempts(req: Request & {
+        user: {
+            userId: number;
+        };
+    }): Promise<import("./types").StatsAttemptsResponse>;
 }

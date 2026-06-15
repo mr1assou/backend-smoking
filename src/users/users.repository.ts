@@ -30,6 +30,7 @@ export class UsersRepository {
     return this.prisma.user.findUnique({
       where: { user_id: userId },
       select: {
+        user_id: true,
         email: true,
         username: true,
         sex: true,
@@ -43,6 +44,7 @@ export class UsersRepository {
         cigarettesPerPack: true,
         packPrice: true,
         timezone: true,
+        image_url: true,
       },
     });
   }
@@ -88,6 +90,20 @@ export class UsersRepository {
     return this.prisma.user.update({
       where: { user_id: userId },
       data: { hashedRefreshToken },
+    });
+  }
+
+  updateProfileImage(userId: number, imageUrl: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { user_id: userId },
+      data: { image_url: imageUrl },
+    });
+  }
+
+  updateLastOfflineAt(userId: number, at: Date): Promise<User> {
+    return this.prisma.user.update({
+      where: { user_id: userId },
+      data: { last_offline_at: at },
     });
   }
 }

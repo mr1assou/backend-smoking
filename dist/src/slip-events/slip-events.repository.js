@@ -14,7 +14,7 @@ const common_1 = require("@nestjs/common");
 const attempts_service_1 = require("../attempts/attempts.service");
 const utc_instant_1 = require("../common/utc-instant");
 const prisma_service_1 = require("../prisma/prisma.service");
-const slip_cigarette_count_1 = require("./slip-cigarette-count");
+const lib_1 = require("./lib");
 let SlipEventsRepository = class SlipEventsRepository {
     prisma;
     attemptsService;
@@ -41,7 +41,7 @@ let SlipEventsRepository = class SlipEventsRepository {
     }
     createWithAttemptRotation(data) {
         const now = (0, utc_instant_1.utcInstantNow)();
-        const cigarettesCount = (0, slip_cigarette_count_1.resolveSlipCigarettesCount)(data.outcome, data.cigarettesCount);
+        const cigarettesCount = (0, lib_1.resolveSlipCigarettesCount)(data.outcome, data.cigarettesCount);
         const economics = this.attemptsService.buildEconomics({
             cigarettesPerDay: data.cigarettesPerDay,
             cigarettesPerPack: data.cigarettesPerPack,

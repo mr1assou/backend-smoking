@@ -2,7 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import { toUtcIso, utcInstantNow } from '../common/utc-instant';
+import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersRepository } from './users.repository';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
@@ -13,6 +15,7 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly attemptsService: AttemptsService,
+    private readonly storageService: StorageService,
   ) {}
 
   async createWithHashedPassword(
@@ -66,6 +69,12 @@ export class UsersService {
     return this.usersRepository.updateDevicePreferences(userId, data);
   }
 
+  async updateProfileImage(userId: number, dto: UpdateProfileImageDto) {
+    this.storageService.assertOwnedProfileImageUrl(userId, dto.image_url);
+    await this.usersRepository.updateProfileImage(userId, dto.image_url);
+    return { image_url: dto.image_url };
+  }
+
   async setRefreshTokenHash(
     userId: number,
     hashedRefreshToken: string | null,
@@ -84,6 +93,7 @@ export class UsersService {
       : 0;
 
     return {
+      userId: user.user_id,
       email: user.email,
       name: user.username ?? undefined,
       hasCompletedOnboarding: Boolean(user.username?.trim()),
@@ -98,6 +108,7 @@ export class UsersService {
       cigarettesPerPack: user.cigarettesPerPack ?? undefined,
       packPrice: user.packPrice ?? undefined,
       timezone: user.timezone ?? undefined,
+      imageUrl: user.image_url ?? undefined,
       slipCigarettesTotal,
       currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
     };

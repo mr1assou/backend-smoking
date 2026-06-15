@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
+import { PresenceService } from '../presence/presence.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import {
@@ -27,6 +28,7 @@ export type GoogleAuthResult = {
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
+    private readonly presenceService: PresenceService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly googleToken: GoogleTokenService,
@@ -84,6 +86,7 @@ export class AuthService {
   }
 
   async logout(userId: number) {
+    await this.presenceService.markOffline(userId);
     await this.usersService.setRefreshTokenHash(userId, null);
   }
 

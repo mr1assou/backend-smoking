@@ -1,0 +1,3 @@
+export const POST_COMMENTS_PAGE_SIZE = 5;
+
+export const POST_COMMENTS_MAX_PAGE_SIZE = 30;

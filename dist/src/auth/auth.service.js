@@ -49,15 +49,18 @@ const config_1 = require("@nestjs/config");
 const crypto_1 = require("crypto");
 const argon2 = __importStar(require("argon2"));
 const users_service_1 = require("../users/users.service");
+const presence_service_1 = require("../presence/presence.service");
 const auth_constants_1 = require("./auth.constants");
 const google_token_service_1 = require("./google/google-token.service");
 let AuthService = class AuthService {
     usersService;
+    presenceService;
     jwt;
     config;
     googleToken;
-    constructor(usersService, jwt, config, googleToken) {
+    constructor(usersService, presenceService, jwt, config, googleToken) {
         this.usersService = usersService;
+        this.presenceService = presenceService;
         this.jwt = jwt;
         this.config = config;
         this.googleToken = googleToken;
@@ -94,6 +97,7 @@ let AuthService = class AuthService {
         return this.issueTokensForUser(user.user_id, user.email);
     }
     async logout(userId) {
+        await this.presenceService.markOffline(userId);
         await this.usersService.setRefreshTokenHash(userId, null);
     }
     async issueTokensForUser(userId, email) {
@@ -124,6 +128,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
+        presence_service_1.PresenceService,
         jwt_1.JwtService,
         config_1.ConfigService,
         google_token_service_1.GoogleTokenService])

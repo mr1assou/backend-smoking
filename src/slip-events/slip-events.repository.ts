@@ -3,7 +3,7 @@ import { SlipEvent } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import { utcInstantNow } from '../common/utc-instant';
 import { PrismaService } from '../prisma/prisma.service';
-import { resolveSlipCigarettesCount } from './slip-cigarette-count';
+import { resolveSlipCigarettesCount } from './lib';
 import type { SlipOutcome } from './types/slip-outcome';
 
 export type CreateSlipEventData = {

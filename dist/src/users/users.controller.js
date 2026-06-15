@@ -16,6 +16,7 @@ exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_guard_1 = require("../auth/guards/jwt.guard");
 const update_onboarding_dto_1 = require("./dto/update-onboarding.dto");
+const update_profile_image_dto_1 = require("./dto/update-profile-image.dto");
 const update_user_preferences_dto_1 = require("./dto/update-user-preferences.dto");
 const users_service_1 = require("./users.service");
 let UsersController = class UsersController {
@@ -31,6 +32,9 @@ let UsersController = class UsersController {
     }
     updatePreferences(req, dto) {
         return this.usersService.updatePreferences(req.user.userId, dto);
+    }
+    updateProfileImage(req, dto) {
+        return this.usersService.updateProfileImage(req.user.userId, dto);
     }
 };
 exports.UsersController = UsersController;
@@ -60,6 +64,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_user_preferences_dto_1.UpdateUserPreferencesDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updatePreferences", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Patch)('me/profile-image'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_profile_image_dto_1.UpdateProfileImageDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateProfileImage", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

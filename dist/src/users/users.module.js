@@ -10,6 +10,7 @@ exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_module_1 = require("../attempts/attempts.module");
 const prisma_module_1 = require("../prisma/prisma.module");
+const storage_module_1 = require("../storage/storage.module");
 const users_repository_1 = require("./users.repository");
 const users_service_1 = require("./users.service");
 let UsersModule = class UsersModule {
@@ -17,7 +18,7 @@ let UsersModule = class UsersModule {
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, attempts_module_1.AttemptsModule],
+        imports: [prisma_module_1.PrismaModule, attempts_module_1.AttemptsModule, storage_module_1.StorageModule],
         providers: [users_repository_1.UsersRepository, users_service_1.UsersService],
         exports: [users_service_1.UsersService, users_repository_1.UsersRepository],
     })
