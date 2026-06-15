@@ -1,5 +1,6 @@
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
+import { BadgesService } from '../badges/badges.service';
 import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
@@ -9,7 +10,8 @@ export declare class UsersService {
     private readonly usersRepository;
     private readonly attemptsService;
     private readonly storageService;
-    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService, storageService: StorageService);
+    private readonly badgesService;
+    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService, storageService: StorageService, badgesService: BadgesService);
     createWithHashedPassword(email: string, hashedPassword: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
     findById(userId: number): Promise<User | null>;
@@ -46,6 +48,7 @@ export declare class UsersService {
         timezone: string | null;
         image_url: string | null;
         last_offline_at: Date | null;
+        freedomPoints: number;
         createdAt: Date;
         updatedAt: Date;
     }>;
@@ -72,6 +75,8 @@ export declare class UsersService {
         imageUrl: string | undefined;
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
+        freedomPoints: number;
+        earnedBadgeIds: string[];
     }>;
     private mapOnboardingDtoToData;
     private resolveQuitDate;

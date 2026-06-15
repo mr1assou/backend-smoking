@@ -38,6 +38,7 @@ model User {
   timezone String?
   image_url String?
   last_offline_at DateTime? @map("last_offline_at") @db.Timestamptz(3)
+  freedomPoints Int @default(0) @map("freedom_points")
 
   slipEvents   SlipEvent[]
   quitAttempts QuitAttempt[]
@@ -51,6 +52,7 @@ model User {
   chatThreadsAsUserTwo ChatThread[] @relation("ChatThreadUserTwo")
   chatMessages         ChatMessage[]
   chatThreadReads      ChatThreadRead[]
+  badges               UserBadge[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -254,4 +256,17 @@ model ChatThreadRead {
   @@unique([thread_id, user_id])
   @@index([user_id])
   @@map("chat_thread_reads")
+}
+
+/// Badges a user has earned (e.g. first-step on signup).
+model UserBadge {
+  user_badge_id Int      @id @default(autoincrement())
+  user_id       Int      @map("user_id")
+  user          User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  badge_id      String   @map("badge_id")
+  earned_at     DateTime @default(now()) @map("earned_at") @db.Timestamptz(3)
+
+  @@unique([user_id, badge_id])
+  @@index([user_id])
+  @@map("user_badges")
 }

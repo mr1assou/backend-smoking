@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
+import { BadgesService } from '../badges/badges.service';
 import { toUtcIso, utcInstantNow } from '../common/utc-instant';
 import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
@@ -16,6 +17,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly attemptsService: AttemptsService,
     private readonly storageService: StorageService,
+    private readonly badgesService: BadgesService,
   ) {}
 
   async createWithHashedPassword(
@@ -91,6 +93,7 @@ export class UsersService {
     const slipCigarettesTotal = activeAttempt
       ? await this.usersRepository.sumSlipCigarettesSince(userId, activeAttempt.startedAt)
       : 0;
+    const earnedBadgeIds = await this.badgesService.findEarnedBadgeIds(userId);
 
     return {
       userId: user.user_id,
@@ -111,6 +114,8 @@ export class UsersService {
       imageUrl: user.image_url ?? undefined,
       slipCigarettesTotal,
       currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
+      freedomPoints: user.freedomPoints,
+      earnedBadgeIds,
     };
   }
 

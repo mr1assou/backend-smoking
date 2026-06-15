@@ -33,4 +33,5 @@ export type UserMeProfile = {
     packPrice: string | null;
     timezone: string | null;
     image_url: string | null;
+    freedomPoints: number;
 };

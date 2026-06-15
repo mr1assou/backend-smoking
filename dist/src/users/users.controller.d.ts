@@ -29,6 +29,8 @@ export declare class UsersController {
         imageUrl: string | undefined;
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
+        freedomPoints: number;
+        earnedBadgeIds: string[];
     }>;
     saveOnboarding(req: Request & {
         user: {
@@ -67,6 +69,7 @@ export declare class UsersController {
         timezone: string | null;
         image_url: string | null;
         last_offline_at: Date | null;
+        freedomPoints: number;
         createdAt: Date;
         updatedAt: Date;
     }>;

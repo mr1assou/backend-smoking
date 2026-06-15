@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_service_1 = require("../attempts/attempts.service");
+const badges_service_1 = require("../badges/badges.service");
 const utc_instant_1 = require("../common/utc-instant");
 const storage_service_1 = require("../storage/storage.service");
 const users_repository_1 = require("./users.repository");
@@ -19,10 +20,12 @@ let UsersService = class UsersService {
     usersRepository;
     attemptsService;
     storageService;
-    constructor(usersRepository, attemptsService, storageService) {
+    badgesService;
+    constructor(usersRepository, attemptsService, storageService, badgesService) {
         this.usersRepository = usersRepository;
         this.attemptsService = attemptsService;
         this.storageService = storageService;
+        this.badgesService = badgesService;
     }
     async createWithHashedPassword(email, hashedPassword) {
         return this.usersRepository.createWithCredentials(email, hashedPassword);
@@ -72,6 +75,7 @@ let UsersService = class UsersService {
         const slipCigarettesTotal = activeAttempt
             ? await this.usersRepository.sumSlipCigarettesSince(userId, activeAttempt.startedAt)
             : 0;
+        const earnedBadgeIds = await this.badgesService.findEarnedBadgeIds(userId);
         return {
             userId: user.user_id,
             email: user.email,
@@ -91,6 +95,8 @@ let UsersService = class UsersService {
             imageUrl: user.image_url ?? undefined,
             slipCigarettesTotal,
             currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
+            freedomPoints: user.freedomPoints,
+            earnedBadgeIds,
         };
     }
     mapOnboardingDtoToData(dto) {
@@ -131,6 +137,7 @@ exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_repository_1.UsersRepository,
         attempts_service_1.AttemptsService,
-        storage_service_1.StorageService])
+        storage_service_1.StorageService,
+        badges_service_1.BadgesService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map
