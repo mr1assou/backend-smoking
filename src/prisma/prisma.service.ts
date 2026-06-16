@@ -60,9 +60,10 @@ function createPgPool(config: ConfigService): Pool {
       ca: readFileSync(caPath, 'utf8'),
       rejectUnauthorized: true,
     },
-    max: 10,
+    // Keep modest but avoid starvation when a request fans out to multiple queries.
+    max: 20,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 15_000,
+    connectionTimeoutMillis: 30_000,
     // Recycle connections before Aiven/cloud providers drop idle sockets.
     maxLifetimeSeconds: 300,
     keepAlive: true,
@@ -93,10 +94,11 @@ export class PrismaService
   constructor(config: ConfigService) {
     const pool = createPgPool(config);
     const adapter = new PrismaPg(pool);
-    const base = new PrismaClient({ adapter });
     const logger = new Logger(PrismaService.name);
 
-    const extended = base.$extends({
+    super({ adapter });
+
+    const extended = this.$extends({
       name: 'pg-connection-retry',
       query: {
         $allModels: {
@@ -111,8 +113,8 @@ export class PrismaService
               logger.warn(
                 'PostgreSQL connection dropped — retrying query once',
               );
-              await base.$disconnect();
-              await base.$connect();
+              // Avoid disconnect/connect storms; just retry once after a short delay.
+              await new Promise((resolve) => setTimeout(resolve, 150));
               return query(args);
             }
           },
@@ -120,15 +122,13 @@ export class PrismaService
       },
     });
 
-    super({ adapter });
-
     const service = extended as unknown as PrismaService;
     Object.defineProperty(service, 'pool', { value: pool });
 
     service.onModuleInit = async () => {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          await base.$connect();
+          await service.$connect();
           break;
         } catch (error) {
           if (attempt === 3) throw error;
@@ -136,12 +136,12 @@ export class PrismaService
           await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
         }
       }
-      await base.$queryRaw`SELECT 1`;
+      await service.$queryRaw`SELECT 1`;
       logger.log('PostgreSQL connection verified');
     };
 
     service.onModuleDestroy = async () => {
-      await base.$disconnect();
+      await service.$disconnect();
       await pool.end();
     };
 

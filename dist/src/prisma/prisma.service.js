@@ -59,9 +59,9 @@ function createPgPool(config) {
             ca: (0, fs_1.readFileSync)(caPath, 'utf8'),
             rejectUnauthorized: true,
         },
-        max: 10,
+        max: 20,
         idleTimeoutMillis: 30_000,
-        connectionTimeoutMillis: 15_000,
+        connectionTimeoutMillis: 30_000,
         maxLifetimeSeconds: 300,
         keepAlive: true,
         keepAliveInitialDelayMillis: 10_000,
@@ -79,9 +79,9 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_1.Prism
     constructor(config) {
         const pool = createPgPool(config);
         const adapter = new adapter_pg_1.PrismaPg(pool);
-        const base = new client_1.PrismaClient({ adapter });
         const logger = new common_1.Logger(PrismaService_1.name);
-        const extended = base.$extends({
+        super({ adapter });
+        const extended = this.$extends({
             name: 'pg-connection-retry',
             query: {
                 $allModels: {
@@ -94,21 +94,19 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_1.Prism
                                 throw error;
                             }
                             logger.warn('PostgreSQL connection dropped — retrying query once');
-                            await base.$disconnect();
-                            await base.$connect();
+                            await new Promise((resolve) => setTimeout(resolve, 150));
                             return query(args);
                         }
                     },
                 },
             },
         });
-        super({ adapter });
         const service = extended;
         Object.defineProperty(service, 'pool', { value: pool });
         service.onModuleInit = async () => {
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    await base.$connect();
+                    await service.$connect();
                     break;
                 }
                 catch (error) {
@@ -118,11 +116,11 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_1.Prism
                     await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
                 }
             }
-            await base.$queryRaw `SELECT 1`;
+            await service.$queryRaw `SELECT 1`;
             logger.log('PostgreSQL connection verified');
         };
         service.onModuleDestroy = async () => {
-            await base.$disconnect();
+            await service.$disconnect();
             await pool.end();
         };
         return service;
