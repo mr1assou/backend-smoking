@@ -51,14 +51,20 @@ export class PresenceGateway
     client.data.user = user;
 
     try {
-      const { wentOnline } = await this.presence.connect(user.userId, client.id);
+      const { wentOnline } = await this.presence.connect(
+        user.userId,
+        client.id,
+      );
       await this.emitSnapshot(client);
 
       if (wentOnline) {
         this.broadcastPresence(user.userId, true);
       }
     } catch (error) {
-      this.logger.error(`Presence connect failed for user ${user.userId}`, error);
+      this.logger.error(
+        `Presence connect failed for user ${user.userId}`,
+        error,
+      );
       client.disconnect(true);
     }
   }
@@ -71,7 +77,10 @@ export class PresenceGateway
       await this.presence.markOfflineIfDisconnected(userId, true);
       this.broadcastPresence(userId, false);
     } catch (error) {
-      this.logger.error(`Presence disconnect failed for socket ${client.id}`, error);
+      this.logger.error(
+        `Presence disconnect failed for socket ${client.id}`,
+        error,
+      );
     }
   }
 

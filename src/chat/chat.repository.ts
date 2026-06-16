@@ -85,7 +85,11 @@ export class ChatRepository {
     });
   }
 
-  listMessages(threadId: number, before?: Date, limit = CHAT_MESSAGES_PAGE_SIZE) {
+  listMessages(
+    threadId: number,
+    before?: Date,
+    limit = CHAT_MESSAGES_PAGE_SIZE,
+  ) {
     return this.prisma.chatMessage.findMany({
       where: {
         thread_id: threadId,

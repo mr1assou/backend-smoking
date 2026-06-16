@@ -36,7 +36,11 @@ type TypingBody = { threadId: number; isTyping: boolean };
   cors: { origin: true, credentials: true },
 })
 export class ChatGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit, OnModuleDestroy
+  implements
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleInit,
+    OnModuleDestroy
 {
   private readonly logger = new Logger(ChatGateway.name);
   private subscriber: Redis | null = null;
@@ -99,7 +103,12 @@ export class ChatGateway
     if (!user?.userId || !body?.threadId) return { ok: false };
 
     try {
-      await this.chatService.listMessages(user.userId, body.threadId, undefined, 1);
+      await this.chatService.listMessages(
+        user.userId,
+        body.threadId,
+        undefined,
+        1,
+      );
       await client.join(chatThreadRoom(body.threadId));
       await this.chatService.markSeen(user.userId, body.threadId);
       return { ok: true };
@@ -128,7 +137,10 @@ export class ChatGateway
     if (!user?.userId || !body?.threadId) return { ok: false };
 
     try {
-      const payload = await this.chatService.markSeen(user.userId, body.threadId);
+      const payload = await this.chatService.markSeen(
+        user.userId,
+        body.threadId,
+      );
       return { ok: true, payload };
     } catch (error) {
       this.logger.warn(`mark_seen failed for user ${user.userId}`, error);
@@ -196,7 +208,9 @@ export class ChatGateway
     senderId: number,
   ) {
     const peerUserId = senderId === userOneId ? userTwoId : userOneId;
-    const sockets = await this.server.in(chatThreadRoom(threadId)).fetchSockets();
+    const sockets = await this.server
+      .in(chatThreadRoom(threadId))
+      .fetchSockets();
     const peerViewing = sockets.some(
       (socket) => socket.data.user?.userId === peerUserId,
     );
@@ -209,4 +223,3 @@ export class ChatGateway
     }
   }
 }
-

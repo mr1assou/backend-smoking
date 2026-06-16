@@ -14,21 +14,21 @@ import { GoogleOAuthService } from './google/google-oauth.service';
 import { GoogleTokenService } from './google/google-token.service';
 
 @Module({
-    imports: [
-        PassportModule,
-        JwtModule.register({}),
-        PresenceModule,
-        UsersModule,
-        SlipEventsModule,
-        StatsModule,
-    ],
-    controllers: [AuthController, UsersController],
-    providers: [
-        AuthService,
-        GoogleTokenService,
-        GoogleOAuthService,
-        JwtStrategy,
-        JwtRefreshStrategy,
-    ],
+  imports: [
+    PassportModule,
+    JwtModule.register({}),
+    PresenceModule,
+    UsersModule,
+    SlipEventsModule,
+    StatsModule,
+  ],
+  controllers: [AuthController, UsersController],
+  providers: [
+    AuthService,
+    GoogleTokenService,
+    GoogleOAuthService,
+    JwtStrategy,
+    JwtRefreshStrategy,
+  ],
 })
-export class AuthModule { }
+export class AuthModule {}

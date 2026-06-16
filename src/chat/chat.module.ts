@@ -10,12 +10,7 @@ import { ChatService } from './chat.service';
 @Module({
   imports: [JwtModule.register({}), StorageModule],
   controllers: [ChatController],
-  providers: [
-    ChatRepository,
-    ChatService,
-    ChatPubSubService,
-    ChatGateway,
-  ],
+  providers: [ChatRepository, ChatService, ChatPubSubService, ChatGateway],
   exports: [ChatService],
 })
 export class ChatModule {}

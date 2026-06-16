@@ -11,22 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersRepository = void 0;
 const common_1 = require("@nestjs/common");
-const badges_repository_1 = require("../badges/badges.repository");
 const prisma_service_1 = require("../prisma/prisma.service");
 let UsersRepository = class UsersRepository {
     prisma;
-    badgesRepository;
-    constructor(prisma, badgesRepository) {
+    constructor(prisma) {
         this.prisma = prisma;
-        this.badgesRepository = badgesRepository;
     }
     createWithCredentials(email, password) {
-        return this.prisma.$transaction(async (tx) => {
-            const user = await tx.user.create({
-                data: { email, password },
-            });
-            await this.badgesRepository.grantSignupBadge(user.user_id, tx);
-            return user;
+        return this.prisma.user.create({
+            data: { email, password },
         });
     }
     findByEmail(email) {
@@ -109,7 +102,6 @@ let UsersRepository = class UsersRepository {
 exports.UsersRepository = UsersRepository;
 exports.UsersRepository = UsersRepository = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        badges_repository_1.BadgesRepository])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], UsersRepository);
 //# sourceMappingURL=users.repository.js.map

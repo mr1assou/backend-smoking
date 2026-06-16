@@ -73,7 +73,10 @@ function createPgPool(config: ConfigService): Pool {
   const logger = new Logger('PgPool');
 
   pool.on('error', (error) => {
-    logger.error('Idle PostgreSQL client error — connection removed from pool', error);
+    logger.error(
+      'Idle PostgreSQL client error — connection removed from pool',
+      error,
+    );
   });
 
   return pool;
@@ -104,7 +107,9 @@ export class PrismaService
                 throw error;
               }
 
-              logger.warn('PostgreSQL connection dropped — retrying query once');
+              logger.warn(
+                'PostgreSQL connection dropped — retrying query once',
+              );
               await base.$disconnect();
               await base.$connect();
               return query(args);
@@ -126,9 +131,7 @@ export class PrismaService
           break;
         } catch (error) {
           if (attempt === 3) throw error;
-          logger.warn(
-            `PostgreSQL connect failed — retry ${attempt}/2`,
-          );
+          logger.warn(`PostgreSQL connect failed — retry ${attempt}/2`);
           await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
         }
       }

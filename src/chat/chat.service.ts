@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { toUtcIso } from '../common/utc-instant';
 import { StorageService } from '../storage/storage.service';
 import { ChatPubSubService } from './chat-pubsub.service';
@@ -46,7 +50,10 @@ export class ChatService {
     );
   }
 
-  async openThread(userId: number, peerUserId: number): Promise<ChatThreadSummaryDto> {
+  async openThread(
+    userId: number,
+    peerUserId: number,
+  ): Promise<ChatThreadSummaryDto> {
     if (peerUserId === userId) {
       throw new BadRequestException('Cannot open a chat with yourself');
     }
@@ -56,7 +63,10 @@ export class ChatService {
       throw new NotFoundException('User not found');
     }
 
-    const thread = await this.chatRepository.findOrCreateThread(userId, peerUserId);
+    const thread = await this.chatRepository.findOrCreateThread(
+      userId,
+      peerUserId,
+    );
     const myRead = thread.reads.find((read) => read.user_id === userId);
     const unreadCount = await this.chatRepository.countUnreadMessages(
       thread.thread_id,
@@ -137,12 +147,18 @@ export class ChatService {
     threadId: number,
     viewerUserId: number,
   ): Promise<number | null> {
-    const thread = await this.chatRepository.findThreadForUser(threadId, viewerUserId);
+    const thread = await this.chatRepository.findThreadForUser(
+      threadId,
+      viewerUserId,
+    );
     if (!thread) return null;
     return peerUserIdFromThread(thread, viewerUserId);
   }
 
-  async markSeen(userId: number, threadId: number): Promise<MessagesSeenPayload> {
+  async markSeen(
+    userId: number,
+    threadId: number,
+  ): Promise<MessagesSeenPayload> {
     const thread = await this.requireThread(threadId, userId);
     const lastReadAt = new Date();
 
@@ -168,7 +184,10 @@ export class ChatService {
     threadId: number,
     userId: number,
   ): Promise<ThreadWithRelations> {
-    const thread = await this.chatRepository.findThreadForUser(threadId, userId);
+    const thread = await this.chatRepository.findThreadForUser(
+      threadId,
+      userId,
+    );
     if (!thread) throw new NotFoundException('Thread not found');
     return thread;
   }
@@ -266,7 +285,10 @@ export class ChatService {
     };
   }
 
-  private peerLastReadAt(thread: ThreadWithRelations, viewerUserId: number): string | null {
+  private peerLastReadAt(
+    thread: ThreadWithRelations,
+    viewerUserId: number,
+  ): string | null {
     const peerUserId = peerUserIdFromThread(thread, viewerUserId);
     const peerRead = thread.reads.find((row) => row.user_id === peerUserId);
     return peerRead ? toUtcIso(peerRead.last_read_at) : null;

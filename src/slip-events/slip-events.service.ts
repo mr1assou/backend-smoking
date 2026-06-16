@@ -51,14 +51,18 @@ export class SlipEventsService {
   }
 
   async remove(userId: number, slipEventId: number) {
-    const event = await this.slipEventsRepository.findOwnedById(userId, slipEventId);
-    if (!event) throw new NotFoundException('Slip event not found');
-
-    const restored = await this.slipEventsRepository.deleteOwnedAndRestoreAttempt(
+    const event = await this.slipEventsRepository.findOwnedById(
       userId,
       slipEventId,
-      event,
     );
+    if (!event) throw new NotFoundException('Slip event not found');
+
+    const restored =
+      await this.slipEventsRepository.deleteOwnedAndRestoreAttempt(
+        userId,
+        slipEventId,
+        event,
+      );
 
     return {
       streakStart: restored.streakStart ? toUtcIso(restored.streakStart) : null,

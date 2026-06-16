@@ -1,6 +1,7 @@
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import { BadgesService } from '../badges/badges.service';
+import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
@@ -11,7 +12,8 @@ export declare class UsersService {
     private readonly attemptsService;
     private readonly storageService;
     private readonly badgesService;
-    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService, storageService: StorageService, badgesService: BadgesService);
+    private readonly freedomPointsService;
+    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService, storageService: StorageService, badgesService: BadgesService, freedomPointsService: FreedomPointsService);
     createWithHashedPassword(email: string, hashedPassword: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
     findById(userId: number): Promise<User | null>;

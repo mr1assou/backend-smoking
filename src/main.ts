@@ -20,9 +20,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.enableCors({ origin: true, credentials: true });
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, transform: true }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   app.getHttpAdapter().get('/', (_req, res) => {
     res.json({ message: 'Quit Smoking API' });
@@ -31,6 +29,3 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
-
-
-

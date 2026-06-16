@@ -3,6 +3,6 @@ export function utcInstantNow(): Date {
   return new Date();
 }
 
-export function toUtcIso(date: Date): string  {
+export function toUtcIso(date: Date): string {
   return date.toISOString();
 }

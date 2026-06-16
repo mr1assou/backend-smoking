@@ -60,7 +60,10 @@ export class PresenceRepository {
   }
 
   async removeFromOnlineSet(userId: number): Promise<boolean> {
-    const wasMember = await this.client().sismember(PRESENCE_ONLINE_SET, String(userId));
+    const wasMember = await this.client().sismember(
+      PRESENCE_ONLINE_SET,
+      String(userId),
+    );
     if (!wasMember) return false;
     await this.client().srem(PRESENCE_ONLINE_SET, String(userId));
     return true;
@@ -71,11 +74,15 @@ export class PresenceRepository {
   }
 
   async isOnline(userId: number): Promise<boolean> {
-    return (await this.client().sismember(PRESENCE_ONLINE_SET, String(userId))) === 1;
+    return (
+      (await this.client().sismember(PRESENCE_ONLINE_SET, String(userId))) === 1
+    );
   }
 
   async areOnline(userIds: number[]): Promise<Record<number, boolean>> {
-    const unique = [...new Set(userIds.filter((id) => Number.isFinite(id) && id > 0))];
+    const unique = [
+      ...new Set(userIds.filter((id) => Number.isFinite(id) && id > 0)),
+    ];
     const out: Record<number, boolean> = {};
     if (unique.length === 0) return out;
 

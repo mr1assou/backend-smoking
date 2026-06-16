@@ -1,0 +1,3 @@
+export const LEADERBOARD_PAGE_SIZE = 15;
+
+export const LEADERBOARD_MAX_PAGE_SIZE = 50;

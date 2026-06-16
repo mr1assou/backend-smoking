@@ -53,7 +53,11 @@ export class AttemptsRepository {
     });
   }
 
-  createNext(userId: number, attemptNumber: number, startedAt: Date): Promise<QuitAttempt> {
+  createNext(
+    userId: number,
+    attemptNumber: number,
+    startedAt: Date,
+  ): Promise<QuitAttempt> {
     return this.prisma.quitAttempt.create({
       data: {
         user_id: userId,
@@ -63,10 +67,7 @@ export class AttemptsRepository {
     });
   }
 
-  close(
-    attemptId: number,
-    data: CloseAttemptData,
-  ): Promise<QuitAttempt> {
+  close(attemptId: number, data: CloseAttemptData): Promise<QuitAttempt> {
     return this.prisma.quitAttempt.update({
       where: { attempt_id: attemptId },
       data: {

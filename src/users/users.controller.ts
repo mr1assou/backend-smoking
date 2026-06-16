@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';

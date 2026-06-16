@@ -26,7 +26,8 @@ export const R2_ALLOWED_CHAT_MEDIA_TYPES = [
   'audio/wav',
 ] as const;
 
-export type R2ChatMediaContentType = (typeof R2_ALLOWED_CHAT_MEDIA_TYPES)[number];
+export type R2ChatMediaContentType =
+  (typeof R2_ALLOWED_CHAT_MEDIA_TYPES)[number];
 
 export const R2_PRESIGN_EXPIRES_SECONDS = 300;
 

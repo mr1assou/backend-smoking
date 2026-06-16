@@ -273,7 +273,9 @@ export class PostsRepository {
   toggleCommentVote(commentId: number, userId: number, vote: PostVoteValue) {
     return this.prisma.$transaction(async (tx) => {
       const existing = await tx.postCommentVote.findUnique({
-        where: { comment_id_user_id: { comment_id: commentId, user_id: userId } },
+        where: {
+          comment_id_user_id: { comment_id: commentId, user_id: userId },
+        },
       });
 
       let upDelta = 0;
@@ -484,7 +486,11 @@ export class PostsRepository {
     };
   }
 
-  async findCommentsByAuthor(authorId: number, offset = 0, limit = POST_FEED_PAGE_SIZE) {
+  async findCommentsByAuthor(
+    authorId: number,
+    offset = 0,
+    limit = POST_FEED_PAGE_SIZE,
+  ) {
     const rows = await this.prisma.postComment.findMany({
       where: { author_id: authorId },
       orderBy: { created_at: 'desc' },

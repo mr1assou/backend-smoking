@@ -71,12 +71,7 @@ export class PostsService {
         );
 
         const { ids, hasMore: redisHasMore } =
-          await this.postsCacheRepository.getFeedIds(
-            'newest',
-            tagId,
-            offset,
-            limit,
-          );
+          await this.postsCacheRepository.getFeedIds(tagId, offset, limit);
 
         if (ids.length > 0 || offset === 0) {
           const items = await this.buildFeedFromCache(viewerUserId, ids);
@@ -89,16 +84,22 @@ export class PostsService {
           return { items, has_more };
         }
       } catch (error) {
-        this.logger.warn('Redis feed read failed, falling back to Postgres', error);
+        this.logger.warn(
+          'Redis feed read failed, falling back to Postgres',
+          error,
+        );
       }
     }
 
-    const { rows, hasMore } = await this.postsRepository.findFeed(viewerUserId, {
-      sort,
-      tagId,
-      offset,
-      limit,
-    });
+    const { rows, hasMore } = await this.postsRepository.findFeed(
+      viewerUserId,
+      {
+        sort,
+        tagId,
+        offset,
+        limit,
+      },
+    );
 
     return this.buildFeedPageFromRows(rows, viewerUserId, hasMore);
   }
@@ -221,20 +222,24 @@ export class PostsService {
         dto.reply_to_user_id === post.author_id ? post.author_id : undefined;
     }
 
-    const { comment, post: updatedPost } = await this.postsRepository.createComment(
-      postId,
-      userId,
-      text,
-      { parentCommentId, replyToUserId },
-    );
-
-    await this.postsCacheRepository
-      .syncCommentCount(updatedPost.post_id, updatedPost.comment_count, updatedPost.tag_id)
-      .catch((error) => {
-        this.logger.warn(`Failed to sync comment count for post ${postId}`, error);
+    const { comment, post: updatedPost } =
+      await this.postsRepository.createComment(postId, userId, text, {
+        parentCommentId,
+        replyToUserId,
       });
 
-    const onlineById = await this.presenceService.areOnline([comment.author_id]);
+    await this.postsCacheRepository
+      .syncCommentCount(updatedPost.post_id, updatedPost.comment_count)
+      .catch((error) => {
+        this.logger.warn(
+          `Failed to sync comment count for post ${postId}`,
+          error,
+        );
+      });
+
+    const onlineById = await this.presenceService.areOnline([
+      comment.author_id,
+    ]);
     return this.toComment(comment, userId, onlineById);
   }
 
@@ -246,7 +251,10 @@ export class PostsService {
   ): Promise<PostCommentResponse> {
     await this.requirePost(postId);
 
-    const comment = await this.postsRepository.findCommentById(commentId, postId);
+    const comment = await this.postsRepository.findCommentById(
+      commentId,
+      postId,
+    );
     if (!comment) {
       throw new NotFoundException('Comment not found');
     }
@@ -264,7 +272,9 @@ export class PostsService {
       text,
       userId,
     );
-    const onlineById = await this.presenceService.areOnline([updated.author_id]);
+    const onlineById = await this.presenceService.areOnline([
+      updated.author_id,
+    ]);
     return this.toComment(updated, userId, onlineById);
   }
 
@@ -279,7 +289,10 @@ export class PostsService {
   }> {
     const post = await this.requirePost(postId);
 
-    const comment = await this.postsRepository.findCommentById(commentId, postId);
+    const comment = await this.postsRepository.findCommentById(
+      commentId,
+      postId,
+    );
     if (!comment) {
       throw new NotFoundException('Comment not found');
     }
@@ -294,9 +307,12 @@ export class PostsService {
       await this.postsRepository.deleteComment(commentId, postId);
 
     await this.postsCacheRepository
-      .syncCommentCount(updatedPost.post_id, updatedPost.comment_count, updatedPost.tag_id)
+      .syncCommentCount(updatedPost.post_id, updatedPost.comment_count)
       .catch((error) => {
-        this.logger.warn(`Failed to sync comment count for post ${postId}`, error);
+        this.logger.warn(
+          `Failed to sync comment count for post ${postId}`,
+          error,
+        );
       });
 
     return {
@@ -314,16 +330,16 @@ export class PostsService {
   ) {
     await this.requirePost(postId);
 
-    const comment = await this.postsRepository.findCommentById(commentId, postId);
+    const comment = await this.postsRepository.findCommentById(
+      commentId,
+      postId,
+    );
     if (!comment) {
       throw new NotFoundException('Comment not found');
     }
 
-    const { comment: updated, myVote } = await this.postsRepository.toggleCommentVote(
-      commentId,
-      userId,
-      dto.vote,
-    );
+    const { comment: updated, myVote } =
+      await this.postsRepository.toggleCommentVote(commentId, userId, dto.vote);
 
     return {
       comment_id: updated.comment_id,
@@ -348,24 +364,30 @@ export class PostsService {
 
     await Promise.all([
       this.postsCacheRepository
-        .syncVoteStats(
-          post.post_id,
-          post.upvote_count,
-          post.downvote_count,
-          post.tag_id,
-        )
+        .syncVoteStats(post.post_id, post.upvote_count, post.downvote_count)
         .catch((error) => {
-          this.logger.warn(`Failed to sync vote stats for post ${postId}`, error);
+          this.logger.warn(
+            `Failed to sync vote stats for post ${postId}`,
+            error,
+          );
         }),
-      this.postsCacheRepository.setUserVote(userId, postId, myVote).catch((error) => {
-        this.logger.warn(`Failed to sync user vote for post ${postId}`, error);
-      }),
+      this.postsCacheRepository
+        .setUserVote(userId, postId, myVote)
+        .catch((error) => {
+          this.logger.warn(
+            `Failed to sync user vote for post ${postId}`,
+            error,
+          );
+        }),
     ]);
 
     return this.toEngagement(post, myVote);
   }
 
-  async sharePost(postId: number, userId: number): Promise<PostEngagementResponse> {
+  async sharePost(
+    postId: number,
+    userId: number,
+  ): Promise<PostEngagementResponse> {
     await this.requirePost(postId);
 
     const post = await this.postsRepository.incrementShareCount(postId);
@@ -373,9 +395,14 @@ export class PostsService {
     const myVote =
       vote?.vote === 'up' || vote?.vote === 'down' ? vote.vote : null;
 
-    await this.postsCacheRepository.incrementShareCount(postId).catch((error) => {
-      this.logger.warn(`Failed to sync share count for post ${postId}`, error);
-    });
+    await this.postsCacheRepository
+      .incrementShareCount(postId)
+      .catch((error) => {
+        this.logger.warn(
+          `Failed to sync share count for post ${postId}`,
+          error,
+        );
+      });
 
     return this.toEngagement(post, myVote);
   }
@@ -384,7 +411,9 @@ export class PostsService {
     if (dto.image_url) {
       this.storageService.assertOwnedPostImageUrl(userId, dto.image_url);
     } else if (dto.image_frame || dto.image_crop) {
-      throw new BadRequestException('image_url is required when image metadata is provided');
+      throw new BadRequestException(
+        'image_url is required when image metadata is provided',
+      );
     }
 
     const data = PostsRepository.fromDto(userId, dto);
@@ -405,7 +434,9 @@ export class PostsService {
     } else if (dto.image_url === null) {
       // clearing image is allowed
     } else if (dto.image_frame || dto.image_crop) {
-      throw new BadRequestException('image_url is required when image metadata is provided');
+      throw new BadRequestException(
+        'image_url is required when image metadata is provided',
+      );
     }
 
     const title = dto.title?.trim();
@@ -415,10 +446,14 @@ export class PostsService {
 
     const post = await this.postsRepository.update(postId, {
       ...(title !== undefined ? { title } : {}),
-      ...(dto.description !== undefined ? { description: dto.description.trim() } : {}),
+      ...(dto.description !== undefined
+        ? { description: dto.description.trim() }
+        : {}),
       ...(dto.tag_id !== undefined ? { tag_id: dto.tag_id } : {}),
       ...(dto.image_url !== undefined ? { image_url: dto.image_url } : {}),
-      ...(dto.image_frame !== undefined ? { image_frame: dto.image_frame } : {}),
+      ...(dto.image_frame !== undefined
+        ? { image_frame: dto.image_frame }
+        : {}),
       ...(dto.image_crop !== undefined
         ? {
             image_crop:
@@ -432,19 +467,27 @@ export class PostsService {
     await this.postsCacheRepository
       .updatePostCard(post, existing.tag_id)
       .catch((error) => {
-        this.logger.warn(`Failed to update Redis cache for post ${postId}`, error);
+        this.logger.warn(
+          `Failed to update Redis cache for post ${postId}`,
+          error,
+        );
       });
 
     return post;
   }
 
-  async deletePost(postId: number, userId: number): Promise<{ post_id: number }> {
+  async deletePost(
+    postId: number,
+    userId: number,
+  ): Promise<{ post_id: number }> {
     const post = await this.requireOwnedPost(postId, userId);
     await this.postsRepository.delete(postId);
 
-    await this.postsCacheRepository.removePost(postId, post.tag_id).catch((error) => {
-      this.logger.warn(`Failed to remove post ${postId} from Redis`, error);
-    });
+    await this.postsCacheRepository
+      .removePost(postId, post.tag_id)
+      .catch((error) => {
+        this.logger.warn(`Failed to remove post ${postId} from Redis`, error);
+      });
 
     return { post_id: postId };
   }
@@ -475,7 +518,10 @@ export class PostsService {
     if (missingIds.length > 0) {
       const rows = await this.postsRepository.findPostsByIds(missingIds);
       await this.postsCacheRepository.indexPosts(rows).catch((error) => {
-        this.logger.warn('Failed to backfill missing post cards in Redis', error);
+        this.logger.warn(
+          'Failed to backfill missing post cards in Redis',
+          error,
+        );
       });
       for (const row of rows) {
         cards.set(row.post_id, this.cacheRowFromPost(row));
@@ -518,7 +564,10 @@ export class PostsService {
     viewerUserId: number,
     postIds: number[],
   ): Promise<Record<number, 'up' | 'down' | null>> {
-    const cached = await this.postsCacheRepository.getUserVotes(viewerUserId, postIds);
+    const cached = await this.postsCacheRepository.getUserVotes(
+      viewerUserId,
+      postIds,
+    );
     const unknownIds = postIds.filter((postId) => cached[postId] === undefined);
 
     if (unknownIds.length > 0) {

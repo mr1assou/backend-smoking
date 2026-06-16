@@ -5,9 +5,26 @@ import { FIRST_STEP_BADGE_ID } from './lib/badge.constants';
 
 type DbClient = Prisma.TransactionClient | PrismaService;
 
+export type UserStreakContext = {
+  streakStart: Date | null;
+  quitDate: Date | null;
+  freedomPoints: number;
+};
+
 @Injectable()
 export class BadgesRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  findUserBadgeContext(userId: number): Promise<UserStreakContext | null> {
+    return this.prisma.user.findUnique({
+      where: { user_id: userId },
+      select: {
+        streakStart: true,
+        quitDate: true,
+        freedomPoints: true,
+      },
+    });
+  }
 
   grantBadge(
     userId: number,
@@ -30,7 +47,10 @@ export class BadgesRepository {
       });
   }
 
-  grantSignupBadge(userId: number, client: DbClient = this.prisma): Promise<void> {
+  grantSignupBadge(
+    userId: number,
+    client: DbClient = this.prisma,
+  ): Promise<void> {
     return this.grantBadge(userId, FIRST_STEP_BADGE_ID, client);
   }
 

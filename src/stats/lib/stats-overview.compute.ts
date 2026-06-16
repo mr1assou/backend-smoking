@@ -167,7 +167,12 @@ export function computeOverviewByRange(
 
   return STATS_FILTER_RANGES.reduce(
     (acc, range) => {
-      acc[range] = computeOverviewForRange(attempts, statsEconomics, range, now);
+      acc[range] = computeOverviewForRange(
+        attempts,
+        statsEconomics,
+        range,
+        now,
+      );
       return acc;
     },
     {} as Record<StatsFilterRange, StatsImpact>,

@@ -4,6 +4,7 @@ export type LeaderboardUserRow = {
   country: string | null;
   countryFlag: string | null;
   image_url: string | null;
+  freedomPoints: number;
 };
 
 export type LeaderboardEntryResponse = {
@@ -21,5 +22,9 @@ export type LeaderboardEntryResponse = {
 
 export type LeaderboardResponse = {
   items: LeaderboardEntryResponse[];
+  viewer: LeaderboardEntryResponse;
   total_users: number;
+  has_more: boolean;
+  offset: number;
+  limit: number;
 };

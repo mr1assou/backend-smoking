@@ -1,12 +1,10 @@
 import { User } from '@prisma/client';
-import { BadgesRepository } from '../badges/badges.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
 import type { UserMeProfile, UserOnboardingData } from './types/user-onboarding-data';
 export declare class UsersRepository {
     private readonly prisma;
-    private readonly badgesRepository;
-    constructor(prisma: PrismaService, badgesRepository: BadgesRepository);
+    constructor(prisma: PrismaService);
     createWithCredentials(email: string, password: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
     findById(userId: number): Promise<User | null>;

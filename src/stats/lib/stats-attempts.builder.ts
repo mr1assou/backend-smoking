@@ -22,7 +22,12 @@ export async function buildAttemptsList(
     rows.map(async (row) => {
       const isActive = row.endedAt === null;
 
-      if (isActive && active && row.attempt_id === active.attempt_id && activeSnapshot) {
+      if (
+        isActive &&
+        active &&
+        row.attempt_id === active.attempt_id &&
+        activeSnapshot
+      ) {
         return {
           attemptNumber: row.attemptNumber,
           startedAt: toUtcIso(row.startedAt),

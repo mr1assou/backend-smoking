@@ -26,13 +26,10 @@ export class GoogleOAuthService {
     }
 
     const client = this.getOAuthClient();
-    const state = this.jwt.sign(
-      { returnUrl } satisfies OAuthStatePayload,
-      {
-        secret: this.config.get<string>('JWT_SECRET'),
-        expiresIn: '10m',
-      },
-    );
+    const state = this.jwt.sign({ returnUrl } satisfies OAuthStatePayload, {
+      secret: this.config.get<string>('JWT_SECRET'),
+      expiresIn: '10m',
+    });
 
     return client.generateAuthUrl({
       access_type: 'online',
@@ -66,7 +63,9 @@ export class GoogleOAuthService {
       const { tokens } = await client.getToken(code);
       const idToken = tokens.id_token;
       if (!idToken) {
-        throw new InternalServerErrorException('Google did not return an ID token');
+        throw new InternalServerErrorException(
+          'Google did not return an ID token',
+        );
       }
 
       const auth = await this.authService.googleSignIn(idToken);

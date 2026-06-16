@@ -1,24 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { BadgesRepository } from '../badges/badges.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
-import type { UserMeProfile, UserOnboardingData } from './types/user-onboarding-data';
+import type {
+  UserMeProfile,
+  UserOnboardingData,
+} from './types/user-onboarding-data';
 
 @Injectable()
 export class UsersRepository {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly badgesRepository: BadgesRepository,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   createWithCredentials(email: string, password: string): Promise<User> {
-    return this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: { email, password },
-      });
-      await this.badgesRepository.grantSignupBadge(user.user_id, tx);
-      return user;
+    return this.prisma.user.create({
+      data: { email, password },
     });
   }
 

@@ -24,7 +24,10 @@ export class PresenceService {
     this.broadcaster?.(userId, isOnline);
   }
 
-  async connect(userId: number, socketId: string): Promise<PresenceConnectResult> {
+  async connect(
+    userId: number,
+    socketId: string,
+  ): Promise<PresenceConnectResult> {
     const wasOnline = await this.presenceRepository.hasOpenSockets(userId);
     await this.presenceRepository.registerSocket(userId, socketId);
     return { wentOnline: !wasOnline };
@@ -36,7 +39,10 @@ export class PresenceService {
       return { userId: null, wentOffline: false };
     }
 
-    const remaining = await this.presenceRepository.removeSocket(socketId, userId);
+    const remaining = await this.presenceRepository.removeSocket(
+      socketId,
+      userId,
+    );
     if (remaining > 0) {
       return { userId, wentOffline: false };
     }
@@ -85,7 +91,10 @@ export class PresenceService {
     try {
       await this.usersRepository.updateLastOfflineAt(userId, new Date());
     } catch (error) {
-      this.logger.warn(`Failed to persist last_offline_at for user ${userId}`, error);
+      this.logger.warn(
+        `Failed to persist last_offline_at for user ${userId}`,
+        error,
+      );
     }
   }
 }

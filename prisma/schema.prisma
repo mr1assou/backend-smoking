@@ -53,11 +53,27 @@ model User {
   chatMessages         ChatMessage[]
   chatThreadReads      ChatThreadRead[]
   badges               UserBadge[]
+  freedomPointLedger   FreedomPointLedger[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+/// Immutable record of FP earned (aggregate cached on `users.freedom_points`).
+model FreedomPointLedger {
+  ledger_id   Int      @id @default(autoincrement())
+  user_id     Int      @map("user_id")
+  user        User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  amount      Int
+  source_type String   @map("source_type")
+  source_key  String   @map("source_key")
+  earned_at   DateTime @default(now()) @map("earned_at") @db.Timestamptz(3)
+
+  @@unique([user_id, source_type, source_key])
+  @@index([user_id, earned_at(sort: Desc)])
+  @@map("freedom_point_ledger")
 }
 
 model QuitAttempt {

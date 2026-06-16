@@ -1,7 +1,4 @@
-import {
-  LEADERBOARD_STATIC_BADGE_ID,
-  LEADERBOARD_STATIC_FREEDOM_POINTS,
-} from './leaderboard.constants';
+import { LEADERBOARD_STATIC_BADGE_ID } from './leaderboard.constants';
 import type {
   LeaderboardEntryResponse,
   LeaderboardResponse,
@@ -9,30 +6,65 @@ import type {
 } from '../types/leaderboard.types';
 import { displayUsername } from './leaderboard.filters';
 
-type MapLeaderboardOptions = {
+type MapEntryOptions = {
+  rank: number;
   viewerUserId: number;
   onlineById: Record<number, boolean>;
 };
 
-export function mapLeaderboardResponse(
-  rows: LeaderboardUserRow[],
-  options: MapLeaderboardOptions,
-): LeaderboardResponse {
-  const items: LeaderboardEntryResponse[] = rows.map((row, index) => ({
+function mapLeaderboardEntry(
+  row: LeaderboardUserRow,
+  options: MapEntryOptions,
+): LeaderboardEntryResponse {
+  return {
     user_id: row.user_id,
     username: displayUsername(row),
     country: row.country,
     country_flag: row.countryFlag,
     image_url: row.image_url,
-    rank: index + 1,
-    freedom_points: LEADERBOARD_STATIC_FREEDOM_POINTS,
+    rank: options.rank,
+    freedom_points: row.freedomPoints,
     badge_id: LEADERBOARD_STATIC_BADGE_ID,
     is_online: options.onlineById[row.user_id] === true,
     is_current_user: row.user_id === options.viewerUserId,
-  }));
+  };
+}
+
+type MapLeaderboardPageOptions = {
+  viewerUserId: number;
+  viewerRow: LeaderboardUserRow;
+  viewerRank: number;
+  onlineById: Record<number, boolean>;
+  offset: number;
+  limit: number;
+  totalUsers: number;
+  hasMore: boolean;
+};
+
+export function mapLeaderboardPage(
+  rows: LeaderboardUserRow[],
+  options: MapLeaderboardPageOptions,
+): LeaderboardResponse {
+  const items = rows.map((row, index) =>
+    mapLeaderboardEntry(row, {
+      rank: options.offset + index + 1,
+      viewerUserId: options.viewerUserId,
+      onlineById: options.onlineById,
+    }),
+  );
+
+  const viewer = mapLeaderboardEntry(options.viewerRow, {
+    rank: options.viewerRank,
+    viewerUserId: options.viewerUserId,
+    onlineById: options.onlineById,
+  });
 
   return {
     items,
-    total_users: items.length,
+    viewer,
+    total_users: options.totalUsers,
+    has_more: options.hasMore,
+    offset: options.offset,
+    limit: options.limit,
   };
 }

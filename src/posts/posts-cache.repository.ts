@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service';
 import { POST_FEED_REDIS_WINDOW_SIZE } from './lib/post-feed-pagination.constants';
-import { hottestScore } from './lib/post-hotness-score';
-import { POST_FEED_SORTS } from './lib/post-feed-sort.constants';
-import type { PostFeedSort } from './lib/post-feed-sort.constants';
 import {
   POSTS_FEED_BACKFILL_LOCK,
   feedKey,
@@ -68,15 +65,16 @@ export class PostsCacheRepository {
   }
 
   async getFeedIds(
-    sort: PostFeedSort,
     tagId: string | undefined,
     offset: number,
     limit: number,
   ): Promise<{ ids: number[]; hasMore: boolean }> {
-    const key = feedKey(sort, tagId);
+    const key = feedKey('newest', tagId);
     const members = await this.client().zrevrange(key, offset, offset + limit);
     const hasMore = members.length > limit;
-    const ids = members.slice(0, limit).map((value) => Number.parseInt(value, 10));
+    const ids = members
+      .slice(0, limit)
+      .map((value) => Number.parseInt(value, 10));
     return { ids: ids.filter((id) => Number.isFinite(id) && id > 0), hasMore };
   }
 
@@ -99,7 +97,9 @@ export class PostsCacheRepository {
       if (await this.isFeedIndexed()) return;
       const posts = await backfill();
       await this.indexPosts(posts);
-      this.logger.log(`Indexed ${posts.length} posts into Redis feed caches`);
+      this.logger.log(
+        `Indexed ${posts.length} posts into Redis newest feed cache`,
+      );
     } catch (error) {
       this.logger.error('Failed to backfill post feed cache', error);
       throw error;
@@ -126,7 +126,10 @@ export class PostsCacheRepository {
     await this.enforceWindowLimit();
   }
 
-  async updatePostCard(post: PostCacheRow, previousTagId?: string | null): Promise<void> {
+  async updatePostCard(
+    post: PostCacheRow,
+    previousTagId?: string | null,
+  ): Promise<void> {
     if (!(await this.isPostCached(post.post_id))) return;
     const pipeline = this.client().pipeline();
     pipeline.hset(postCardKey(post.post_id), this.serializeCardFields(post));
@@ -144,12 +147,8 @@ export class PostsCacheRepository {
   async removePost(postId: number, tagId: string | null): Promise<void> {
     const pipeline = this.client().pipeline();
     pipeline.del(postCardKey(postId));
-
-    for (const sort of POST_FEED_SORTS) {
-      pipeline.zrem(feedKey(sort), postId);
-      if (tagId) pipeline.zrem(feedKey(sort, tagId), postId);
-    }
-
+    pipeline.zrem(feedKey('newest'), postId);
+    if (tagId) pipeline.zrem(feedKey('newest', tagId), postId);
     await pipeline.exec();
   }
 
@@ -157,30 +156,26 @@ export class PostsCacheRepository {
     postId: number,
     upvoteCount: number,
     downvoteCount: number,
-    tagId: string | null,
   ): Promise<void> {
     if (!(await this.isPostCached(postId))) return;
 
-    const hot = hottestScore(upvoteCount, downvoteCount);
-    const pipeline = this.client().pipeline();
-    pipeline.hset(postCardKey(postId), 'up', String(upvoteCount), 'down', String(downvoteCount));
-    pipeline.zadd(feedKey('hottest'), hot, postId);
-    if (tagId) pipeline.zadd(feedKey('hottest', tagId), hot, postId);
-    await pipeline.exec();
+    await this.client().hset(
+      postCardKey(postId),
+      'up',
+      String(upvoteCount),
+      'down',
+      String(downvoteCount),
+    );
   }
 
-  async syncCommentCount(
-    postId: number,
-    commentCount: number,
-    tagId: string | null,
-  ): Promise<void> {
+  async syncCommentCount(postId: number, commentCount: number): Promise<void> {
     if (!(await this.isPostCached(postId))) return;
 
-    const pipeline = this.client().pipeline();
-    pipeline.hset(postCardKey(postId), 'comments', String(commentCount));
-    pipeline.zadd(feedKey('most_commented'), commentCount, postId);
-    if (tagId) pipeline.zadd(feedKey('most_commented', tagId), commentCount, postId);
-    await pipeline.exec();
+    await this.client().hset(
+      postCardKey(postId),
+      'comments',
+      String(commentCount),
+    );
   }
 
   async incrementShareCount(postId: number): Promise<void> {
@@ -279,16 +274,10 @@ export class PostsCacheRepository {
     post: PostCacheRow,
   ): void {
     const ts = post.created_at.getTime();
-    const hot = hottestScore(post.upvote_count, post.downvote_count);
 
     pipeline.zadd(feedKey('newest'), ts, post.post_id);
-    pipeline.zadd(feedKey('hottest'), hot, post.post_id);
-    pipeline.zadd(feedKey('most_commented'), post.comment_count, post.post_id);
-
     if (post.tag_id) {
       pipeline.zadd(feedKey('newest', post.tag_id), ts, post.post_id);
-      pipeline.zadd(feedKey('hottest', post.tag_id), hot, post.post_id);
-      pipeline.zadd(feedKey('most_commented', post.tag_id), post.comment_count, post.post_id);
     }
   }
 
@@ -298,9 +287,7 @@ export class PostsCacheRepository {
     tagId: string | null | undefined,
   ): void {
     if (!tagId) return;
-    for (const sort of POST_FEED_SORTS) {
-      pipeline.zrem(feedKey(sort, tagId), postId);
-    }
+    pipeline.zrem(feedKey('newest', tagId), postId);
   }
 
   private serializeCardFields(post: PostCacheRow): Record<string, string> {
@@ -311,7 +298,8 @@ export class PostsCacheRepository {
       tag_id: post.tag_id ?? '',
       image_url: post.image_url ?? '',
       image_frame: post.image_frame ?? '',
-      image_crop: post.image_crop == null ? '' : JSON.stringify(post.image_crop),
+      image_crop:
+        post.image_crop == null ? '' : JSON.stringify(post.image_crop),
       created_at: post.created_at.toISOString(),
       updated_at: post.updated_at.toISOString(),
       up: String(post.upvote_count),
@@ -378,12 +366,8 @@ export class PostsCacheRepository {
     const tagId = await this.client().hget(postCardKey(postId), 'tag_id');
     const pipeline = this.client().pipeline();
     pipeline.del(postCardKey(postId));
-
-    for (const sort of POST_FEED_SORTS) {
-      pipeline.zrem(feedKey(sort), postId);
-      if (tagId) pipeline.zrem(feedKey(sort, tagId), postId);
-    }
-
+    pipeline.zrem(feedKey('newest'), postId);
+    if (tagId) pipeline.zrem(feedKey('newest', tagId), postId);
     await pipeline.exec();
   }
 

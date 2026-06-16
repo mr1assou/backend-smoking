@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import { BadgesService } from '../badges/badges.service';
+import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { toUtcIso, utcInstantNow } from '../common/utc-instant';
 import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
@@ -18,6 +19,7 @@ export class UsersService {
     private readonly attemptsService: AttemptsService,
     private readonly storageService: StorageService,
     private readonly badgesService: BadgesService,
+    private readonly freedomPointsService: FreedomPointsService,
   ) {}
 
   async createWithHashedPassword(
@@ -58,6 +60,8 @@ export class UsersService {
 
     if (data.quitDate) {
       await this.attemptsService.ensureFirstAttempt(userId, data.quitDate);
+      await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+      await this.badgesService.syncEarnedBadges(userId);
     }
 
     return result;
@@ -85,15 +89,22 @@ export class UsersService {
   }
 
   async getMe(userId: number) {
+    const fpSync =
+      await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+    const badgeSync = await this.badgesService.syncEarnedBadges(userId);
+
     const user = await this.usersRepository.findMeProfile(userId);
 
     if (!user) throw new NotFoundException('User not found');
 
     const activeAttempt = await this.attemptsService.getActiveAttempt(userId);
     const slipCigarettesTotal = activeAttempt
-      ? await this.usersRepository.sumSlipCigarettesSince(userId, activeAttempt.startedAt)
+      ? await this.usersRepository.sumSlipCigarettesSince(
+          userId,
+          activeAttempt.startedAt,
+        )
       : 0;
-    const earnedBadgeIds = await this.badgesService.findEarnedBadgeIds(userId);
+    const earnedBadgeIds = badgeSync.earnedBadgeIds;
 
     return {
       userId: user.user_id,
@@ -114,7 +125,7 @@ export class UsersService {
       imageUrl: user.image_url ?? undefined,
       slipCigarettesTotal,
       currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
-      freedomPoints: user.freedomPoints,
+      freedomPoints: fpSync.totalFreedomPoints,
       earnedBadgeIds,
     };
   }

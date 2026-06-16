@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsIn, IsNumber, IsOptional, Max, Min, ValidateNested } from 'class-validator';
+import {
+  IsIn,
+  IsNumber,
+  IsOptional,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 export class PostImageCropDto {
   @IsNumber()

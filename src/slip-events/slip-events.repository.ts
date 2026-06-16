@@ -31,7 +31,10 @@ export class SlipEventsRepository {
     private readonly attemptsService: AttemptsService,
   ) {}
 
-  findOwnedById(userId: number, slipEventId: number): Promise<SlipEvent | null> {
+  findOwnedById(
+    userId: number,
+    slipEventId: number,
+  ): Promise<SlipEvent | null> {
     return this.prisma.slipEvent.findFirst({
       where: { slip_event_id: slipEventId, user_id: userId },
     });
@@ -50,7 +53,9 @@ export class SlipEventsRepository {
       .then((result) => result._sum.cigarettesCount ?? 0);
   }
 
-  createWithAttemptRotation(data: CreateSlipEventData): Promise<SlipCreateResult> {
+  createWithAttemptRotation(
+    data: CreateSlipEventData,
+  ): Promise<SlipCreateResult> {
     const now = utcInstantNow();
     const cigarettesCount = resolveSlipCigarettesCount(
       data.outcome,
@@ -87,7 +92,8 @@ export class SlipEventsRepository {
         _sum: { cigarettesCount: true },
       });
       const slipThisEvent = cigarettesCount ?? 0;
-      const totalSlipCigarettes = (priorSlipSum._sum.cigarettesCount ?? 0) + slipThisEvent;
+      const totalSlipCigarettes =
+        (priorSlipSum._sum.cigarettesCount ?? 0) + slipThisEvent;
 
       const snapshot = this.attemptsService.computeSnapshot(
         economics,

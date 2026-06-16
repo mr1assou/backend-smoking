@@ -23,7 +23,10 @@ export type AttemptSummary = {
 export class AttemptsService {
   constructor(private readonly attemptsRepository: AttemptsRepository) {}
 
-  async ensureFirstAttempt(userId: number, startedAt: Date): Promise<QuitAttempt> {
+  async ensureFirstAttempt(
+    userId: number,
+    startedAt: Date,
+  ): Promise<QuitAttempt> {
     const active = await this.attemptsRepository.findActive(userId);
     if (active) return active;
 
@@ -53,7 +56,12 @@ export class AttemptsService {
     endedAt: Date,
     slipCigarettesSmoked: number,
   ) {
-    return computeAttemptImpact(economics, startedAt, endedAt, slipCigarettesSmoked);
+    return computeAttemptImpact(
+      economics,
+      startedAt,
+      endedAt,
+      slipCigarettesSmoked,
+    );
   }
 
   async getActiveAttempt(userId: number): Promise<QuitAttempt | null> {
@@ -79,5 +87,4 @@ export class AttemptsService {
       slipCigarettesSmoked: row.slipCigarettesSmoked,
     };
   }
-
 }

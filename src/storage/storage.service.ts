@@ -27,7 +27,11 @@ export class StorageService {
     userId: number,
     dto: CreateUploadUrlDto,
   ): Promise<PresignedUpload> {
-    return this.createImageUploadUrl(R2_FOLDERS.PROFILES, userId, dto.contentType);
+    return this.createImageUploadUrl(
+      R2_FOLDERS.PROFILES,
+      userId,
+      dto.contentType,
+    );
   }
 
   createChatMediaUploadUrl(
@@ -57,7 +61,9 @@ export class StorageService {
   ): void {
     const prefix = this.storageRepository.userFolderPrefix(folder, userId);
     if (!imageUrl.startsWith(prefix)) {
-      throw new BadRequestException(`Image URL must be uploaded to your ${label} folder`);
+      throw new BadRequestException(
+        `Image URL must be uploaded to your ${label} folder`,
+      );
     }
   }
 
@@ -96,7 +102,9 @@ export class StorageService {
     }
   }
 
-  private assertAllowedChatMediaType(contentType: R2ChatMediaContentType): void {
+  private assertAllowedChatMediaType(
+    contentType: R2ChatMediaContentType,
+  ): void {
     if (!R2_ALLOWED_CHAT_MEDIA_TYPES.includes(contentType)) {
       throw new BadRequestException('Unsupported media type');
     }

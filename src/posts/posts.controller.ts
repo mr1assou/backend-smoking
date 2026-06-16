@@ -14,7 +14,10 @@ import {
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { ListPostCommentsQueryDto, resolveCommentsPagination } from './dto/list-post-comments-query.dto';
+import {
+  ListPostCommentsQueryDto,
+  resolveCommentsPagination,
+} from './dto/list-post-comments-query.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { ListPostsQueryDto } from './dto/list-posts-query.dto';
@@ -112,11 +115,7 @@ export class PostsController {
     @Param('postId', ParseIntPipe) postId: number,
     @Param('commentId', ParseIntPipe) commentId: number,
   ) {
-    return this.postsService.deleteComment(
-      postId,
-      commentId,
-      req.user.userId,
-    );
+    return this.postsService.deleteComment(postId, commentId, req.user.userId);
   }
 
   @UseGuards(JwtGuard)

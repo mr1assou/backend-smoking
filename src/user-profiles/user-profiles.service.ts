@@ -73,6 +73,10 @@ export class UserProfilesService {
     offset = 0,
   ): Promise<FeedPageResponse> {
     await this.requireUser(userId);
-    return this.postsService.listUpvotedPostsByUser(userId, viewerUserId, offset);
+    return this.postsService.listUpvotedPostsByUser(
+      userId,
+      viewerUserId,
+      offset,
+    );
   }
 }

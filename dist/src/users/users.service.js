@@ -13,6 +13,7 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_service_1 = require("../attempts/attempts.service");
 const badges_service_1 = require("../badges/badges.service");
+const freedom_points_service_1 = require("../freedom-points/freedom-points.service");
 const utc_instant_1 = require("../common/utc-instant");
 const storage_service_1 = require("../storage/storage.service");
 const users_repository_1 = require("./users.repository");
@@ -21,11 +22,13 @@ let UsersService = class UsersService {
     attemptsService;
     storageService;
     badgesService;
-    constructor(usersRepository, attemptsService, storageService, badgesService) {
+    freedomPointsService;
+    constructor(usersRepository, attemptsService, storageService, badgesService, freedomPointsService) {
         this.usersRepository = usersRepository;
         this.attemptsService = attemptsService;
         this.storageService = storageService;
         this.badgesService = badgesService;
+        this.freedomPointsService = freedomPointsService;
     }
     async createWithHashedPassword(email, hashedPassword) {
         return this.usersRepository.createWithCredentials(email, hashedPassword);
@@ -49,6 +52,8 @@ let UsersService = class UsersService {
         const result = await this.usersRepository.updateOnboarding(userId, data);
         if (data.quitDate) {
             await this.attemptsService.ensureFirstAttempt(userId, data.quitDate);
+            await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+            await this.badgesService.syncEarnedBadges(userId);
         }
         return result;
     }
@@ -68,6 +73,8 @@ let UsersService = class UsersService {
         await this.usersRepository.updateRefreshToken(userId, hashedRefreshToken);
     }
     async getMe(userId) {
+        const fpSync = await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+        const badgeSync = await this.badgesService.syncEarnedBadges(userId);
         const user = await this.usersRepository.findMeProfile(userId);
         if (!user)
             throw new common_1.NotFoundException('User not found');
@@ -75,7 +82,7 @@ let UsersService = class UsersService {
         const slipCigarettesTotal = activeAttempt
             ? await this.usersRepository.sumSlipCigarettesSince(userId, activeAttempt.startedAt)
             : 0;
-        const earnedBadgeIds = await this.badgesService.findEarnedBadgeIds(userId);
+        const earnedBadgeIds = badgeSync.earnedBadgeIds;
         return {
             userId: user.user_id,
             email: user.email,
@@ -95,7 +102,7 @@ let UsersService = class UsersService {
             imageUrl: user.image_url ?? undefined,
             slipCigarettesTotal,
             currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
-            freedomPoints: user.freedomPoints,
+            freedomPoints: fpSync.totalFreedomPoints,
             earnedBadgeIds,
         };
     }
@@ -138,6 +145,7 @@ exports.UsersService = UsersService = __decorate([
     __metadata("design:paramtypes", [users_repository_1.UsersRepository,
         attempts_service_1.AttemptsService,
         storage_service_1.StorageService,
-        badges_service_1.BadgesService])
+        badges_service_1.BadgesService,
+        freedom_points_service_1.FreedomPointsService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map
