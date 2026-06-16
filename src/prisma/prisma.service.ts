@@ -92,7 +92,8 @@ export class PrismaService
 
   constructor(config: ConfigService) {
     const pool = createPgPool(config);
-    const base = new PrismaClient({ adapter: new PrismaPg(pool) });
+    const adapter = new PrismaPg(pool);
+    const base = new PrismaClient({ adapter });
     const logger = new Logger(PrismaService.name);
 
     const extended = base.$extends({
@@ -119,7 +120,7 @@ export class PrismaService
       },
     });
 
-    super({ adapter: new PrismaPg(pool) });
+    super({ adapter });
 
     const service = extended as unknown as PrismaService;
     Object.defineProperty(service, 'pool', { value: pool });

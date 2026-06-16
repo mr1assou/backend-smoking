@@ -1,8 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import type { Request } from 'express';
+import {
+  ExtractJwt,
+  Strategy,
+  type StrategyOptionsWithRequest,
+} from 'passport-jwt';
+
+function refreshTokenFromCookie(req: Request): string | null {
+  const token: unknown = req.cookies?.['refresh_token'];
+  return typeof token === 'string' ? token : null;
+}
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -10,17 +19,21 @@ export class JwtRefreshStrategy extends PassportStrategy(
   'jwt-refresh',
 ) {
   constructor(config: ConfigService) {
-    super({
+    const options: StrategyOptionsWithRequest = {
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: Request) => req?.cookies?.['refresh_token'] ?? null,
+        (req: Request) => refreshTokenFromCookie(req),
       ]),
-      secretOrKey: config.get<string>('JWT_REFRESH_SECRET'),
+      secretOrKey: config.getOrThrow<string>('JWT_REFRESH_SECRET'),
       passReqToCallback: true,
-    });
+    };
+    super(options);
   }
 
   validate(req: Request, payload: { sub: number; email: string }) {
-    const refreshToken = req.cookies['refresh_token'];
+    const refreshToken = refreshTokenFromCookie(req);
+    if (!refreshToken) {
+      return null;
+    }
     return { userId: payload.sub, email: payload.email, refreshToken };
   }
 }

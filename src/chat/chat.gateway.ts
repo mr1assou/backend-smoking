@@ -18,7 +18,11 @@ import { ConfigService } from '@nestjs/config';
 import type Redis from 'ioredis';
 import type { Server, Socket } from 'socket.io';
 import { RedisService } from '../redis/redis.service';
-import { verifyPresenceSocketUser } from '../presence/lib/socket-auth';
+import {
+  verifyPresenceSocketUser,
+  getSocketUser,
+  setSocketUser,
+} from '../presence/lib/socket-auth';
 import { ChatService } from './chat.service';
 import {
   CHAT_EVENTS_CHANNEL,
@@ -86,12 +90,12 @@ export class ChatGateway
       return;
     }
 
-    client.data.user = user;
+    setSocketUser(client, user);
     await client.join(chatUserRoom(user.userId));
   }
 
-  handleDisconnect(_client: Socket) {
-    // rooms are cleaned up automatically
+  handleDisconnect(client: Socket): void {
+    void client.id;
   }
 
   @SubscribeMessage('chat:join')
@@ -99,7 +103,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: ThreadBody,
   ) {
-    const user = client.data.user;
+    const user = getSocketUser(client);
     if (!user?.userId || !body?.threadId) return { ok: false };
 
     try {
@@ -133,7 +137,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: ThreadBody,
   ) {
-    const user = client.data.user;
+    const user = getSocketUser(client);
     if (!user?.userId || !body?.threadId) return { ok: false };
 
     try {
@@ -153,7 +157,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: TypingBody,
   ) {
-    const user = client.data.user;
+    const user = getSocketUser(client);
     if (!user?.userId || !body?.threadId) return { ok: false };
 
     try {
@@ -212,7 +216,7 @@ export class ChatGateway
       .in(chatThreadRoom(threadId))
       .fetchSockets();
     const peerViewing = sockets.some(
-      (socket) => socket.data.user?.userId === peerUserId,
+      (socket) => getSocketUser(socket)?.userId === peerUserId,
     );
     if (!peerViewing) return;
 

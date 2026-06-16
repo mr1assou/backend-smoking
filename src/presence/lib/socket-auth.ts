@@ -4,8 +4,30 @@ import type { PresenceSocketUser } from '../types/presence.types';
 
 type JwtPayload = { sub: number; email: string };
 
+type SocketData = {
+  user?: PresenceSocketUser;
+};
+
+type SocketDataCarrier = {
+  data: unknown;
+};
+
+function socketData(client: SocketDataCarrier): SocketData {
+  return client.data as SocketData;
+}
+
+export function getSocketUser(
+  client: SocketDataCarrier,
+): PresenceSocketUser | undefined {
+  return socketData(client).user;
+}
+
+export function setSocketUser(client: Socket, user: PresenceSocketUser): void {
+  socketData(client).user = user;
+}
+
 export function extractSocketToken(client: Socket): string | undefined {
-  const authToken = client.handshake.auth?.token;
+  const authToken: unknown = client.handshake.auth?.token;
   if (typeof authToken === 'string' && authToken.trim()) {
     return authToken.trim();
   }

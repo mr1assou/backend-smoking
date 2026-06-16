@@ -78,7 +78,8 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_1.Prism
     logger = new common_1.Logger(PrismaService_1.name);
     constructor(config) {
         const pool = createPgPool(config);
-        const base = new client_1.PrismaClient({ adapter: new adapter_pg_1.PrismaPg(pool) });
+        const adapter = new adapter_pg_1.PrismaPg(pool);
+        const base = new client_1.PrismaClient({ adapter });
         const logger = new common_1.Logger(PrismaService_1.name);
         const extended = base.$extends({
             name: 'pg-connection-retry',
@@ -101,7 +102,7 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_1.Prism
                 },
             },
         });
-        super({ adapter: new adapter_pg_1.PrismaPg(pool) });
+        super({ adapter });
         const service = extended;
         Object.defineProperty(service, 'pool', { value: pool });
         service.onModuleInit = async () => {

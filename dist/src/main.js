@@ -19,10 +19,10 @@ async function bootstrap() {
     app.use((0, cookie_parser_1.default)());
     app.enableCors({ origin: true, credentials: true });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
-    app.getHttpAdapter().get('/', (_req, res) => {
+    expressApp.get('/', (_req, res) => {
         res.json({ message: 'Quit Smoking API' });
     });
     await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();
 //# sourceMappingURL=main.js.map

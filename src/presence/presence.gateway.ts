@@ -10,7 +10,11 @@ import { Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Server, Socket } from 'socket.io';
-import { verifyPresenceSocketUser } from './lib/socket-auth';
+import {
+  verifyPresenceSocketUser,
+  getSocketUser,
+  setSocketUser,
+} from './lib/socket-auth';
 import { PresenceService } from './presence.service';
 
 @WebSocketGateway({
@@ -48,7 +52,7 @@ export class PresenceGateway
       return;
     }
 
-    client.data.user = user;
+    setSocketUser(client, user);
 
     try {
       const { wentOnline } = await this.presence.connect(
@@ -91,7 +95,7 @@ export class PresenceGateway
 
   @SubscribeMessage('presence:leave')
   async handleLeave(@ConnectedSocket() client: Socket) {
-    const userId = client.data.user?.userId;
+    const userId = getSocketUser(client)?.userId;
     if (!userId) return { ok: false };
 
     await this.presence.markOffline(userId);

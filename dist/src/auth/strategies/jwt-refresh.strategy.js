@@ -14,18 +14,26 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
+function refreshTokenFromCookie(req) {
+    const token = req.cookies?.['refresh_token'];
+    return typeof token === 'string' ? token : null;
+}
 let JwtRefreshStrategy = class JwtRefreshStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt-refresh') {
     constructor(config) {
-        super({
+        const options = {
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([
-                (req) => req?.cookies?.['refresh_token'] ?? null,
+                (req) => refreshTokenFromCookie(req),
             ]),
-            secretOrKey: config.get('JWT_REFRESH_SECRET'),
+            secretOrKey: config.getOrThrow('JWT_REFRESH_SECRET'),
             passReqToCallback: true,
-        });
+        };
+        super(options);
     }
     validate(req, payload) {
-        const refreshToken = req.cookies['refresh_token'];
+        const refreshToken = refreshTokenFromCookie(req);
+        if (!refreshToken) {
+            return null;
+        }
         return { userId: payload.sub, email: payload.email, refreshToken };
     }
 };
