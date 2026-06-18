@@ -34,4 +34,6 @@ export type UserMeProfile = {
     timezone: string | null;
     image_url: string | null;
     freedomPoints: number;
+    motivationCardIndex: number;
+    tipsCardIndex: number;
 };

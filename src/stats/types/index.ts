@@ -8,3 +8,4 @@ export type {
   StatsOverviewByRange,
   StatsOverviewResponse,
 } from './stats-overview-response';
+export type { GoalStatsRow, StatsGoalsResponse } from './stats-goals-response';

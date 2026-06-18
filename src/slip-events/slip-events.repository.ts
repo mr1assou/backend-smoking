@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SlipEvent } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import { utcInstantNow } from '../common/utc-instant';
+import { GoalsRepository } from '../goals/goals.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import { resolveSlipCigarettesCount } from './lib';
 import type { SlipOutcome } from './types/slip-outcome';
@@ -29,6 +30,7 @@ export class SlipEventsRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly attemptsService: AttemptsService,
+    private readonly goalsRepository: GoalsRepository,
   ) {}
 
   findOwnedById(
@@ -135,6 +137,12 @@ export class SlipEventsRepository {
         },
       });
 
+      await this.goalsRepository.failActiveGoalsForAttempt(
+        tx,
+        closedAttempt.attempt_id,
+        event.slip_event_id,
+      );
+
       await tx.user.update({
         where: { user_id: data.userId },
         data: { streakStart: now, quitDate: now },
@@ -180,6 +188,11 @@ export class SlipEventsRepository {
         });
 
         currentAttemptNumber = reopened.attemptNumber;
+
+        await this.goalsRepository.restoreGoalsFailedBySlip(
+          tx,
+          slipEventId,
+        );
 
         await tx.user.update({
           where: { user_id: userId },

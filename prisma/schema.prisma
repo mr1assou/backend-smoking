@@ -36,6 +36,8 @@ model User {
   cigarettesPerPack    Int?
 
   timezone String?
+  motivationCardIndex Int @default(0) @map("motivation_card_index")
+  tipsCardIndex       Int @default(0) @map("tips_card_index")
   image_url String?
   last_offline_at DateTime? @map("last_offline_at") @db.Timestamptz(3)
   freedomPoints Int @default(0) @map("freedom_points")
@@ -54,6 +56,7 @@ model User {
   chatThreadReads      ChatThreadRead[]
   badges               UserBadge[]
   freedomPointLedger   FreedomPointLedger[]
+  goals                UserGoal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,9 +93,31 @@ model QuitAttempt {
   lifeMinutesGained    Int       @default(0) @map("life_minutes_gained")
   slipCigarettesSmoked Int       @default(0) @map("slip_cigarettes_smoked")
   closingSlipEvent     SlipEvent?
+  goals                UserGoal[]
 
   @@unique([user_id, attemptNumber])
   @@map("quit_attempts")
+}
+
+model UserGoal {
+  goal_id               Int       @id @default(autoincrement())
+  user_id               Int       @map("user_id")
+  attempt_id            Int       @map("attempt_id")
+  type                  String
+  target                Float
+  status                String    @default("active")
+  started_at            DateTime  @default(now()) @map("started_at") @db.Timestamptz(3)
+  completed_at          DateTime? @map("completed_at") @db.Timestamptz(3)
+  failed_at             DateTime? @map("failed_at") @db.Timestamptz(3)
+  failed_reason         String?   @map("failed_reason")
+  failed_by_slip_event_id Int?    @map("failed_by_slip_event_id")
+
+  user    User        @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  attempt QuitAttempt @relation(fields: [attempt_id], references: [attempt_id], onDelete: Cascade)
+
+  @@unique([attempt_id, type])
+  @@index([user_id, status])
+  @@map("user_goals")
 }
 
 model SlipEvent {

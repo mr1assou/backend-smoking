@@ -1,5 +1,6 @@
 import { SlipEvent } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
+import { GoalsRepository } from '../goals/goals.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import type { SlipOutcome } from './types/slip-outcome';
 export type CreateSlipEventData = {
@@ -21,7 +22,8 @@ export type SlipCreateResult = {
 export declare class SlipEventsRepository {
     private readonly prisma;
     private readonly attemptsService;
-    constructor(prisma: PrismaService, attemptsService: AttemptsService);
+    private readonly goalsRepository;
+    constructor(prisma: PrismaService, attemptsService: AttemptsService, goalsRepository: GoalsRepository);
     findOwnedById(userId: number, slipEventId: number): Promise<SlipEvent | null>;
     sumSlipCigarettesSince(userId: number, since: Date): Promise<number>;
     createWithAttemptRotation(data: CreateSlipEventData): Promise<SlipCreateResult>;

@@ -13,4 +13,9 @@ export declare class StatsController {
             userId: number;
         };
     }): Promise<import("./types").StatsAttemptsResponse>;
+    getGoals(req: Request & {
+        user: {
+            userId: number;
+        };
+    }): Promise<import("./types").StatsGoalsResponse>;
 }

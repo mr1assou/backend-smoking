@@ -48,6 +48,8 @@ export declare class UsersService {
         yearsSmoking: string | null;
         cigarettesPerPack: number | null;
         timezone: string | null;
+        motivationCardIndex: number;
+        tipsCardIndex: number;
         image_url: string | null;
         last_offline_at: Date | null;
         freedomPoints: number;
@@ -74,6 +76,8 @@ export declare class UsersService {
         cigarettesPerPack: number | undefined;
         packPrice: string | undefined;
         timezone: string | undefined;
+        motivationCardIndex: number;
+        tipsCardIndex: number;
         imageUrl: string | undefined;
         slipCigarettesTotal: number;
         currentAttemptNumber: number;

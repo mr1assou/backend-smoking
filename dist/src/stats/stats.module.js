@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsModule = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_module_1 = require("../attempts/attempts.module");
+const goals_module_1 = require("../goals/goals.module");
 const prisma_module_1 = require("../prisma/prisma.module");
 const users_module_1 = require("../users/users.module");
 const stats_controller_1 = require("./stats.controller");
@@ -19,7 +20,7 @@ let StatsModule = class StatsModule {
 exports.StatsModule = StatsModule;
 exports.StatsModule = StatsModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, attempts_module_1.AttemptsModule],
+        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, attempts_module_1.AttemptsModule, goals_module_1.GoalsModule],
         controllers: [stats_controller_1.StatsController],
         providers: [stats_service_1.StatsService, stats_repository_1.StatsRepository],
     })

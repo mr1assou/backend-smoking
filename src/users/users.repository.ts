@@ -49,6 +49,8 @@ export class UsersRepository {
         timezone: true,
         image_url: true,
         freedomPoints: true,
+        motivationCardIndex: true,
+        tipsCardIndex: true,
       },
     });
   }

@@ -13,16 +13,20 @@ exports.StatsService = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_repository_1 = require("../attempts/attempts.repository");
 const attempts_service_1 = require("../attempts/attempts.service");
+const goals_repository_1 = require("../goals/goals.repository");
 const users_repository_1 = require("../users/users.repository");
 const lib_1 = require("./lib");
+const goals_stats_builder_1 = require("./lib/goals-stats.builder");
 let StatsService = class StatsService {
     usersRepository;
     attemptsRepository;
     attemptsService;
-    constructor(usersRepository, attemptsRepository, attemptsService) {
+    goalsRepository;
+    constructor(usersRepository, attemptsRepository, attemptsService, goalsRepository) {
         this.usersRepository = usersRepository;
         this.attemptsRepository = attemptsRepository;
         this.attemptsService = attemptsService;
+        this.goalsRepository = goalsRepository;
     }
     async getOverview(userId) {
         const context = await (0, lib_1.loadStatsUserContext)(userId, this.usersRepository, this.attemptsRepository, this.attemptsService);
@@ -51,12 +55,24 @@ let StatsService = class StatsService {
             attempts,
         };
     }
+    async getGoals(userId) {
+        const user = await this.usersRepository.findById(userId);
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        const rows = await this.goalsRepository.listAllForUser(userId);
+        return {
+            currency: user.currency ?? 'USD',
+            timezone: user.timezone?.trim() || 'UTC',
+            goals: rows.map((row) => (0, goals_stats_builder_1.toGoalStatsRow)(row)),
+        };
+    }
 };
 exports.StatsService = StatsService;
 exports.StatsService = StatsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_repository_1.UsersRepository,
         attempts_repository_1.AttemptsRepository,
-        attempts_service_1.AttemptsService])
+        attempts_service_1.AttemptsService,
+        goals_repository_1.GoalsRepository])
 ], StatsService);
 //# sourceMappingURL=stats.service.js.map

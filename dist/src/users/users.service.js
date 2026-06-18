@@ -62,6 +62,12 @@ let UsersService = class UsersService {
         if (dto.timezone !== undefined) {
             data.timezone = dto.timezone.trim() || null;
         }
+        if (dto.motivationCardIndex !== undefined) {
+            data.motivationCardIndex = dto.motivationCardIndex;
+        }
+        if (dto.tipsCardIndex !== undefined) {
+            data.tipsCardIndex = dto.tipsCardIndex;
+        }
         return this.usersRepository.updateDevicePreferences(userId, data);
     }
     async updateProfileImage(userId, dto) {
@@ -99,6 +105,8 @@ let UsersService = class UsersService {
             cigarettesPerPack: user.cigarettesPerPack ?? undefined,
             packPrice: user.packPrice ?? undefined,
             timezone: user.timezone ?? undefined,
+            motivationCardIndex: user.motivationCardIndex,
+            tipsCardIndex: user.tipsCardIndex,
             imageUrl: user.image_url ?? undefined,
             slipCigarettesTotal,
             currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,

@@ -18,4 +18,10 @@ export class StatsController {
   getAttempts(@Req() req: Request & { user: { userId: number } }) {
     return this.statsService.getAttempts(req.user.userId);
   }
+
+  @UseGuards(JwtGuard)
+  @Get('goals')
+  getGoals(@Req() req: Request & { user: { userId: number } }) {
+    return this.statsService.getGoals(req.user.userId);
+  }
 }

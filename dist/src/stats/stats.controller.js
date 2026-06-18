@@ -27,6 +27,9 @@ let StatsController = class StatsController {
     getAttempts(req) {
         return this.statsService.getAttempts(req.user.userId);
     }
+    getGoals(req) {
+        return this.statsService.getGoals(req.user.userId);
+    }
 };
 exports.StatsController = StatsController;
 __decorate([
@@ -45,6 +48,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], StatsController.prototype, "getAttempts", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('goals'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], StatsController.prototype, "getGoals", null);
 exports.StatsController = StatsController = __decorate([
     (0, common_1.Controller)('auth/me/stats'),
     __metadata("design:paramtypes", [stats_service_1.StatsService])

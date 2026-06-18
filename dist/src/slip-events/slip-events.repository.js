@@ -13,14 +13,17 @@ exports.SlipEventsRepository = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_service_1 = require("../attempts/attempts.service");
 const utc_instant_1 = require("../common/utc-instant");
+const goals_repository_1 = require("../goals/goals.repository");
 const prisma_service_1 = require("../prisma/prisma.service");
 const lib_1 = require("./lib");
 let SlipEventsRepository = class SlipEventsRepository {
     prisma;
     attemptsService;
-    constructor(prisma, attemptsService) {
+    goalsRepository;
+    constructor(prisma, attemptsService, goalsRepository) {
         this.prisma = prisma;
         this.attemptsService = attemptsService;
+        this.goalsRepository = goalsRepository;
     }
     findOwnedById(userId, slipEventId) {
         return this.prisma.slipEvent.findFirst({
@@ -102,6 +105,7 @@ let SlipEventsRepository = class SlipEventsRepository {
                     newAttemptId: newAttempt.attempt_id,
                 },
             });
+            await this.goalsRepository.failActiveGoalsForAttempt(tx, closedAttempt.attempt_id, event.slip_event_id);
             await tx.user.update({
                 where: { user_id: data.userId },
                 data: { streakStart: now, quitDate: now },
@@ -134,6 +138,7 @@ let SlipEventsRepository = class SlipEventsRepository {
                     where: { attempt_id: event.newAttemptId },
                 });
                 currentAttemptNumber = reopened.attemptNumber;
+                await this.goalsRepository.restoreGoalsFailedBySlip(tx, slipEventId);
                 await tx.user.update({
                     where: { user_id: userId },
                     data: {
@@ -161,6 +166,7 @@ exports.SlipEventsRepository = SlipEventsRepository;
 exports.SlipEventsRepository = SlipEventsRepository = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        attempts_service_1.AttemptsService])
+        attempts_service_1.AttemptsService,
+        goals_repository_1.GoalsRepository])
 ], SlipEventsRepository);
 //# sourceMappingURL=slip-events.repository.js.map

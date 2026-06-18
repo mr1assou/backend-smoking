@@ -1,0 +1,2 @@
+ALTER TABLE "users" ADD COLUMN "motivation_card_index" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "users" ADD COLUMN "tips_card_index" INTEGER NOT NULL DEFAULT 0;
