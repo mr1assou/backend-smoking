@@ -33,7 +33,7 @@ export function computeAttemptImpact(
     (Math.max(0, economics.cigarettesPerDay) * durationMs) / MS_PER_DAY;
   const avoided = Math.max(
     0,
-    Math.floor(gross) - Math.max(0, slipCigarettesSmoked),
+    gross - Math.max(0, slipCigarettesSmoked),
   );
   const perPack = Math.max(1, economics.cigarettesPerPack);
 
