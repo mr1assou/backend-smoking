@@ -3,6 +3,7 @@ export const FP_PER_SMOKE_FREE_DAY = 10;
 
 export const FREEDOM_POINT_SOURCES = {
   SMOKE_FREE_DAY: 'smoke_free_day',
+  GOAL_COMPLETION: 'goal_completion',
 } as const;
 
 export type FreedomPointSource =

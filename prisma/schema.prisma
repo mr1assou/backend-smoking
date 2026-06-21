@@ -105,6 +105,7 @@ model UserGoal {
   attempt_id            Int       @map("attempt_id")
   type                  String
   target                Float
+  baseline_progress     Float     @default(0) @map("baseline_progress")
   status                String    @default("active")
   started_at            DateTime  @default(now()) @map("started_at") @db.Timestamptz(3)
   completed_at          DateTime? @map("completed_at") @db.Timestamptz(3)
@@ -310,4 +311,23 @@ model UserBadge {
   @@unique([user_id, badge_id])
   @@index([user_id])
   @@map("user_badges")
+}
+
+/// Curated relax-sound tracks — audio stored in R2 under `music/{slug}/`; covers bundled in the app.
+model RelaxSound {
+  sound_id        Int      @id @default(autoincrement())
+  slug            String   @unique
+  label           String
+  description     String   @default("")
+  audio_url       String   @map("audio_url")
+  audio_mime_type String   @map("audio_mime_type")
+  duration_ms     Int?     @map("duration_ms")
+  size_bytes      Int?     @map("size_bytes")
+  sort_order      Int      @default(0) @map("sort_order")
+  is_active       Boolean  @default(true) @map("is_active")
+  created_at      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updated_at      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([is_active, sort_order])
+  @@map("relax_sounds")
 }

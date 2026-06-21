@@ -17,6 +17,7 @@ const presence_module_1 = require("./presence/presence.module");
 const posts_module_1 = require("./posts/posts.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const redis_module_1 = require("./redis/redis.module");
+const relax_sounds_module_1 = require("./relax-sounds/relax-sounds.module");
 const storage_module_1 = require("./storage/storage.module");
 let AppModule = class AppModule {
 };
@@ -34,6 +35,7 @@ exports.AppModule = AppModule = __decorate([
             storage_module_1.StorageModule,
             posts_module_1.PostsModule,
             chat_module_1.ChatModule,
+            relax_sounds_module_1.RelaxSoundsModule,
         ],
     })
 ], AppModule);

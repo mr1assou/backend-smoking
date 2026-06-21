@@ -3,7 +3,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { loadR2Config } from './lib/r2.config';
-import { R2_PRESIGN_EXPIRES_SECONDS } from './lib/r2.constants';
+import { R2_FOLDERS, R2_PRESIGN_EXPIRES_SECONDS } from './lib/r2.constants';
 
 @Injectable()
 export class StorageRepository {
@@ -27,6 +27,14 @@ export class StorageRepository {
 
   buildObjectKey(folder: string, userId: number, fileName: string): string {
     return `${folder}/${userId}/${fileName}`;
+  }
+
+  buildMusicObjectKey(slug: string, fileName: string): string {
+    return `${R2_FOLDERS.MUSIC}/${slug}/${fileName}`;
+  }
+
+  musicFolderPrefix(): string {
+    return `${this.publicUrl}/${R2_FOLDERS.MUSIC}/`;
   }
 
   publicUrlForKey(key: string): string {
@@ -54,5 +62,22 @@ export class StorageRepository {
       uploadUrl,
       expiresIn: R2_PRESIGN_EXPIRES_SECONDS,
     }));
+  }
+
+  async putObject(
+    key: string,
+    body: Buffer,
+    contentType: string,
+  ): Promise<string> {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+        CacheControl: 'public, max-age=31536000, immutable',
+      }),
+    );
+    return this.publicUrlForKey(key);
   }
 }

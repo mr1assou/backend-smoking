@@ -41,6 +41,23 @@ export class StorageService {
     return this.createMediaUploadUrl(R2_FOLDERS.MESSAGES, userId, contentType);
   }
 
+  createMusicUploadUrl(
+    slug: string,
+    fileName: string,
+    contentType: R2ChatMediaContentType,
+  ): Promise<PresignedUpload> {
+    this.assertAllowedMusicAudioType(contentType, fileName);
+    const key = this.storageRepository.buildMusicObjectKey(slug, fileName);
+    return this.createPresignedUpload(key, contentType);
+  }
+
+  assertMusicUrl(url: string): void {
+    const prefix = this.storageRepository.musicFolderPrefix();
+    if (!url.startsWith(prefix)) {
+      throw new BadRequestException('URL must point to the music folder in R2');
+    }
+  }
+
   assertOwnedPostImageUrl(userId: number, imageUrl: string): void {
     this.assertOwnedImageUrl(R2_FOLDERS.POSTS, userId, imageUrl, 'posts');
   }
@@ -85,6 +102,13 @@ export class StorageService {
 
     const fileName = `${uuidv4()}${mimeToExtension(contentType)}`;
     const key = this.storageRepository.buildObjectKey(folder, userId, fileName);
+    return this.createPresignedUpload(key, contentType);
+  }
+
+  private async createPresignedUpload(
+    key: string,
+    contentType: string,
+  ): Promise<PresignedUpload> {
     const { uploadUrl, expiresIn } =
       await this.storageRepository.createPresignedPutUrl(key, contentType);
 
@@ -94,6 +118,22 @@ export class StorageService {
       key,
       expiresIn,
     };
+  }
+
+  private assertAllowedMusicAudioType(
+    contentType: R2ChatMediaContentType,
+    fileName: string,
+  ): void {
+    const lower = fileName.toLowerCase();
+    const isAudio = R2_ALLOWED_CHAT_MEDIA_TYPES.includes(contentType);
+
+    if (!isAudio) {
+      throw new BadRequestException('Only audio files can be uploaded for music');
+    }
+
+    if (!/\.(mp3|wav|m4a|aac)$/i.test(lower)) {
+      throw new BadRequestException('Invalid audio file name');
+    }
   }
 
   private assertAllowedImageType(contentType: R2ImageContentType): void {

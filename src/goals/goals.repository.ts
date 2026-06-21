@@ -38,6 +38,7 @@ export class GoalsRepository {
     attemptId: number,
     type: GoalType,
     target: number,
+    baselineProgress: number,
   ): Promise<UserGoal> {
     const now = utcInstantNow();
 
@@ -53,11 +54,13 @@ export class GoalsRepository {
         attempt_id: attemptId,
         type,
         target,
+        baseline_progress: baselineProgress,
         status: 'active',
         started_at: now,
       },
       update: {
         target,
+        baseline_progress: baselineProgress,
         status: 'active',
         started_at: now,
         completed_at: null,
@@ -115,15 +118,6 @@ export class GoalsRepository {
       .then((result) => result.count);
   }
 
-  maxHistoricalCigarettesAvoided(userId: number): Promise<number> {
-    return this.prisma.quitAttempt
-      .aggregate({
-        where: { user_id: userId, endedAt: { not: null } },
-        _max: { cigarettesAvoided: true },
-      })
-      .then((result) => result._max.cigarettesAvoided ?? 0);
-  }
-
   listAllForUser(userId: number) {
     return this.prisma.userGoal.findMany({
       where: { user_id: userId },
@@ -134,5 +128,19 @@ export class GoalsRepository {
       },
       orderBy: { started_at: 'desc' },
     });
+  }
+
+  findByIdForUser(goalId: number, userId: number): Promise<UserGoal | null> {
+    return this.prisma.userGoal.findFirst({
+      where: { goal_id: goalId, user_id: userId },
+    });
+  }
+
+  deleteActiveGoal(userId: number, goalId: number): Promise<boolean> {
+    return this.prisma.userGoal
+      .deleteMany({
+        where: { goal_id: goalId, user_id: userId, status: 'active' },
+      })
+      .then((result) => result.count > 0);
   }
 }

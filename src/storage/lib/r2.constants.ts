@@ -3,6 +3,7 @@ export const R2_FOLDERS = {
   POSTS: 'posts',
   PROFILES: 'profiles',
   MESSAGES: 'messages',
+  MUSIC: 'music',
 } as const;
 
 export type R2Folder = (typeof R2_FOLDERS)[keyof typeof R2_FOLDERS];

@@ -1,8 +1,4 @@
-export const GOAL_TYPES = [
-  'money_saved',
-  'smoke_free_days',
-  'cigarettes_avoided',
-] as const;
+export const GOAL_TYPES = ['smoke_free_days', 'cigarettes_avoided'] as const;
 
 export type GoalType = (typeof GOAL_TYPES)[number];
 

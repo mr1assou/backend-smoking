@@ -6,19 +6,22 @@ import {
 import { UserGoal } from '@prisma/client';
 import { AttemptsRepository } from '../attempts/attempts.repository';
 import { AttemptsService } from '../attempts/attempts.service';
-import { BadgesService } from '../badges/badges.service';
+import { FreedomPointsService } from '../freedom-points/freedom-points.service';
+import { FREEDOM_POINT_SOURCES } from '../freedom-points/lib/freedom-points.constants';
+import type { AttemptEconomics } from '../stats/lib/attempt-impact';
 import { loadStatsUserContext } from '../stats/lib';
 import { UsersRepository } from '../users/users.repository';
 import type { GoalType } from './goals.constants';
 import { GoalsRepository } from './goals.repository';
 import {
   computeAllMinTargets,
-  enforcesStrictGoalMinimums,
   isAllowedTarget,
   type GoalProgressSnapshot,
 } from './lib/goal-allowed-targets';
+import { computeGoalCompletionBonus } from './lib/goal-completion-bonus';
 import {
   buildGoalProgressSnapshot,
+  currentValueForGoalType,
   isGoalMet,
 } from './lib/goal-progress';
 
@@ -38,7 +41,6 @@ export type GoalsStateResponse = {
   progress: GoalProgressSnapshot;
   goals: UserGoalDto[];
   minTargets: Record<GoalType, number>;
-  strictMinTargets: boolean;
 };
 
 @Injectable()
@@ -48,7 +50,7 @@ export class GoalsService {
     private readonly usersRepository: UsersRepository,
     private readonly attemptsRepository: AttemptsRepository,
     private readonly attemptsService: AttemptsService,
-    private readonly badgesService: BadgesService,
+    private readonly freedomPointsService: FreedomPointsService,
   ) {}
 
   async getGoalsState(userId: number): Promise<GoalsStateResponse> {
@@ -69,12 +71,13 @@ export class GoalsService {
       context.now,
     );
 
-    const earnedBadgeIds = await this.badgesService.findEarnedBadgeIds(userId);
-    const historicalBest =
-      await this.goalsRepository.maxHistoricalCigarettesAvoided(userId);
-
     if (context.active) {
-      await this.syncCompletions(context.active.attempt_id, progress);
+      await this.syncCompletions(
+        userId,
+        context.active.attempt_id,
+        progress,
+        context.economics,
+      );
     }
 
     const goals = context.active
@@ -85,13 +88,7 @@ export class GoalsService {
       currency: context.currency,
       progress,
       goals: goals.map((goal) => this.toDto(goal)),
-      minTargets: computeAllMinTargets(
-        progress,
-        context.economics,
-        earnedBadgeIds,
-        historicalBest,
-      ),
-      strictMinTargets: enforcesStrictGoalMinimums(earnedBadgeIds),
+      minTargets: computeAllMinTargets(progress),
     };
   }
 
@@ -128,20 +125,7 @@ export class GoalsService {
       context.now,
     );
 
-    const earnedBadgeIds = await this.badgesService.findEarnedBadgeIds(userId);
-    const historicalBest =
-      await this.goalsRepository.maxHistoricalCigarettesAvoided(userId);
-
-    if (
-      !isAllowedTarget(
-        type,
-        target,
-        progress,
-        context.economics,
-        earnedBadgeIds,
-        historicalBest,
-      )
-    ) {
+    if (!isAllowedTarget(type, target, progress)) {
       throw new BadRequestException(
         'Target must be at or above the minimum for your current progress',
       );
@@ -152,24 +136,62 @@ export class GoalsService {
       activeAttempt.attempt_id,
       type,
       target,
+      currentValueForGoalType(type, progress),
     );
 
     return this.getGoalsState(userId);
   }
 
+  async deleteGoal(userId: number, goalId: number): Promise<GoalsStateResponse> {
+    const goal = await this.goalsRepository.findByIdForUser(goalId, userId);
+    if (!goal) throw new NotFoundException('Goal not found');
+
+    if (goal.status !== 'active') {
+      throw new BadRequestException('Only active goals can be deleted');
+    }
+
+    const deleted = await this.goalsRepository.deleteActiveGoal(userId, goalId);
+    if (!deleted) throw new NotFoundException('Goal not found');
+
+    return this.getGoalsState(userId);
+  }
+
   private async syncCompletions(
+    userId: number,
     attemptId: number,
     progress: GoalProgressSnapshot,
+    economics: AttemptEconomics,
   ): Promise<void> {
     const activeGoals = await this.goalsRepository.findActiveForAttempt(attemptId);
+    const completedGoals = activeGoals.filter((goal) =>
+      isGoalMet(goal.type as GoalType, goal.target, progress),
+    );
 
     await Promise.all(
-      activeGoals
-        .filter((goal) =>
-          isGoalMet(goal.type as GoalType, goal.target, progress),
-        )
-        .map((goal) => this.goalsRepository.markCompleted(goal.goal_id)),
+      completedGoals.map((goal) => this.completeGoal(userId, goal, economics)),
     );
+  }
+
+  private async completeGoal(
+    userId: number,
+    goal: UserGoal,
+    economics: AttemptEconomics,
+  ): Promise<void> {
+    await this.goalsRepository.markCompleted(goal.goal_id);
+
+    const bonus = computeGoalCompletionBonus(
+      goal.type as GoalType,
+      goal.target,
+      goal.baseline_progress,
+      economics,
+    );
+
+    await this.freedomPointsService.grantOneTimeBonus({
+      userId,
+      amount: bonus,
+      sourceType: FREEDOM_POINT_SOURCES.GOAL_COMPLETION,
+      sourceKey: String(goal.goal_id),
+    });
   }
 
   private toDto(goal: UserGoal): UserGoalDto {

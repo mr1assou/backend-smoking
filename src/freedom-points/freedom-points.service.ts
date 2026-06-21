@@ -96,4 +96,37 @@ export class FreedomPointsService {
       totalFreedomPoints,
     };
   }
+
+  /** Idempotent one-time grant (e.g. goal completion bonus). */
+  async grantOneTimeBonus(input: {
+    userId: number;
+    amount: number;
+    sourceType: string;
+    sourceKey: string;
+  }): Promise<{ pointsAwarded: number; totalFreedomPoints: number }> {
+    const grant = await this.freedomPointsRepository.grantMany([
+      {
+        userId: input.userId,
+        amount: input.amount,
+        sourceType: input.sourceType,
+        sourceKey: input.sourceKey,
+      },
+    ]);
+
+    if (grant.pointsAwarded > 0) {
+      const totalFreedomPoints =
+        await this.freedomPointsRepository.recalculateUserFreedomPoints(
+          input.userId,
+        );
+      return { pointsAwarded: grant.pointsAwarded, totalFreedomPoints };
+    }
+
+    const user =
+      await this.freedomPointsRepository.findUserStreakContext(input.userId);
+
+    return {
+      pointsAwarded: 0,
+      totalFreedomPoints: user?.freedomPoints ?? 0,
+    };
+  }
 }

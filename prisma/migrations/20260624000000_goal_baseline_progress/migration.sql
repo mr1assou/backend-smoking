@@ -1,0 +1,1 @@
+ALTER TABLE "user_goals" ADD COLUMN "baseline_progress" DOUBLE PRECISION NOT NULL DEFAULT 0;

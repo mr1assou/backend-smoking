@@ -8,6 +8,7 @@ import { PresenceModule } from './presence/presence.module';
 import { PostsModule } from './posts/posts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
+import { RelaxSoundsModule } from './relax-sounds/relax-sounds.module';
 import { StorageModule } from './storage/storage.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { StorageModule } from './storage/storage.module';
     StorageModule,
     PostsModule,
     ChatModule,
+    RelaxSoundsModule,
   ],
 })
 export class AppModule {}
