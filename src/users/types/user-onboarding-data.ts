@@ -17,6 +17,7 @@ export type UserOnboardingData = {
   packPrice: string | null;
   yearsSmoking: string | null;
   cigarettesPerPack: number | null;
+  image_url?: string | null;
 };
 
 export type UserMeProfile = {

@@ -4,6 +4,7 @@ import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { UserProfilesModule } from './user-profiles/user-profiles.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { PresenceModule } from './presence/presence.module';
 import { PostsModule } from './posts/posts.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -23,6 +24,7 @@ import { StorageModule } from './storage/storage.module';
     StorageModule,
     PostsModule,
     ChatModule,
+    NotificationsModule,
     RelaxSoundsModule,
   ],
 })

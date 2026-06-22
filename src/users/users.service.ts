@@ -8,6 +8,7 @@ import { StorageService } from '../storage/storage.service';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { defaultProfileFileName } from './lib/default-profile-image';
 import { UsersRepository } from './users.repository';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
 import type { UserOnboardingData } from './types/user-onboarding-data';
@@ -56,6 +57,16 @@ export class UsersService {
 
   async updateOnboarding(userId: number, dto: UpdateOnboardingDto) {
     const data = this.mapOnboardingDtoToData(dto);
+    const existing = await this.usersRepository.findById(userId);
+
+    if (!existing?.image_url) {
+      const fileName = defaultProfileFileName(data.sex);
+      data.image_url = await this.storageService.seedDefaultProfileImage(
+        userId,
+        fileName,
+      );
+    }
+
     const result = await this.usersRepository.updateOnboarding(userId, data);
 
     if (data.quitDate) {

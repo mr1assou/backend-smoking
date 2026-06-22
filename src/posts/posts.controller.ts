@@ -48,6 +48,15 @@ export class PostsController {
   }
 
   @UseGuards(JwtGuard)
+  @Get(':postId')
+  getOne(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    return this.postsService.getPost(req.user.userId, postId);
+  }
+
+  @UseGuards(JwtGuard)
   @Patch(':postId')
   update(
     @Req() req: Request & { user: { userId: number } },

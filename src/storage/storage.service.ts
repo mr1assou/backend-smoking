@@ -1,4 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUploadUrlDto } from './dto/create-upload-url.dto';
 import {
@@ -64,6 +66,21 @@ export class StorageService {
 
   assertOwnedProfileImageUrl(userId: number, imageUrl: string): void {
     this.assertOwnedImageUrl(R2_FOLDERS.PROFILES, userId, imageUrl, 'profiles');
+  }
+
+  /** Copies a bundled default avatar into the user's R2 profiles folder. */
+  async seedDefaultProfileImage(
+    userId: number,
+    fileName: string,
+  ): Promise<string> {
+    const assetPath = join(process.cwd(), 'assets', 'profiles', fileName);
+    const body = await readFile(assetPath);
+    const key = this.storageRepository.buildObjectKey(
+      R2_FOLDERS.PROFILES,
+      userId,
+      `${uuidv4()}.png`,
+    );
+    return this.storageRepository.putObject(key, body, 'image/png');
   }
 
   assertOwnedChatMediaUrl(userId: number, mediaUrl: string): void {

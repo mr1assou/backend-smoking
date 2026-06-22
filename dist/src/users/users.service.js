@@ -16,6 +16,7 @@ const badges_service_1 = require("../badges/badges.service");
 const freedom_points_service_1 = require("../freedom-points/freedom-points.service");
 const utc_instant_1 = require("../common/utc-instant");
 const storage_service_1 = require("../storage/storage.service");
+const default_profile_image_1 = require("./lib/default-profile-image");
 const users_repository_1 = require("./users.repository");
 let UsersService = class UsersService {
     usersRepository;
@@ -49,6 +50,11 @@ let UsersService = class UsersService {
     }
     async updateOnboarding(userId, dto) {
         const data = this.mapOnboardingDtoToData(dto);
+        const existing = await this.usersRepository.findById(userId);
+        if (!existing?.image_url) {
+            const fileName = (0, default_profile_image_1.defaultProfileFileName)(data.sex);
+            data.image_url = await this.storageService.seedDefaultProfileImage(userId, fileName);
+        }
         const result = await this.usersRepository.updateOnboarding(userId, data);
         if (data.quitDate) {
             await this.attemptsService.ensureFirstAttempt(userId, data.quitDate);

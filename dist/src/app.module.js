@@ -13,6 +13,7 @@ const chat_module_1 = require("./chat/chat.module");
 const auth_module_1 = require("./auth/auth.module");
 const user_profiles_module_1 = require("./user-profiles/user-profiles.module");
 const leaderboard_module_1 = require("./leaderboard/leaderboard.module");
+const notifications_module_1 = require("./notifications/notifications.module");
 const presence_module_1 = require("./presence/presence.module");
 const posts_module_1 = require("./posts/posts.module");
 const prisma_module_1 = require("./prisma/prisma.module");
@@ -35,6 +36,7 @@ exports.AppModule = AppModule = __decorate([
             storage_module_1.StorageModule,
             posts_module_1.PostsModule,
             chat_module_1.ChatModule,
+            notifications_module_1.NotificationsModule,
             relax_sounds_module_1.RelaxSoundsModule,
         ],
     })

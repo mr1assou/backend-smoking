@@ -8,6 +8,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { StorageService } from '../storage/storage.service';
 import { PresenceService } from '../presence/presence.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import type { CreateCommentDto } from './dto/create-comment.dto';
 import type { UpdateCommentDto } from './dto/update-comment.dto';
 import type { CreatePostDto } from './dto/create-post.dto';
@@ -51,6 +52,7 @@ export class PostsService {
     private readonly postsCacheRepository: PostsCacheRepository,
     private readonly storageService: StorageService,
     private readonly presenceService: PresenceService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async listFeed(
@@ -216,7 +218,11 @@ export class PostsService {
         throw new NotFoundException('Parent comment not found');
       }
       parentCommentId = parent.comment_id;
-      replyToUserId = dto.reply_to_user_id ?? parent.author_id;
+      // The person being replied to is the author of the parent comment.
+      // Trust the parent row over the client-supplied reply_to_user_id so the
+      // reply notification always reaches the right user (even when the post
+      // author replies to a commenter).
+      replyToUserId = parent.author_id;
     } else if (dto.reply_to_user_id) {
       replyToUserId =
         dto.reply_to_user_id === post.author_id ? post.author_id : undefined;
@@ -233,6 +239,27 @@ export class PostsService {
       .catch((error) => {
         this.logger.warn(
           `Failed to sync comment count for post ${postId}`,
+          error,
+        );
+      });
+
+    void this.notificationsService
+      .createForComment({
+        actor: {
+          user_id: comment.author.user_id,
+          username: comment.author.username,
+          image_url: comment.author.image_url,
+          countryFlag: comment.author.countryFlag,
+        },
+        postId,
+        postAuthorId: post.author_id,
+        commentId: comment.comment_id,
+        text,
+        replyToUserId,
+      })
+      .catch((error) => {
+        this.logger.warn(
+          `Failed to fan out notifications for comment on post ${postId}`,
           error,
         );
       });
@@ -381,7 +408,44 @@ export class PostsService {
         }),
     ]);
 
+    // Notify the post author when a vote is actively cast (not on removal).
+    if (
+      (myVote === 'up' || myVote === 'down') &&
+      post.author_id !== userId
+    ) {
+      void this.notifyPostVote(postId, post.author_id, userId, myVote);
+    }
+
     return this.toEngagement(post, myVote);
+  }
+
+  private async notifyPostVote(
+    postId: number,
+    postAuthorId: number,
+    actorId: number,
+    vote: 'up' | 'down',
+  ): Promise<void> {
+    try {
+      const [actor] = await this.postsRepository.findAuthorsByIds([actorId]);
+      if (!actor) return;
+
+      await this.notificationsService.createForVote({
+        actor: {
+          user_id: actor.user_id,
+          username: actor.username,
+          image_url: actor.image_url,
+          countryFlag: actor.countryFlag,
+        },
+        postId,
+        postAuthorId,
+        vote,
+      });
+    } catch (error) {
+      this.logger.warn(
+        `Failed to fan out vote notification for post ${postId}`,
+        error,
+      );
+    }
   }
 
   async sharePost(
@@ -423,7 +487,32 @@ export class PostsService {
       this.logger.warn(`Failed to index new post ${post.post_id}`, error);
     });
 
+    void this.notifyOnlineUsersOfNewPost(post.post_id, userId, post.title);
+
     return post;
+  }
+
+  private async notifyOnlineUsersOfNewPost(
+    postId: number,
+    actorId: number,
+    title: string,
+  ): Promise<void> {
+    try {
+      const onlineIds = await this.presenceService.getOnlineUserIds();
+      if (onlineIds.length === 0) return;
+
+      await this.notificationsService.createForNewPost({
+        actorId,
+        postId,
+        recipientIds: onlineIds,
+        text: title,
+      });
+    } catch (error) {
+      this.logger.warn(
+        `Failed to fan out new-post notifications for post ${postId}`,
+        error,
+      );
+    }
   }
 
   async updatePost(postId: number, userId: number, dto: UpdatePostDto) {
@@ -633,6 +722,15 @@ export class PostsService {
       if (!post) throw new NotFoundException('Post not found');
       return post;
     });
+  }
+
+  async getPost(
+    viewerUserId: number,
+    postId: number,
+  ): Promise<FeedPostResponse> {
+    const [post] = await this.buildFeedFromCache(viewerUserId, [postId]);
+    if (!post) throw new NotFoundException('Post not found');
+    return post;
   }
 
   private toAuthor(
