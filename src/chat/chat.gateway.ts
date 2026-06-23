@@ -194,6 +194,20 @@ export class ChatGateway
           event.payload.sender_id,
         );
         break;
+      case 'chat:message_updated':
+        this.server
+          .to(chatUserRoom(event.user_one_id))
+          .to(chatUserRoom(event.user_two_id))
+          .to(chatThreadRoom(event.thread_id))
+          .emit('chat:message_updated', event.payload);
+        break;
+      case 'chat:message_deleted':
+        this.server
+          .to(chatUserRoom(event.user_one_id))
+          .to(chatUserRoom(event.user_two_id))
+          .to(chatThreadRoom(event.thread_id))
+          .emit('chat:message_deleted', event.payload);
+        break;
       case 'messages_seen':
         this.server
           .to(chatUserRoom(event.peer_user_id))

@@ -278,6 +278,8 @@ model ChatMessage {
   media_duration_ms Int?       @map("media_duration_ms")
   /// Uploaded file size in bytes.
   media_size_bytes  Int?       @map("media_size_bytes")
+  is_deleted        Boolean    @default(false) @map("is_deleted")
+  edited_at         DateTime?  @map("edited_at") @db.Timestamptz(3)
 
   created_at        DateTime   @default(now()) @db.Timestamptz(3)
 

@@ -5,7 +5,6 @@ import {
   POSTS_FEED_BACKFILL_LOCK,
   feedKey,
   postCardKey,
-  userVotesKey,
 } from './lib/posts.redis-keys';
 
 export type PostCacheRow = {
@@ -181,64 +180,6 @@ export class PostsCacheRepository {
   async incrementShareCount(postId: number): Promise<void> {
     if (!(await this.isPostCached(postId))) return;
     await this.client().hincrby(postCardKey(postId), 'shares', 1);
-  }
-
-  async setUserVote(
-    userId: number,
-    postId: number,
-    vote: 'up' | 'down' | null,
-  ): Promise<void> {
-    const key = userVotesKey(userId);
-    await this.client().hset(key, String(postId), vote ?? 'none');
-  }
-
-  async backfillUserVotes(
-    userId: number,
-    votes: Array<{ post_id: number; vote: string }>,
-    postIds: number[],
-  ): Promise<void> {
-    if (postIds.length === 0) return;
-
-    const voted = new Map(
-      votes
-        .filter((row) => row.vote === 'up' || row.vote === 'down')
-        .map((row) => [row.post_id, row.vote] as const),
-    );
-
-    const pipeline = this.client().pipeline();
-    for (const postId of postIds) {
-      const vote = voted.get(postId);
-      pipeline.hset(userVotesKey(userId), String(postId), vote ?? 'none');
-    }
-    await pipeline.exec();
-  }
-
-  async getUserVotes(
-    userId: number,
-    postIds: number[],
-  ): Promise<Record<number, 'up' | 'down' | null | undefined>> {
-    const out: Record<number, 'up' | 'down' | null | undefined> = {};
-    if (postIds.length === 0) return out;
-
-    const values = await this.client().hmget(
-      userVotesKey(userId),
-      ...postIds.map(String),
-    );
-
-    postIds.forEach((postId, index) => {
-      const vote = values[index];
-      if (vote === 'up' || vote === 'down') {
-        out[postId] = vote;
-        return;
-      }
-      if (vote === 'none') {
-        out[postId] = null;
-        return;
-      }
-      out[postId] = undefined;
-    });
-
-    return out;
   }
 
   async getPostCards(postIds: number[]): Promise<Map<number, CachedPostCard>> {

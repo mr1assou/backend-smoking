@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,10 +9,12 @@ import { StorageService } from '../storage/storage.service';
 import { ChatPubSubService } from './chat-pubsub.service';
 import { ChatRepository } from './chat.repository';
 import type { SendMessageDto } from './dto/send-message.dto';
+import type { EditMessageDto } from './dto/edit-message.dto';
 import {
   canonicalThreadPair,
   peerUserIdFromThread,
 } from './lib/canonical-thread-pair';
+import { isWithinChatMessageEditWindow } from './lib/chat-message-mutation';
 import {
   CHAT_MESSAGES_PAGE_MAX,
   CHAT_MESSAGES_PAGE_SIZE,
@@ -173,6 +176,51 @@ export class ChatService {
     return payload;
   }
 
+  async editMessage(
+    userId: number,
+    threadId: number,
+    messageId: number,
+    dto: EditMessageDto,
+  ): Promise<ChatMessageDto> {
+    const thread = await this.requireThread(threadId, userId);
+    const message = await this.requireOwnedMessage(userId, threadId, messageId);
+
+    if (!isWithinChatMessageEditWindow(message.created_at)) {
+      throw new ForbiddenException('This message can no longer be edited');
+    }
+
+    if (message.message_type !== 'text') {
+      throw new BadRequestException('Only text messages can be edited');
+    }
+
+    const text = dto.text.trim();
+    if (!text) throw new BadRequestException('Text is required');
+
+    const updated = await this.chatRepository.updateMessageText(
+      messageId,
+      text,
+      new Date(),
+    );
+
+    const payload = this.toMessageDto(updated);
+    await this.publishThreadMessageEvent(thread, 'chat:message_updated', payload);
+    return payload;
+  }
+
+  async deleteMessage(
+    userId: number,
+    threadId: number,
+    messageId: number,
+  ): Promise<ChatMessageDto> {
+    const thread = await this.requireThread(threadId, userId);
+    await this.requireOwnedMessage(userId, threadId, messageId);
+
+    const deleted = await this.chatRepository.softDeleteMessage(messageId);
+    const payload = this.toMessageDto(deleted);
+    await this.publishThreadMessageEvent(thread, 'chat:message_deleted', payload);
+    return payload;
+  }
+
   async resolvePeerUserId(
     threadId: number,
     viewerUserId: number,
@@ -246,6 +294,8 @@ export class ChatService {
     media_mime_type: string | null;
     media_duration_ms: number | null;
     media_size_bytes: number | null;
+    is_deleted: boolean;
+    edited_at: Date | null;
     created_at: Date;
   }): ChatMessageDto {
     return {
@@ -258,8 +308,46 @@ export class ChatService {
       media_mime_type: message.media_mime_type,
       media_duration_ms: message.media_duration_ms,
       media_size_bytes: message.media_size_bytes,
+      is_deleted: message.is_deleted,
+      edited_at: message.edited_at ? toUtcIso(message.edited_at) : null,
       created_at: toUtcIso(message.created_at),
     };
+  }
+
+  private async requireOwnedMessage(
+    userId: number,
+    threadId: number,
+    messageId: number,
+  ) {
+    const message = await this.chatRepository.findOwnedMessage(
+      messageId,
+      threadId,
+      userId,
+    );
+    if (!message) throw new NotFoundException('Message not found');
+    if (message.is_deleted) {
+      throw new BadRequestException('Message already deleted');
+    }
+    return message;
+  }
+
+  private async publishThreadMessageEvent(
+    thread: ThreadWithRelations,
+    type: 'chat:message_updated' | 'chat:message_deleted',
+    payload: ChatMessageDto,
+  ) {
+    const [user_one_id, user_two_id] = canonicalThreadPair(
+      thread.user_one_id,
+      thread.user_two_id,
+    );
+
+    await this.chatPubSub.publish({
+      type,
+      thread_id: thread.thread_id,
+      user_one_id,
+      user_two_id,
+      payload,
+    });
   }
 
   private toThreadSummary(
@@ -293,6 +381,8 @@ export class ChatService {
         media_mime_type: string | null;
         media_duration_ms: number | null;
         media_size_bytes: number | null;
+        is_deleted: boolean;
+        edited_at: Date | null;
         created_at: Date;
       }[];
     },

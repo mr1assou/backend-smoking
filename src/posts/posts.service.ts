@@ -389,24 +389,14 @@ export class PostsService {
       dto.vote,
     );
 
-    await Promise.all([
-      this.postsCacheRepository
-        .syncVoteStats(post.post_id, post.upvote_count, post.downvote_count)
-        .catch((error) => {
-          this.logger.warn(
-            `Failed to sync vote stats for post ${postId}`,
-            error,
-          );
-        }),
-      this.postsCacheRepository
-        .setUserVote(userId, postId, myVote)
-        .catch((error) => {
-          this.logger.warn(
-            `Failed to sync user vote for post ${postId}`,
-            error,
-          );
-        }),
-    ]);
+    await this.postsCacheRepository
+      .syncVoteStats(post.post_id, post.upvote_count, post.downvote_count)
+      .catch((error) => {
+        this.logger.warn(
+          `Failed to sync vote stats for post ${postId}`,
+          error,
+        );
+      });
 
     // Notify the post author when a vote is actively cast (not on removal).
     if (
@@ -653,39 +643,21 @@ export class PostsService {
     viewerUserId: number,
     postIds: number[],
   ): Promise<Record<number, 'up' | 'down' | null>> {
-    const cached = await this.postsCacheRepository.getUserVotes(
+    const resolved: Record<number, 'up' | 'down' | null> = {};
+    for (const postId of postIds) {
+      resolved[postId] = null;
+    }
+
+    const rows = await this.postsRepository.findUserVotesForPosts(
       viewerUserId,
       postIds,
     );
-    const unknownIds = postIds.filter((postId) => cached[postId] === undefined);
-
-    if (unknownIds.length > 0) {
-      const rows = await this.postsRepository.findUserVotesForPosts(
-        viewerUserId,
-        unknownIds,
-      );
-      await this.postsCacheRepository
-        .backfillUserVotes(viewerUserId, rows, unknownIds)
-        .catch((error) => {
-          this.logger.warn('Failed to backfill user votes in Redis', error);
-        });
-
-      const voted = new Map<number, 'up' | 'down'>();
-      for (const row of rows) {
-        if (row.vote === 'up' || row.vote === 'down') {
-          voted.set(row.post_id, row.vote);
-        }
-      }
-
-      for (const postId of unknownIds) {
-        cached[postId] = voted.get(postId) ?? null;
+    for (const row of rows) {
+      if (row.vote === 'up' || row.vote === 'down') {
+        resolved[row.post_id] = row.vote;
       }
     }
 
-    const resolved: Record<number, 'up' | 'down' | null> = {};
-    for (const postId of postIds) {
-      resolved[postId] = cached[postId] ?? null;
-    }
     return resolved;
   }
 

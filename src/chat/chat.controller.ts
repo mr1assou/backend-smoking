@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -16,6 +18,7 @@ import { ListMessagesQueryDto } from './dto/list-messages-query.dto';
 import { ListSupportUsersQueryDto } from './dto/list-support-users-query.dto';
 import { OpenThreadDto } from './dto/open-thread.dto';
 import { SendMessageDto } from './dto/send-message.dto';
+import { EditMessageDto } from './dto/edit-message.dto';
 import { CHAT_MESSAGES_PAGE_SIZE } from './lib/chat-pagination';
 
 @Controller('chat')
@@ -73,6 +76,32 @@ export class ChatController {
     @Body() dto: SendMessageDto,
   ) {
     return this.chatService.sendMessage(req.user.userId, threadId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('threads/:threadId/messages/:messageId')
+  editMessage(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('threadId', ParseIntPipe) threadId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Body() dto: EditMessageDto,
+  ) {
+    return this.chatService.editMessage(
+      req.user.userId,
+      threadId,
+      messageId,
+      dto,
+    );
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('threads/:threadId/messages/:messageId')
+  deleteMessage(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('threadId', ParseIntPipe) threadId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+  ) {
+    return this.chatService.deleteMessage(req.user.userId, threadId, messageId);
   }
 
   @UseGuards(JwtGuard)

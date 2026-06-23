@@ -12,6 +12,8 @@ export type ChatMessageDto = {
   media_mime_type: string | null;
   media_duration_ms: number | null;
   media_size_bytes: number | null;
+  is_deleted: boolean;
+  edited_at: string | null;
   created_at: string;
 };
 
@@ -62,6 +64,20 @@ export type ChatTypingPayload = {
 export type ChatRedisEvent =
   | {
       type: 'chat:message';
+      thread_id: number;
+      user_one_id: number;
+      user_two_id: number;
+      payload: ChatMessageDto;
+    }
+  | {
+      type: 'chat:message_updated';
+      thread_id: number;
+      user_one_id: number;
+      user_two_id: number;
+      payload: ChatMessageDto;
+    }
+  | {
+      type: 'chat:message_deleted';
       thread_id: number;
       user_one_id: number;
       user_two_id: number;

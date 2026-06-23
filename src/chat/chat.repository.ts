@@ -164,6 +164,40 @@ export class ChatRepository {
     });
   }
 
+  findOwnedMessage(messageId: number, threadId: number, senderId: number) {
+    return this.prisma.chatMessage.findFirst({
+      where: {
+        message_id: messageId,
+        thread_id: threadId,
+        sender_id: senderId,
+      },
+    });
+  }
+
+  updateMessageText(messageId: number, text: string, editedAt: Date) {
+    return this.prisma.chatMessage.update({
+      where: { message_id: messageId },
+      data: {
+        text,
+        edited_at: editedAt,
+      },
+    });
+  }
+
+  softDeleteMessage(messageId: number) {
+    return this.prisma.chatMessage.update({
+      where: { message_id: messageId },
+      data: {
+        is_deleted: true,
+        text: null,
+        media_url: null,
+        media_mime_type: null,
+        media_duration_ms: null,
+        media_size_bytes: null,
+      },
+    });
+  }
+
   countUnreadMessages(
     threadId: number,
     viewerUserId: number,
