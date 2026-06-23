@@ -21,6 +21,10 @@ export class BadgesService {
     return this.badgesRepository.findEarnedBadgeIds(userId);
   }
 
+  countCompletedGoals(userId: number): Promise<number> {
+    return this.badgesRepository.countCompletedGoals(userId);
+  }
+
   /**
    * Grants the next sequential badge when its requirements are met.
    * Safe to call on every session load (after FP sync).
@@ -33,6 +37,8 @@ export class BadgesService {
       await this.badgesRepository.findEarnedBadgeIds(userId);
     const earnedSet = new Set(earnedBadgeIds);
     const hasCommittedToQuit = Boolean(context.quitDate);
+    const goalsCompleted =
+      await this.badgesRepository.countCompletedGoals(userId);
 
     const smokeFreeDays = smokeFreeDaysFromInstant(
       context.streakStart,
@@ -44,6 +50,7 @@ export class BadgesService {
       earnedSet,
       smokeFreeDays,
       context.freedomPoints,
+      goalsCompleted,
       hasCommittedToQuit,
     );
 

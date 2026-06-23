@@ -1,3 +1,4 @@
+import { minDaysAheadFromStreakDays } from '../../common/smoke-free-days';
 import type { GoalType } from '../goals.constants';
 
 export type GoalProgressSnapshot = {
@@ -6,12 +7,13 @@ export type GoalProgressSnapshot = {
   /** Ceil of elapsed streak in day units (1d 23h → 2). */
   smokeFreeDaysInProgress: number;
   cigarettesAvoided: number;
+  elapsedSmokeFreeMs: number;
 };
 
 function computeMinTarget(type: GoalType, progress: GoalProgressSnapshot): number {
   switch (type) {
     case 'smoke_free_days':
-      return progress.smokeFreeDays + 2;
+      return minDaysAheadFromStreakDays(progress.smokeFreeDays);
     case 'cigarettes_avoided':
       return Math.max(1, Math.floor(progress.cigarettesAvoided) + 1);
   }

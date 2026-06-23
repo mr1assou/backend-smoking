@@ -63,4 +63,10 @@ export class BadgesRepository {
       })
       .then((rows) => rows.map((row) => row.badge_id));
   }
+
+  countCompletedGoals(userId: number): Promise<number> {
+    return this.prisma.userGoal.count({
+      where: { user_id: userId, status: 'completed' },
+    });
+  }
 }

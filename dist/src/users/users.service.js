@@ -117,6 +117,7 @@ let UsersService = class UsersService {
             slipCigarettesTotal,
             currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
             freedomPoints: fpSync.totalFreedomPoints,
+            goalsCompleted: await this.badgesService.countCompletedGoals(userId),
             earnedBadgeIds,
         };
     }

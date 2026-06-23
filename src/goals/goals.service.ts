@@ -6,6 +6,7 @@ import {
 import { UserGoal } from '@prisma/client';
 import { AttemptsRepository } from '../attempts/attempts.repository';
 import { AttemptsService } from '../attempts/attempts.service';
+import { BadgesService } from '../badges/badges.service';
 import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { FREEDOM_POINT_SOURCES } from '../freedom-points/lib/freedom-points.constants';
 import type { AttemptEconomics } from '../stats/lib/attempt-impact';
@@ -19,9 +20,9 @@ import {
   type GoalProgressSnapshot,
 } from './lib/goal-allowed-targets';
 import { computeGoalCompletionBonus } from './lib/goal-completion-bonus';
+import { elapsedSmokeFreeMs } from '../common/smoke-free-days';
 import {
   buildGoalProgressSnapshot,
-  currentValueForGoalType,
   isGoalMet,
 } from './lib/goal-progress';
 
@@ -30,6 +31,7 @@ export type UserGoalDto = {
   attemptId: number;
   type: GoalType;
   target: number;
+  baselineProgress: number;
   status: string;
   startedAt: string;
   completedAt: string | null;
@@ -51,6 +53,7 @@ export class GoalsService {
     private readonly attemptsRepository: AttemptsRepository,
     private readonly attemptsService: AttemptsService,
     private readonly freedomPointsService: FreedomPointsService,
+    private readonly badgesService: BadgesService,
   ) {}
 
   async getGoalsState(userId: number): Promise<GoalsStateResponse> {
@@ -131,12 +134,17 @@ export class GoalsService {
       );
     }
 
+    const baselineProgress =
+      type === 'smoke_free_days'
+        ? elapsedSmokeFreeMs(user.streakStart, user.quitDate, context.now)
+        : progress.cigarettesAvoided;
+
     await this.goalsRepository.upsertActiveGoal(
       userId,
       activeAttempt.attempt_id,
       type,
       target,
-      currentValueForGoalType(type, progress),
+      baselineProgress,
     );
 
     return this.getGoalsState(userId);
@@ -163,9 +171,7 @@ export class GoalsService {
     economics: AttemptEconomics,
   ): Promise<void> {
     const activeGoals = await this.goalsRepository.findActiveForAttempt(attemptId);
-    const completedGoals = activeGoals.filter((goal) =>
-      isGoalMet(goal.type as GoalType, goal.target, progress),
-    );
+    const completedGoals = activeGoals.filter((goal) => isGoalMet(goal, progress));
 
     await Promise.all(
       completedGoals.map((goal) => this.completeGoal(userId, goal, economics)),
@@ -192,6 +198,8 @@ export class GoalsService {
       sourceType: FREEDOM_POINT_SOURCES.GOAL_COMPLETION,
       sourceKey: String(goal.goal_id),
     });
+
+    await this.badgesService.syncEarnedBadges(userId);
   }
 
   private toDto(goal: UserGoal): UserGoalDto {
@@ -200,6 +208,7 @@ export class GoalsService {
       attemptId: goal.attempt_id,
       type: goal.type as GoalType,
       target: goal.target,
+      baselineProgress: goal.baseline_progress,
       status: goal.status,
       startedAt: goal.started_at.toISOString(),
       completedAt: goal.completed_at?.toISOString() ?? null,

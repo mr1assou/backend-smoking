@@ -82,6 +82,7 @@ export declare class UsersService {
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
         freedomPoints: number;
+        goalsCompleted: number;
         earnedBadgeIds: string[];
     }>;
     private mapOnboardingDtoToData;

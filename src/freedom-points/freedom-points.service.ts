@@ -23,7 +23,7 @@ export class FreedomPointsService {
   ) {}
 
   /**
-   * Awards +10 FP for each completed 24h smoke-free period not yet recorded
+   * Awards +5 FP for each completed 24h smoke-free period not yet recorded
    * for the user's active quit attempt. Safe to call on every session load.
    */
   async syncSmokeFreeDayRewards(

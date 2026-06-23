@@ -32,6 +32,7 @@ export declare class UsersController {
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
         freedomPoints: number;
+        goalsCompleted: number;
         earnedBadgeIds: string[];
     }>;
     saveOnboarding(req: Request & {

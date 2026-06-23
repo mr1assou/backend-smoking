@@ -13,6 +13,7 @@ export function findNextPendingBadgeGrant(
   earnedBadgeIds: ReadonlySet<string>,
   smokeFreeDays: number,
   freedomPoints: number,
+  goalsCompleted: number,
   hasCommittedToQuit: boolean,
 ): string | null {
   for (const badge of BADGE_DEFINITIONS) {
@@ -27,6 +28,7 @@ export function findNextPendingBadgeGrant(
         badge,
         smokeFreeDays,
         freedomPoints,
+        goalsCompleted,
         hasCommittedToQuit,
       )
     ) {
