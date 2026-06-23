@@ -9,11 +9,21 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
+import { SearchUsersQueryDto } from './dto/search-users-query.dto';
 import { UserProfilesService } from './user-profiles.service';
 
 @Controller('users')
 export class UserProfilesController {
   constructor(private readonly userProfiles: UserProfilesService) {}
+
+  @UseGuards(JwtGuard)
+  @Get('search')
+  searchUsers(
+    @Req() req: Request & { user: { userId: number } },
+    @Query() query: SearchUsersQueryDto,
+  ) {
+    return this.userProfiles.searchUsers(req.user.userId, query.username);
+  }
 
   @UseGuards(JwtGuard)
   @Get(':userId/streak')

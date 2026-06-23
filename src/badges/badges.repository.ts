@@ -64,6 +64,26 @@ export class BadgesRepository {
       .then((rows) => rows.map((row) => row.badge_id));
   }
 
+  async findEarnedBadgeIdsByUserIds(
+    userIds: number[],
+  ): Promise<Map<number, string[]>> {
+    if (userIds.length === 0) return new Map();
+
+    const rows = await this.prisma.userBadge.findMany({
+      where: { user_id: { in: userIds } },
+      select: { user_id: true, badge_id: true },
+      orderBy: { earned_at: 'asc' },
+    });
+
+    const map = new Map<number, string[]>();
+    for (const row of rows) {
+      const list = map.get(row.user_id) ?? [];
+      list.push(row.badge_id);
+      map.set(row.user_id, list);
+    }
+    return map;
+  }
+
   countCompletedGoals(userId: number): Promise<number> {
     return this.prisma.userGoal.count({
       where: { user_id: userId, status: 'completed' },

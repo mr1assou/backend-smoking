@@ -9,7 +9,12 @@ const PEER_SELECT = {
   username: true,
   image_url: true,
   countryFlag: true,
+  role: true,
 } as const;
+
+const ONBOARDED_USER_WHERE = {
+  AND: [{ username: { not: null } }, { NOT: { username: { equals: '' } } }],
+};
 
 type CreateMessageInput = {
   threadId: number;
@@ -30,6 +35,27 @@ export class ChatRepository {
     return this.prisma.user.findUnique({
       where: { user_id: userId },
       select: { user_id: true, username: true },
+    });
+  }
+
+  findUserRole(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { user_id: userId },
+      select: { role: true },
+    });
+  }
+
+  listSupportStaff(excludeUserId: number, offset: number, limit: number) {
+    return this.prisma.user.findMany({
+      where: {
+        ...ONBOARDED_USER_WHERE,
+        role: 'support',
+        user_id: { not: excludeUserId },
+      },
+      select: PEER_SELECT,
+      orderBy: { username: 'asc' },
+      skip: offset,
+      take: limit + 1,
     });
   }
 

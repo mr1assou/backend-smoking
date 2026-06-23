@@ -12,6 +12,7 @@ import { defaultProfileFileName } from './lib/default-profile-image';
 import { UsersRepository } from './users.repository';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
 import type { UserOnboardingData } from './types/user-onboarding-data';
+import { DEFAULT_USER_ROLE } from './lib/user-roles';
 
 @Injectable()
 export class UsersService {
@@ -89,6 +90,12 @@ export class UsersService {
     if (dto.tipsCardIndex !== undefined) {
       data.tipsCardIndex = dto.tipsCardIndex;
     }
+    if (dto.savedTipCardIds !== undefined) {
+      data.savedTipCardIds = dto.savedTipCardIds;
+    }
+    if (dto.savedMotivationCardIds !== undefined) {
+      data.savedMotivationCardIds = dto.savedMotivationCardIds;
+    }
     return this.usersRepository.updateDevicePreferences(userId, data);
   }
 
@@ -141,12 +148,15 @@ export class UsersService {
       timezone: user.timezone ?? undefined,
       motivationCardIndex: user.motivationCardIndex,
       tipsCardIndex: user.tipsCardIndex,
+      savedTipCardIds: user.savedTipCardIds,
+      savedMotivationCardIds: user.savedMotivationCardIds,
       imageUrl: user.image_url ?? undefined,
       slipCigarettesTotal,
       currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
       freedomPoints: fpSync.totalFreedomPoints,
       goalsCompleted: await this.badgesService.countCompletedGoals(userId),
       earnedBadgeIds,
+      role: user.role ?? DEFAULT_USER_ROLE,
     };
   }
 

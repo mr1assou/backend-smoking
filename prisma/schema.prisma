@@ -38,9 +38,12 @@ model User {
   timezone String?
   motivationCardIndex Int @default(0) @map("motivation_card_index")
   tipsCardIndex       Int @default(0) @map("tips_card_index")
+  savedTipCardIds String[] @default([]) @map("saved_tip_card_ids")
+  savedMotivationCardIds String[] @default([]) @map("saved_motivation_card_ids")
   image_url String?
   last_offline_at DateTime? @map("last_offline_at") @db.Timestamptz(3)
   freedomPoints Int @default(0) @map("freedom_points")
+  role          String @default("normal")
 
   slipEvents   SlipEvent[]
   quitAttempts QuitAttempt[]

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { toUtcIso } from '../common/utc-instant';
+import { DEFAULT_USER_ROLE } from '../users/lib/user-roles';
+import { USERNAME_SEARCH_RESULT_LIMIT } from './lib/normalize-username-search';
 
 export type UserStreakStats = {
   streak_start: string | null;
@@ -66,5 +68,33 @@ export class UserProfilesRepository {
       attempt_number: active?.attemptNumber ?? attempts[0]?.attemptNumber ?? 1,
       max_duration_ms: maxDurationMs,
     };
+  }
+
+  searchNormalUsersByUsername(
+    viewerUserId: number,
+    usernamePrefix: string,
+    limit = USERNAME_SEARCH_RESULT_LIMIT,
+  ) {
+    return this.prisma.user.findMany({
+      where: {
+        role: DEFAULT_USER_ROLE,
+        user_id: { not: viewerUserId },
+        username: {
+          not: null,
+          startsWith: usernamePrefix,
+          mode: 'insensitive',
+        },
+        NOT: { username: { equals: '' } },
+      },
+      select: {
+        user_id: true,
+        username: true,
+        image_url: true,
+        countryFlag: true,
+        country: true,
+      },
+      orderBy: { username: 'asc' },
+      take: limit,
+    });
   }
 }

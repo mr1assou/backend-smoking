@@ -15,6 +15,8 @@ class UpdateUserPreferencesDto {
     timezone;
     motivationCardIndex;
     tipsCardIndex;
+    savedTipCardIds;
+    savedMotivationCardIds;
 }
 exports.UpdateUserPreferencesDto = UpdateUserPreferencesDto;
 __decorate([
@@ -35,4 +37,16 @@ __decorate([
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], UpdateUserPreferencesDto.prototype, "tipsCardIndex", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], UpdateUserPreferencesDto.prototype, "savedTipCardIds", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], UpdateUserPreferencesDto.prototype, "savedMotivationCardIds", void 0);
 //# sourceMappingURL=update-user-preferences.dto.js.map

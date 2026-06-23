@@ -39,4 +39,7 @@ export type UserMeProfile = {
   freedomPoints: number;
   motivationCardIndex: number;
   tipsCardIndex: number;
+  savedTipCardIds: string[];
+  savedMotivationCardIds: string[];
+  role: string;
 };

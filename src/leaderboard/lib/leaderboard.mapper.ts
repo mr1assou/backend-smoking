@@ -32,7 +32,7 @@ function mapLeaderboardEntry(
 
 type MapLeaderboardPageOptions = {
   viewerUserId: number;
-  viewerRow: LeaderboardUserRow;
+  viewerRow: LeaderboardUserRow | null;
   viewerRank: number;
   onlineById: Record<number, boolean>;
   offset: number;
@@ -53,11 +53,13 @@ export function mapLeaderboardPage(
     }),
   );
 
-  const viewer = mapLeaderboardEntry(options.viewerRow, {
-    rank: options.viewerRank,
-    viewerUserId: options.viewerUserId,
-    onlineById: options.onlineById,
-  });
+  const viewer = options.viewerRow
+    ? mapLeaderboardEntry(options.viewerRow, {
+        rank: options.viewerRank,
+        viewerUserId: options.viewerUserId,
+        onlineById: options.onlineById,
+      })
+    : null;
 
   return {
     items,

@@ -21,7 +21,9 @@ import type {
   ChatMessagesPageDto,
   ChatThreadSummaryDto,
   MessagesSeenPayload,
+  SupportUsersPageDto,
 } from './types/chat.types';
+import { DEFAULT_USER_ROLE } from '../users/lib/user-roles';
 
 type ThreadWithRelations = NonNullable<
   Awaited<ReturnType<ChatRepository['findThreadForUser']>>
@@ -48,6 +50,34 @@ export class ChatService {
         return this.toThreadSummary(row, userId, unreadCount);
       }),
     );
+  }
+
+  async listSupportUsers(
+    userId: number,
+    offset = 0,
+    limit = 30,
+  ): Promise<SupportUsersPageDto> {
+    const take = Math.min(Math.max(limit, 1), 50);
+    const safeOffset = Math.max(offset, 0);
+    const rows = await this.chatRepository.listSupportStaff(
+      userId,
+      safeOffset,
+      take,
+    );
+
+    const hasMore = rows.length > take;
+    const page = hasMore ? rows.slice(0, take) : rows;
+
+    return {
+      items: page.map((row) => ({
+        user_id: row.user_id,
+        username: row.username,
+        image_url: row.image_url,
+        country_flag: row.countryFlag,
+        role: row.role ?? DEFAULT_USER_ROLE,
+      })),
+      has_more: hasMore,
+    };
   }
 
   async openThread(
@@ -243,12 +273,14 @@ export class ChatService {
         username: string | null;
         image_url: string | null;
         countryFlag: string | null;
+        role: string;
       };
       userTwo: {
         user_id: number;
         username: string | null;
         image_url: string | null;
         countryFlag: string | null;
+        role: string;
       };
       reads: { user_id: number; last_read_at: Date }[];
       messages: {
@@ -278,6 +310,7 @@ export class ChatService {
       peer_username: peer.username,
       peer_image_url: peer.image_url,
       peer_country_flag: peer.countryFlag,
+      peer_role: peer.role ?? DEFAULT_USER_ROLE,
       last_message: lastMessage ? this.toMessageDto(lastMessage) : null,
       unread_count: unreadCount,
       peer_last_read_at: peerRead ? toUtcIso(peerRead.last_read_at) : null,

@@ -18,6 +18,7 @@ const utc_instant_1 = require("../common/utc-instant");
 const storage_service_1 = require("../storage/storage.service");
 const default_profile_image_1 = require("./lib/default-profile-image");
 const users_repository_1 = require("./users.repository");
+const user_roles_1 = require("./lib/user-roles");
 let UsersService = class UsersService {
     usersRepository;
     attemptsService;
@@ -74,6 +75,12 @@ let UsersService = class UsersService {
         if (dto.tipsCardIndex !== undefined) {
             data.tipsCardIndex = dto.tipsCardIndex;
         }
+        if (dto.savedTipCardIds !== undefined) {
+            data.savedTipCardIds = dto.savedTipCardIds;
+        }
+        if (dto.savedMotivationCardIds !== undefined) {
+            data.savedMotivationCardIds = dto.savedMotivationCardIds;
+        }
         return this.usersRepository.updateDevicePreferences(userId, data);
     }
     async updateProfileImage(userId, dto) {
@@ -113,12 +120,15 @@ let UsersService = class UsersService {
             timezone: user.timezone ?? undefined,
             motivationCardIndex: user.motivationCardIndex,
             tipsCardIndex: user.tipsCardIndex,
+            savedTipCardIds: user.savedTipCardIds,
+            savedMotivationCardIds: user.savedMotivationCardIds,
             imageUrl: user.image_url ?? undefined,
             slipCigarettesTotal,
             currentAttemptNumber: activeAttempt?.attemptNumber ?? 1,
             freedomPoints: fpSync.totalFreedomPoints,
             goalsCompleted: await this.badgesService.countCompletedGoals(userId),
             earnedBadgeIds,
+            role: user.role ?? user_roles_1.DEFAULT_USER_ROLE,
         };
     }
     mapOnboardingDtoToData(dto) {

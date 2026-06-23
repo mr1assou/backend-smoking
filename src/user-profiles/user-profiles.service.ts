@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadgesRepository } from '../badges/badges.repository';
+import { highestEarnedBadgeId } from '../badges/lib/highest-earned-badge';
 import { PostsService } from '../posts/posts.service';
 import type { FeedPageResponse } from '../posts/types/feed-page';
 import { toUtcIso } from '../common/utc-instant';
@@ -7,8 +9,10 @@ import { UserProfilesRepository } from './user-profiles.repository';
 import type {
   UserPresenceResponse,
   UserProfileCommentsPage,
+  UserSearchResponse,
   UserStreakResponse,
 } from './types/user-profile.types';
+import { normalizeUsernameSearchQuery } from './lib/normalize-username-search';
 
 @Injectable()
 export class UserProfilesService {
@@ -16,6 +20,7 @@ export class UserProfilesService {
     private readonly profilesRepository: UserProfilesRepository,
     private readonly postsService: PostsService,
     private readonly presenceService: PresenceService,
+    private readonly badgesRepository: BadgesRepository,
   ) {}
 
   private async requireUser(userId: number) {
@@ -78,5 +83,34 @@ export class UserProfilesService {
       viewerUserId,
       offset,
     );
+  }
+
+  async searchUsers(
+    viewerUserId: number,
+    rawUsername: string,
+  ): Promise<UserSearchResponse> {
+    const username = normalizeUsernameSearchQuery(rawUsername);
+    const rows = await this.profilesRepository.searchNormalUsersByUsername(
+      viewerUserId,
+      username,
+    );
+
+    const userIds = rows.map((row) => row.user_id);
+    const [onlineById, badgesByUser] = await Promise.all([
+      this.presenceService.areOnline(userIds),
+      this.badgesRepository.findEarnedBadgeIdsByUserIds(userIds),
+    ]);
+
+    return {
+      items: rows.map((row) => ({
+        user_id: row.user_id,
+        username: row.username?.trim() ?? '',
+        image_url: row.image_url,
+        country_flag: row.countryFlag,
+        country: row.country,
+        badge_id: highestEarnedBadgeId(badgesByUser.get(row.user_id) ?? []),
+        is_online: onlineById[row.user_id] === true,
+      })),
+    };
   }
 }

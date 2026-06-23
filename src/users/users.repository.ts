@@ -51,6 +51,9 @@ export class UsersRepository {
         freedomPoints: true,
         motivationCardIndex: true,
         tipsCardIndex: true,
+        savedTipCardIds: true,
+        savedMotivationCardIds: true,
+        role: true,
       },
     });
   }

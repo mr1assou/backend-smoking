@@ -28,3 +28,17 @@ export type UserPresenceResponse = {
   is_online: boolean;
   last_offline_at: string | null;
 };
+
+export type UserSearchResultItem = {
+  user_id: number;
+  username: string;
+  image_url: string | null;
+  country_flag: string | null;
+  country: string | null;
+  badge_id: string;
+  is_online: boolean;
+};
+
+export type UserSearchResponse = {
+  items: UserSearchResultItem[];
+};

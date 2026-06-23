@@ -1,8 +1,13 @@
 import type { LeaderboardUserRow } from '../types/leaderboard.types';
+import { DEFAULT_USER_ROLE } from '../../users/lib/user-roles';
 
-/** Onboarded users with a non-empty display name. */
+/** Onboarded normal-role users with a non-empty display name. */
 export const LEADERBOARD_ELIGIBLE_USER_WHERE = {
-  AND: [{ username: { not: null } }, { NOT: { username: { equals: '' } } }],
+  AND: [
+    { username: { not: null } },
+    { NOT: { username: { equals: '' } } },
+    { role: DEFAULT_USER_ROLE },
+  ],
 };
 
 /** Only onboarded users with a non-empty display name appear on the board. */

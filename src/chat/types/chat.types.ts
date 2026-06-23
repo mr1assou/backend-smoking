@@ -21,6 +21,7 @@ export type ChatThreadSummaryDto = {
   peer_username: string | null;
   peer_image_url: string | null;
   peer_country_flag: string | null;
+  peer_role: string;
   last_message: ChatMessageDto | null;
   unread_count: number;
   peer_last_read_at: string | null;
@@ -37,6 +38,19 @@ export type MessagesSeenPayload = {
   thread_id: number;
   reader_user_id: number;
   last_read_at: string;
+};
+
+export type SupportUserDto = {
+  user_id: number;
+  username: string | null;
+  image_url: string | null;
+  country_flag: string | null;
+  role: string;
+};
+
+export type SupportUsersPageDto = {
+  items: SupportUserDto[];
+  has_more: boolean;
 };
 
 export type ChatTypingPayload = {

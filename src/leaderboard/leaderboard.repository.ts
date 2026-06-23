@@ -63,6 +63,13 @@ export class LeaderboardRepository {
     });
   }
 
+  findUserRole(userId: number): Promise<{ role: string } | null> {
+    return this.prisma.user.findUnique({
+      where: { user_id: userId },
+      select: { role: true },
+    });
+  }
+
   /** Users ranked above the given player (same ordering as the leaderboard). */
   countUsersRankedAhead(
     userId: number,

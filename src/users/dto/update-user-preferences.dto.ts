@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class UpdateUserPreferencesDto {
   @IsOptional()
@@ -15,4 +15,14 @@ export class UpdateUserPreferencesDto {
   @IsInt()
   @Min(0)
   tipsCardIndex?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  savedTipCardIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  savedMotivationCardIds?: string[];
 }

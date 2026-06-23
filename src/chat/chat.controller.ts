@@ -13,6 +13,7 @@ import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ChatService } from './chat.service';
 import { ListMessagesQueryDto } from './dto/list-messages-query.dto';
+import { ListSupportUsersQueryDto } from './dto/list-support-users-query.dto';
 import { OpenThreadDto } from './dto/open-thread.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { CHAT_MESSAGES_PAGE_SIZE } from './lib/chat-pagination';
@@ -25,6 +26,19 @@ export class ChatController {
   @Get('threads')
   listThreads(@Req() req: Request & { user: { userId: number } }) {
     return this.chatService.listThreads(req.user.userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('support/users')
+  listSupportUsers(
+    @Req() req: Request & { user: { userId: number } },
+    @Query() query: ListSupportUsersQueryDto,
+  ) {
+    return this.chatService.listSupportUsers(
+      req.user.userId,
+      query.offset ?? 0,
+      query.limit ?? 30,
+    );
   }
 
   @UseGuards(JwtGuard)

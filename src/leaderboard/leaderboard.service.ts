@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { BadgesService } from '../badges/badges.service';
 import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { PresenceService } from '../presence/presence.service';
+import { isSupportRole } from '../users/lib/user-roles';
 import type { ListLeaderboardQueryDto } from './dto/list-leaderboard-query.dto';
 import { resolveLeaderboardPagination } from './dto/list-leaderboard-query.dto';
 import { mapLeaderboardPage } from './lib/leaderboard.mapper';
@@ -25,21 +26,23 @@ export class LeaderboardService {
     await this.badgesService.syncEarnedBadges(viewerUserId);
 
     const { offset, limit } = resolveLeaderboardPagination(query);
-    const [totalUsers, page, viewerRow] = await Promise.all([
+    const [totalUsers, page, viewerRow, viewerRole] = await Promise.all([
       this.leaderboardRepository.countEligibleUsers(),
       this.leaderboardRepository.findEligibleUsersPaginated(offset, limit),
       this.leaderboardRepository.findEligibleUserById(viewerUserId),
+      this.leaderboardRepository.findUserRole(viewerUserId),
     ]);
 
-    if (!viewerRow) {
+    if (!viewerRow && !isSupportRole(viewerRole?.role)) {
       throw new NotFoundException('Viewer is not eligible for the leaderboard');
     }
 
-    const viewerRank =
-      (await this.leaderboardRepository.countUsersRankedAhead(
-        viewerUserId,
-        viewerRow.freedomPoints,
-      )) + 1;
+    const viewerRank = viewerRow
+      ? (await this.leaderboardRepository.countUsersRankedAhead(
+          viewerUserId,
+          viewerRow.freedomPoints,
+        )) + 1
+      : 0;
 
     const userIds = [
       ...new Set([viewerUserId, ...page.rows.map((row) => row.user_id)]),

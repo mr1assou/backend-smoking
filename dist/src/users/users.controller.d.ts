@@ -28,12 +28,15 @@ export declare class UsersController {
         timezone: string | undefined;
         motivationCardIndex: number;
         tipsCardIndex: number;
+        savedTipCardIds: string[];
+        savedMotivationCardIds: string[];
         imageUrl: string | undefined;
         slipCigarettesTotal: number;
         currentAttemptNumber: number;
         freedomPoints: number;
         goalsCompleted: number;
         earnedBadgeIds: string[];
+        role: string;
     }>;
     saveOnboarding(req: Request & {
         user: {
@@ -72,9 +75,12 @@ export declare class UsersController {
         timezone: string | null;
         motivationCardIndex: number;
         tipsCardIndex: number;
+        savedTipCardIds: string[];
+        savedMotivationCardIds: string[];
         image_url: string | null;
         last_offline_at: Date | null;
         freedomPoints: number;
+        role: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

@@ -22,7 +22,7 @@ export type LeaderboardEntryResponse = {
 
 export type LeaderboardResponse = {
   items: LeaderboardEntryResponse[];
-  viewer: LeaderboardEntryResponse;
+  viewer: LeaderboardEntryResponse | null;
   total_users: number;
   has_more: boolean;
   offset: number;
