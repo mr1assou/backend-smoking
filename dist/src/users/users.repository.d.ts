@@ -18,4 +18,5 @@ export declare class UsersRepository {
     updateRefreshToken(userId: number, hashedRefreshToken: string | null): Promise<User>;
     updateProfileImage(userId: number, imageUrl: string): Promise<User>;
     updateLastOfflineAt(userId: number, at: Date): Promise<User>;
+    resetJourneyProgress(userId: number, startedAt: Date): Promise<void>;
 }

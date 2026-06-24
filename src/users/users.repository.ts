@@ -114,4 +114,38 @@ export class UsersRepository {
       data: { last_offline_at: at },
     });
   }
+
+  /** Wipes quit progress and restarts the user at day zero (keeps account + profile). */
+  async resetJourneyProgress(userId: number, startedAt: Date): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.userGoal.deleteMany({ where: { user_id: userId } });
+      await tx.slipEvent.deleteMany({ where: { user_id: userId } });
+      await tx.quitAttempt.deleteMany({ where: { user_id: userId } });
+      await tx.planDayProgress.deleteMany({ where: { user_id: userId } });
+      await tx.userBadge.deleteMany({ where: { user_id: userId } });
+      await tx.freedomPointLedger.deleteMany({ where: { user_id: userId } });
+
+      await tx.user.update({
+        where: { user_id: userId },
+        data: {
+          quitDate: startedAt,
+          streakStart: startedAt,
+          quitDatePreset: 'Now',
+          freedomPoints: 0,
+          motivationCardIndex: 0,
+          tipsCardIndex: 0,
+          savedTipCardIds: [],
+          savedMotivationCardIds: [],
+        },
+      });
+
+      await tx.quitAttempt.create({
+        data: {
+          user_id: userId,
+          attemptNumber: 1,
+          startedAt,
+        },
+      });
+    });
+  }
 }

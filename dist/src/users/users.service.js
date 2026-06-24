@@ -64,6 +64,17 @@ let UsersService = class UsersService {
         }
         return result;
     }
+    async resetJourney(userId) {
+        const user = await this.usersRepository.findById(userId);
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        if (!user.username?.trim()) {
+            throw new common_1.NotFoundException('Complete onboarding before resetting your journey');
+        }
+        const startedAt = (0, utc_instant_1.utcInstantNow)();
+        await this.usersRepository.resetJourneyProgress(userId, startedAt);
+        return this.getMe(userId);
+    }
     async updatePreferences(userId, dto) {
         const data = {};
         if (dto.motivationCardIndex !== undefined) {

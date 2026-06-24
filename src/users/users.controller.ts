@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
@@ -41,5 +41,12 @@ export class UsersController {
     @Body() dto: UpdateProfileImageDto,
   ) {
     return this.usersService.updateProfileImage(req.user.userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('me/reset-journey')
+  @HttpCode(HttpStatus.OK)
+  resetJourney(@Req() req: Request & { user: { userId: number } }) {
+    return this.usersService.resetJourney(req.user.userId);
   }
 }

@@ -50,6 +50,9 @@ export declare class UsersController {
             userId: number;
         };
     }, dto: UpdateUserPreferencesDto): Promise<{
+        username: string | null;
+        quitDate: Date | null;
+        streakStart: Date | null;
         user_id: number;
         email: string;
         password: string;
@@ -58,14 +61,11 @@ export declare class UsersController {
         motivation: string | null;
         priorQuitAttempts: string | null;
         primaryInterests: string[];
-        username: string | null;
         sex: string | null;
         country: string | null;
         countryFlag: string | null;
         currency: string | null;
         quitDatePreset: string | null;
-        quitDate: Date | null;
-        streakStart: Date | null;
         cigarettesPerDay: number | null;
         cigarettesPerDayNote: string | null;
         packPrice: string | null;
@@ -88,5 +88,36 @@ export declare class UsersController {
         };
     }, dto: UpdateProfileImageDto): Promise<{
         image_url: string;
+    }>;
+    resetJourney(req: Request & {
+        user: {
+            userId: number;
+        };
+    }): Promise<{
+        userId: number;
+        email: string;
+        name: string | undefined;
+        hasCompletedOnboarding: boolean;
+        sex: string | undefined;
+        country: string | undefined;
+        countryFlag: string | undefined;
+        currency: string | undefined;
+        quitDatePreset: string | undefined;
+        quitDate: string | undefined;
+        streakStart: string | undefined;
+        cigarettesPerDay: number | undefined;
+        cigarettesPerPack: number | undefined;
+        packPrice: string | undefined;
+        motivationCardIndex: number;
+        tipsCardIndex: number;
+        savedTipCardIds: string[];
+        savedMotivationCardIds: string[];
+        imageUrl: string | undefined;
+        slipCigarettesTotal: number;
+        currentAttemptNumber: number;
+        freedomPoints: number;
+        goalsCompleted: number;
+        earnedBadgeIds: string[];
+        role: string;
     }>;
 }

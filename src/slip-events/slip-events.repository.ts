@@ -99,7 +99,7 @@ export class SlipEventsRepository {
 
       const snapshot = this.attemptsService.computeSnapshot(
         economics,
-        activeAttempt.startedAt,
+        data.previousStreakStart,
         now,
         totalSlipCigarettes,
       );

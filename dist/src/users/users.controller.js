@@ -36,6 +36,9 @@ let UsersController = class UsersController {
     updateProfileImage(req, dto) {
         return this.usersService.updateProfileImage(req.user.userId, dto);
     }
+    resetJourney(req) {
+        return this.usersService.resetJourney(req.user.userId);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -73,6 +76,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_profile_image_dto_1.UpdateProfileImageDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateProfileImage", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('me/reset-journey'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "resetJourney", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

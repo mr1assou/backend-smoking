@@ -74,7 +74,7 @@ let SlipEventsRepository = class SlipEventsRepository {
             });
             const slipThisEvent = cigarettesCount ?? 0;
             const totalSlipCigarettes = (priorSlipSum._sum.cigarettesCount ?? 0) + slipThisEvent;
-            const snapshot = this.attemptsService.computeSnapshot(economics, activeAttempt.startedAt, now, totalSlipCigarettes);
+            const snapshot = this.attemptsService.computeSnapshot(economics, data.previousStreakStart, now, totalSlipCigarettes);
             const closedAttempt = await tx.quitAttempt.update({
                 where: { attempt_id: activeAttempt.attempt_id },
                 data: {

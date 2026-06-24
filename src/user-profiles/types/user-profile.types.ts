@@ -21,6 +21,7 @@ export type UserStreakResponse = {
   streak_start: string | null;
   attempt_number: number;
   max_duration_ms: number;
+  member_since: string;
 };
 
 export type UserPresenceResponse = {
