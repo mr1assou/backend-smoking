@@ -74,7 +74,6 @@ export class StatsService {
 
     return {
       currency: context.currency,
-      timezone: context.timezone,
       economics: {
         cigarettesPerDay: context.economics.cigarettesPerDay,
         cigarettesPerPack: context.economics.cigarettesPerPack,
@@ -92,7 +91,6 @@ export class StatsService {
 
     return {
       currency: user.currency ?? 'USD',
-      timezone: user.timezone?.trim() || 'UTC',
       goals: rows.map((row) => toGoalStatsRow(row)),
     };
   }

@@ -8,7 +8,6 @@ import type { AttemptImpactSnapshot } from './attempt-impact';
 
 export type StatsUserContext = {
   currency: string;
-  timezone: string;
   economics: ReturnType<AttemptsService['buildEconomics']>;
   now: Date;
   active: QuitAttempt | null;
@@ -45,7 +44,6 @@ export async function loadStatsUserContext(
 
   return {
     currency: user.currency ?? 'USD',
-    timezone: user.timezone?.trim() || 'UTC',
     economics,
     now,
     active,

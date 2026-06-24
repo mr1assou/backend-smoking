@@ -81,9 +81,6 @@ export class UsersService {
 
   async updatePreferences(userId: number, dto: UpdateUserPreferencesDto) {
     const data: UserDevicePreferencesUpdate = {};
-    if (dto.timezone !== undefined) {
-      data.timezone = dto.timezone.trim() || null;
-    }
     if (dto.motivationCardIndex !== undefined) {
       data.motivationCardIndex = dto.motivationCardIndex;
     }
@@ -145,7 +142,6 @@ export class UsersService {
       cigarettesPerDay: user.cigarettesPerDay ?? undefined,
       cigarettesPerPack: user.cigarettesPerPack ?? undefined,
       packPrice: user.packPrice ?? undefined,
-      timezone: user.timezone ?? undefined,
       motivationCardIndex: user.motivationCardIndex,
       tipsCardIndex: user.tipsCardIndex,
       savedTipCardIds: user.savedTipCardIds,

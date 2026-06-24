@@ -1,11 +1,6 @@
-import { IsArray, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class UpdateUserPreferencesDto {
-  @IsOptional()
-  @IsString()
-  @MaxLength(64)
-  timezone?: string;
-
   @IsOptional()
   @IsInt()
   @Min(0)

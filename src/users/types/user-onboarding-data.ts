@@ -34,7 +34,6 @@ export type UserMeProfile = {
   cigarettesPerDay: number | null;
   cigarettesPerPack: number | null;
   packPrice: string | null;
-  timezone: string | null;
   image_url: string | null;
   freedomPoints: number;
   motivationCardIndex: number;

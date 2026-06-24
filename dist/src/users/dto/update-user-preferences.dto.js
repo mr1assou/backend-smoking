@@ -12,19 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateUserPreferencesDto = void 0;
 const class_validator_1 = require("class-validator");
 class UpdateUserPreferencesDto {
-    timezone;
     motivationCardIndex;
     tipsCardIndex;
     savedTipCardIds;
     savedMotivationCardIds;
 }
 exports.UpdateUserPreferencesDto = UpdateUserPreferencesDto;
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(64),
-    __metadata("design:type", String)
-], UpdateUserPreferencesDto.prototype, "timezone", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsInt)(),

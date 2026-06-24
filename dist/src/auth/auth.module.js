@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const goals_module_1 = require("../goals/goals.module");
+const plan_module_1 = require("../plan/plan.module");
 const presence_module_1 = require("../presence/presence.module");
 const slip_events_module_1 = require("../slip-events/slip-events.module");
 const stats_module_1 = require("../stats/stats.module");
@@ -35,6 +36,7 @@ exports.AuthModule = AuthModule = __decorate([
             slip_events_module_1.SlipEventsModule,
             stats_module_1.StatsModule,
             goals_module_1.GoalsModule,
+            plan_module_1.PlanModule,
         ],
         controllers: [auth_controller_1.AuthController, users_controller_1.UsersController],
         providers: [

@@ -49,7 +49,6 @@ let UsersRepository = class UsersRepository {
                 cigarettesPerDay: true,
                 cigarettesPerPack: true,
                 packPrice: true,
-                timezone: true,
                 image_url: true,
                 freedomPoints: true,
                 motivationCardIndex: true,

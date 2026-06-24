@@ -46,7 +46,6 @@ let StatsService = class StatsService {
         const attempts = await (0, lib_1.buildAttemptsList)(userId, context.economics, context.active, context.activeSnapshot, context.now, this.attemptsRepository, this.attemptsService, this.usersRepository);
         return {
             currency: context.currency,
-            timezone: context.timezone,
             economics: {
                 cigarettesPerDay: context.economics.cigarettesPerDay,
                 cigarettesPerPack: context.economics.cigarettesPerPack,
@@ -62,7 +61,6 @@ let StatsService = class StatsService {
         const rows = await this.goalsRepository.listAllForUser(userId);
         return {
             currency: user.currency ?? 'USD',
-            timezone: user.timezone?.trim() || 'UTC',
             goals: rows.map((row) => (0, goals_stats_builder_1.toGoalStatsRow)(row)),
         };
     }

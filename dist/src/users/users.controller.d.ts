@@ -25,7 +25,6 @@ export declare class UsersController {
         cigarettesPerDay: number | undefined;
         cigarettesPerPack: number | undefined;
         packPrice: string | undefined;
-        timezone: string | undefined;
         motivationCardIndex: number;
         tipsCardIndex: number;
         savedTipCardIds: string[];
@@ -72,7 +71,6 @@ export declare class UsersController {
         packPrice: string | null;
         yearsSmoking: string | null;
         cigarettesPerPack: number | null;
-        timezone: string | null;
         motivationCardIndex: number;
         tipsCardIndex: number;
         savedTipCardIds: string[];

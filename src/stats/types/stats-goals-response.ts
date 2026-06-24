@@ -15,6 +15,5 @@ export type GoalStatsRow = {
 
 export type StatsGoalsResponse = {
   currency: string;
-  timezone: string;
   goals: GoalStatsRow[];
 };

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { GoalsModule } from '../goals/goals.module';
+import { PlanModule } from '../plan/plan.module';
 import { PresenceModule } from '../presence/presence.module';
 import { SlipEventsModule } from '../slip-events/slip-events.module';
 import { StatsModule } from '../stats/stats.module';
@@ -23,6 +24,7 @@ import { GoogleTokenService } from './google/google-token.service';
     SlipEventsModule,
     StatsModule,
     GoalsModule,
+    PlanModule,
   ],
   controllers: [AuthController, UsersController],
   providers: [

@@ -1,0 +1,3814 @@
+{
+  "app_name": "Quitify",
+  "plan_name": "180 Day Quit Smoking Plan",
+  "total_days": 180,
+  "chapters": [
+    {
+      "chapter": 1,
+      "name": "Survival",
+      "role": "First 2 weeks: cravings, triggers, get through each day",
+      "day_start": 1,
+      "day_end": 14,
+      "days": [
+        {
+          "day": 1,
+          "title": "Day 1: You quit",
+          "intro": "Today is the hardest day to start and the most important one. You do not need willpower for ninety days right now. You need it for the next ten minutes, then the ten after that.",
+          "tasks": [
+            {
+              "id": "d1t1",
+              "type": "action",
+              "title": "Remove every cigarette and lighter",
+              "text": "Go through your home, car, bag and desk and throw away every cigarette, lighter and ashtray you own. Do not save one for emergencies."
+            },
+            {
+              "id": "d1t2",
+              "type": "breathing",
+              "title": "Do your first craving reset",
+              "text": "Open the craving tool once now, even if you do not feel a craving yet, so you know exactly where it is when you need it."
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Day 2: The hardest part is starting",
+          "intro": "Nicotine is mostly out of your blood by now, which is why today can feel rough. That is your body healing, not your body failing.",
+          "tasks": [
+            {
+              "id": "d2t1",
+              "type": "fact",
+              "title": "Know what is happening in your body",
+              "text": "Your heart rate and blood pressure are already dropping back toward normal. Carbon monoxide levels in your blood have dropped and oxygen is reaching your muscles and organs better than two days ago."
+            },
+            {
+              "id": "d2t2",
+              "type": "action",
+              "title": "Tell one person you trust",
+              "text": "Message or call one person and tell them you quit smoking yesterday. Saying it out loud to someone makes it real and gives you one more reason to follow through."
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Day 3: Peak craving day",
+          "intro": "Nicotine withdrawal symptoms are usually strongest around day 3. This is the peak, not the new normal. It gets easier from here.",
+          "tasks": [
+            {
+              "id": "d3t1",
+              "type": "breathing",
+              "title": "Ride out one craving with the tool",
+              "text": "Next time a craving hits, open the craving tool instead of fighting it in your head. Let it guide you through it."
+            },
+            {
+              "id": "d3t2",
+              "type": "journal",
+              "title": "Write down today's hardest moment",
+              "text": "In one or two sentences, write what time of day was hardest today and what you were doing right before the craving hit."
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Day 4: Naming your triggers",
+          "intro": "Cravings rarely come out of nowhere. They are usually attached to a place, a feeling, or a habit. Today you start spotting yours.",
+          "tasks": [
+            {
+              "id": "d4t1",
+              "type": "journal",
+              "title": "List your top three triggers",
+              "text": "Write down the three moments that make you want a cigarette the most right now, for example morning coffee, after meals, or stress at work."
+            },
+            {
+              "id": "d4t2",
+              "type": "action",
+              "title": "Change one small routine",
+              "text": "Pick one trigger from your list and change something physical about it today, like drinking your coffee in a different spot or taking a different route on your break."
+            },
+            {
+              "id": "d4t3",
+              "type": "fact",
+              "title": "See your money saved so far",
+              "text": "Check your stats tab and look at how much money you have already kept in your pocket since day one."
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Day 5: Your hands need a job",
+          "intro": "A lot of the urge to smoke is physical, not just mental. Your hands and mouth are used to having something to do.",
+          "tasks": [
+            {
+              "id": "d5t1",
+              "type": "action",
+              "title": "Pick a hand stand in",
+              "text": "Choose one object to carry today, like a pen, a stress ball, or sunflower seeds, so your hands have something to do instead of reaching for a pack."
+            },
+            {
+              "id": "d5t2",
+              "type": "game",
+              "title": "Play a craving distraction game",
+              "text": "When you feel restless today, open a mini game in the craving toolkit for two minutes instead of stepping outside for a smoke."
+            },
+            {
+              "id": "d5t3",
+              "type": "checkin",
+              "title": "Rate today's cravings",
+              "text": "Mark how strong your cravings felt today on a scale from one to five so you can see the trend later."
+            }
+          ]
+        },
+        {
+          "day": 6,
+          "title": "Day 6: Sleep and smoking",
+          "intro": "Withdrawal can mess with your sleep for a little while. Knowing this in advance makes it less alarming when it happens.",
+          "tasks": [
+            {
+              "id": "d6t1",
+              "type": "fact",
+              "title": "Understand why sleep feels off",
+              "text": "Nicotine affects sleep cycles, so some restlessness this week is normal withdrawal, not a sign something is wrong with you."
+            },
+            {
+              "id": "d6t2",
+              "type": "audio",
+              "title": "Try a wind down sound before bed",
+              "text": "Play one relaxing sound from the toolkit tonight for five minutes before you try to sleep."
+            },
+            {
+              "id": "d6t3",
+              "type": "journal",
+              "title": "Note your energy levels",
+              "text": "Write one line about how your energy felt today compared to day one."
+            }
+          ]
+        },
+        {
+          "day": 7,
+          "title": "Day 7: One week free",
+          "intro": "Seven days without a cigarette. That is a real, measurable win, and your body has already started repairing itself in ways you cannot fully feel yet.",
+          "tasks": [
+            {
+              "id": "d7t1",
+              "type": "reward",
+              "title": "Claim your seven day badge",
+              "text": "Open your badges tab and collect the one week milestone. You earned this one the hard way."
+            },
+            {
+              "id": "d7t2",
+              "type": "fact",
+              "title": "See what week one did for your body",
+              "text": "Your sense of taste and smell are likely starting to improve and your lungs are beginning to clear out mucus and debris built up from smoking."
+            },
+            {
+              "id": "d7t3",
+              "type": "journal",
+              "title": "Write a note to day one you",
+              "text": "Write two sentences to yourself from day one, telling them how week one actually went."
+            }
+          ]
+        },
+        {
+          "day": 8,
+          "title": "Day 8: Watch your guard",
+          "intro": "A lot of people relapse right after the first big milestone because they feel like they have already won. Stay alert this week, not anxious, just alert.",
+          "tasks": [
+            {
+              "id": "d8t1",
+              "type": "fact",
+              "title": "Know the most common relapse trap",
+              "text": "Many people who relapse do it in week two, often after one drink or one stressful moment, thinking just one cigarette will not matter. It usually restarts the whole habit."
+            },
+            {
+              "id": "d8t2",
+              "type": "action",
+              "title": "Plan your next risky moment",
+              "text": "Think of one event coming up this week where you might be tempted, like a party or a stressful meeting, and decide right now what you will do instead of smoking."
+            },
+            {
+              "id": "d8t3",
+              "type": "checkin",
+              "title": "Log today's mood",
+              "text": "Mark how you are feeling today in one tap so your coach can adjust your missions."
+            },
+            {
+              "id": "d8t4",
+              "type": "breathing",
+              "title": "Practice a calm down even without a craving",
+              "text": "Use the breathing tool once today even if you do not feel a craving, so it becomes second nature."
+            }
+          ]
+        },
+        {
+          "day": 9,
+          "title": "Day 9: Replace the ritual",
+          "intro": "Smoking was never just nicotine, it was a ritual, a break, a pause button in your day. You need a new pause button.",
+          "tasks": [
+            {
+              "id": "d9t1",
+              "type": "action",
+              "title": "Design your new break ritual",
+              "text": "Pick one short activity to replace your old smoke break, like a two minute walk, stretching, or stepping outside for fresh air without a cigarette."
+            },
+            {
+              "id": "d9t2",
+              "type": "journal",
+              "title": "Write what you miss most",
+              "text": "Be honest, write one sentence about what part of smoking you actually miss the most right now."
+            },
+            {
+              "id": "d9t3",
+              "type": "fact",
+              "title": "See your cigarettes not smoked",
+              "text": "Check your stats to see roughly how many cigarettes you have avoided smoking so far."
+            },
+            {
+              "id": "d9t4",
+              "type": "social",
+              "title": "Read one community story",
+              "text": "Open the community tab and read one story from someone further along than you."
+            }
+          ]
+        },
+        {
+          "day": 10,
+          "title": "Day 10: Double digits",
+          "intro": "Ten days. The physical nicotine withdrawal is mostly behind you now, the habit part is what you are working on.",
+          "tasks": [
+            {
+              "id": "d10t1",
+              "type": "fact",
+              "title": "Know what is left to deal with",
+              "text": "Most of the physical nicotine withdrawal fades within the first one to two weeks, so what remains now is mostly habit and association, which is exactly what your missions are built to break."
+            },
+            {
+              "id": "d10t2",
+              "type": "game",
+              "title": "Beat your craving game score",
+              "text": "Open a mini game and try to beat your previous score during a free moment today."
+            },
+            {
+              "id": "d10t3",
+              "type": "checkin",
+              "title": "Compare this week to last",
+              "text": "Rate how this week felt overall compared to your first day."
+            },
+            {
+              "id": "d10t4",
+              "type": "action",
+              "title": "Treat yourself with saved money",
+              "text": "Look at your money saved and spend a small piece of it on something that has nothing to do with smoking."
+            }
+          ]
+        },
+        {
+          "day": 11,
+          "title": "Day 11: Boredom is a trigger too",
+          "intro": "Stress gets blamed a lot, but plain boredom causes just as many cravings. Today is about catching that one.",
+          "tasks": [
+            {
+              "id": "d11t1",
+              "type": "journal",
+              "title": "Spot your boredom moments",
+              "text": "Write down one moment today when you wanted a cigarette purely out of boredom, not stress."
+            },
+            {
+              "id": "d11t2",
+              "type": "action",
+              "title": "Build a boredom list",
+              "text": "Make a short list of three things you can do for two minutes when boredom hits, and save it somewhere you will see it."
+            },
+            {
+              "id": "d11t3",
+              "type": "audio",
+              "title": "Use sound to reset your focus",
+              "text": "Play a focus or calm sound for five minutes during a slow part of your day."
+            },
+            {
+              "id": "d11t4",
+              "type": "fact",
+              "title": "See your streak",
+              "text": "Look at your current streak number and notice it is the longest stretch without smoking you may have had in a long time."
+            }
+          ]
+        },
+        {
+          "day": 12,
+          "title": "Day 12: Cravings get shorter",
+          "intro": "A craving usually peaks and fades within a few minutes if you do not act on it. The more you let them pass, the shorter they get.",
+          "tasks": [
+            {
+              "id": "d12t1",
+              "type": "fact",
+              "title": "Understand the craving wave",
+              "text": "A craving typically rises and falls within roughly three to five minutes, which is why riding it out almost always works better than fighting it for hours in your head."
+            },
+            {
+              "id": "d12t2",
+              "type": "breathing",
+              "title": "Time your next craving",
+              "text": "Next time a craving hits, use the timer in the craving tool and watch how it actually fades."
+            },
+            {
+              "id": "d12t3",
+              "type": "checkin",
+              "title": "Rate your confidence",
+              "text": "Rate from one to five how confident you feel about staying smoke free this week."
+            },
+            {
+              "id": "d12t4",
+              "type": "social",
+              "title": "Send encouragement to someone else",
+              "text": "Find someone in the community on an earlier day than you and send them one encouraging message."
+            }
+          ]
+        },
+        {
+          "day": 13,
+          "title": "Day 13: Almost two weeks",
+          "intro": "Tomorrow closes out the hardest chapter. Today is about noticing how far you already are from day one.",
+          "tasks": [
+            {
+              "id": "d13t1",
+              "type": "journal",
+              "title": "Compare day one to today",
+              "text": "Write two or three sentences comparing how you felt on day one to how you feel right now."
+            },
+            {
+              "id": "d13t2",
+              "type": "action",
+              "title": "Prepare for tomorrow's milestone",
+              "text": "Plan one small way you want to mark hitting two weeks tomorrow, it can be as simple as telling someone or buying yourself something small."
+            },
+            {
+              "id": "d13t3",
+              "type": "fact",
+              "title": "See your health stats moving",
+              "text": "Open your health progress and notice how many markers have already started improving."
+            },
+            {
+              "id": "d13t4",
+              "type": "game",
+              "title": "Play one more round",
+              "text": "Use a mini game once today purely as a small win, no craving required."
+            }
+          ]
+        },
+        {
+          "day": 14,
+          "title": "Day 14: Two weeks. Survival complete",
+          "intro": "You just finished the hardest stretch of quitting. Nicotine withdrawal has done most of its damage already, and you outlasted it. Chapter two is about building the new normal.",
+          "tasks": [
+            {
+              "id": "d14t1",
+              "type": "reward",
+              "title": "Claim your two week badge",
+              "text": "Open your badges tab and collect the two week milestone, this one marks the end of survival mode."
+            },
+            {
+              "id": "d14t2",
+              "type": "fact",
+              "title": "See how far your body has come",
+              "text": "In two weeks your circulation and lung function have likely already started improving and your risk of a nicotine craving driven slip is lower than it was on day three."
+            },
+            {
+              "id": "d14t3",
+              "type": "journal",
+              "title": "Write your survival summary",
+              "text": "Write three short sentences, what was hardest, what surprised you, and what you are proud of from these two weeks."
+            },
+            {
+              "id": "d14t4",
+              "type": "action",
+              "title": "Look ahead to chapter two",
+              "text": "Read the intro to your next chapter and set one intention for how you want the next two weeks to go."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 2,
+      "name": "Break the habit",
+      "role": "New routines, morning/evening, replace smoke breaks",
+      "day_start": 15,
+      "day_end": 30,
+      "days": [
+        {
+          "day": 15,
+          "title": "Day 15: Welcome to chapter two",
+          "intro": "Survival mode is over. Now the real work begins, replacing the habits that smoking used to fill, one routine at a time.",
+          "tasks": [
+            {
+              "id": "d15t1",
+              "type": "journal",
+              "title": "Map your old smoking schedule",
+              "text": "Write down the times of day you used to smoke most, like waking up, after meals, or during work breaks."
+            },
+            {
+              "id": "d15t2",
+              "type": "action",
+              "title": "Pick your hardest hour",
+              "text": "Choose the one hour of the day that is still hardest for you and decide on one specific replacement action for it."
+            },
+            {
+              "id": "d15t3",
+              "type": "fact",
+              "title": "See your chapter one stats",
+              "text": "Open your stats and look at total smoke free days, money saved, and cigarettes avoided from chapter one."
+            },
+            {
+              "id": "d15t4",
+              "type": "checkin",
+              "title": "Set your chapter two goal",
+              "text": "Write or pick one personal goal you want to hit by day thirty."
+            }
+          ]
+        },
+        {
+          "day": 16,
+          "title": "Day 16: The morning routine",
+          "intro": "Mornings are often the strongest smoking ritual, tied to waking up, coffee, or the first stress of the day.",
+          "tasks": [
+            {
+              "id": "d16t1",
+              "type": "action",
+              "title": "Redesign your first ten minutes",
+              "text": "Plan exactly what you will do in the first ten minutes after waking up tomorrow instead of reaching for a cigarette."
+            },
+            {
+              "id": "d16t2",
+              "type": "fact",
+              "title": "Know why mornings are hard",
+              "text": "Many smokers associate the first cigarette of the day with waking up the brain, so replacing it with movement or water can help your body get the same wake up signal."
+            },
+            {
+              "id": "d16t3",
+              "type": "breathing",
+              "title": "Try a morning breathing reset",
+              "text": "Use the breathing tool for one minute tomorrow morning before checking your phone."
+            },
+            {
+              "id": "d16t4",
+              "type": "checkin",
+              "title": "Rate this morning",
+              "text": "Rate how this morning felt without a cigarette compared to a normal morning before."
+            }
+          ]
+        },
+        {
+          "day": 17,
+          "title": "Day 17: After meals",
+          "intro": "After meals is one of the most automatic smoking triggers there is. Today you build a new ending to your meals.",
+          "tasks": [
+            {
+              "id": "d17t1",
+              "type": "action",
+              "title": "Pick a new after meal habit",
+              "text": "Choose one thing to do right after eating instead of smoking, like brushing your teeth, chewing gum, or a short walk."
+            },
+            {
+              "id": "d17t2",
+              "type": "journal",
+              "title": "Notice the pull after eating",
+              "text": "Write one line about how strong the urge was after your biggest meal today."
+            },
+            {
+              "id": "d17t3",
+              "type": "fact",
+              "title": "See your taste and smell progress",
+              "text": "Many ex smokers notice food tasting better within the first few weeks as smell and taste receptors recover."
+            },
+            {
+              "id": "d17t4",
+              "type": "game",
+              "title": "Use a game after lunch",
+              "text": "If a craving hits after your meal today, open a mini game for two minutes instead."
+            }
+          ]
+        },
+        {
+          "day": 18,
+          "title": "Day 18: The commute trigger",
+          "intro": "Driving, walking to work, or waiting for the bus used to come with a cigarette for a lot of smokers. Today is about that gap.",
+          "tasks": [
+            {
+              "id": "d18t1",
+              "type": "action",
+              "title": "Plan your commute differently",
+              "text": "Decide on one small change for your commute today, like a podcast, music, or a different route."
+            },
+            {
+              "id": "d18t2",
+              "type": "checkin",
+              "title": "Log a trigger you noticed",
+              "text": "Tap to log any trigger moment you noticed today, even small ones."
+            },
+            {
+              "id": "d18t3",
+              "type": "fact",
+              "title": "See your streak growing",
+              "text": "Open your streak counter and notice it is now longer than your average gap between cigarettes used to be."
+            },
+            {
+              "id": "d18t4",
+              "type": "audio",
+              "title": "Try a sound during your commute",
+              "text": "Play a calming sound during part of your commute today."
+            }
+          ]
+        },
+        {
+          "day": 19,
+          "title": "Day 19: Stress without smoking",
+          "intro": "A lot of people used cigarettes as their main stress tool. Today is about finding what else can do that job.",
+          "tasks": [
+            {
+              "id": "d19t1",
+              "type": "breathing",
+              "title": "Use breathing for stress, not just cravings",
+              "text": "Next time you feel stressed today, even without a craving, try the breathing tool."
+            },
+            {
+              "id": "d19t2",
+              "type": "journal",
+              "title": "Name your stress source",
+              "text": "Write down the main thing causing you stress this week."
+            },
+            {
+              "id": "d19t3",
+              "type": "fact",
+              "title": "Know the stress myth",
+              "text": "Cigarettes do not actually reduce stress, the brief relief comes from relieving withdrawal symptoms the previous cigarette caused, which means your stress levels can improve once you are fully nicotine free."
+            },
+            {
+              "id": "d19t4",
+              "type": "action",
+              "title": "Try one non smoking stress tool",
+              "text": "Pick one stress reliever to try today that has nothing to do with the craving toolkit, like a short walk or calling a friend."
+            }
+          ]
+        },
+        {
+          "day": 20,
+          "title": "Day 20: Twenty days in",
+          "intro": "Three weeks of new habits forming. This is roughly when new routines start to feel less forced.",
+          "tasks": [
+            {
+              "id": "d20t1",
+              "type": "checkin",
+              "title": "Rate how automatic your new habits feel",
+              "text": "Rate from one to five how natural your replacement habits feel compared to two weeks ago."
+            },
+            {
+              "id": "d20t2",
+              "type": "fact",
+              "title": "See your money milestone",
+              "text": "Check your money saved tab and see what that amount could buy you right now."
+            },
+            {
+              "id": "d20t3",
+              "type": "journal",
+              "title": "Write your easiest win",
+              "text": "Write about the one replacement habit that has worked best for you so far."
+            },
+            {
+              "id": "d20t4",
+              "type": "social",
+              "title": "Share a small win",
+              "text": "Post one small win from this week in the community."
+            }
+          ]
+        },
+        {
+          "day": 21,
+          "title": "Day 21: Three weeks free",
+          "intro": "Three weeks is often talked about as the point where a new habit starts to take hold. You are proof it can.",
+          "tasks": [
+            {
+              "id": "d21t1",
+              "type": "reward",
+              "title": "Claim your three week badge",
+              "text": "Open your badges tab and collect the three week milestone."
+            },
+            {
+              "id": "d21t2",
+              "type": "fact",
+              "title": "See your lung progress",
+              "text": "Around this stage many people notice less coughing and easier breathing during light activity as lung function continues to recover."
+            },
+            {
+              "id": "d21t3",
+              "type": "action",
+              "title": "Test yourself in a real situation",
+              "text": "Put yourself in a mildly triggering situation today on purpose, like sitting near where people smoke, and notice that you can handle it."
+            },
+            {
+              "id": "d21t4",
+              "type": "checkin",
+              "title": "Rate your overall mood this week",
+              "text": "Rate how your mood has been this week on a simple scale."
+            }
+          ]
+        },
+        {
+          "day": 22,
+          "title": "Day 22: Evening wind down",
+          "intro": "Evenings often had their own smoking ritual, the end of work, the after dinner cigarette, the wind down before bed.",
+          "tasks": [
+            {
+              "id": "d22t1",
+              "type": "action",
+              "title": "Build an evening ritual",
+              "text": "Choose one calming activity to do every evening instead of an end of day cigarette, like tea, a show, or a short walk."
+            },
+            {
+              "id": "d22t2",
+              "type": "audio",
+              "title": "Try a sleep sound tonight",
+              "text": "Play a relaxing sound from the toolkit for ten minutes before bed."
+            },
+            {
+              "id": "d22t3",
+              "type": "journal",
+              "title": "Note your sleep quality",
+              "text": "Write one line about how you have been sleeping this past week."
+            },
+            {
+              "id": "d22t4",
+              "type": "fact",
+              "title": "See your full week trend",
+              "text": "Open your weekly stats and look at how your craving intensity has trended over the past seven days."
+            }
+          ]
+        },
+        {
+          "day": 23,
+          "title": "Day 23: Social smoking habits",
+          "intro": "Some cravings are not really about nicotine at all, they are about being around other people who smoke.",
+          "tasks": [
+            {
+              "id": "d23t1",
+              "type": "journal",
+              "title": "Think about your smoking friends",
+              "text": "Write down who in your life still smokes and how often you are around them."
+            },
+            {
+              "id": "d23t2",
+              "type": "action",
+              "title": "Plan your next hangout",
+              "text": "If you know you will be around a smoker soon, decide now what you will do during their smoke break instead of joining them."
+            },
+            {
+              "id": "d23t3",
+              "type": "fact",
+              "title": "Know it gets easier with practice",
+              "text": "Each time you get through a social smoking moment without lighting up, the automatic urge tied to that specific situation gets a little weaker."
+            },
+            {
+              "id": "d23t4",
+              "type": "checkin",
+              "title": "Rate your social confidence",
+              "text": "Rate how confident you feel being around smokers without smoking yourself."
+            }
+          ]
+        },
+        {
+          "day": 24,
+          "title": "Day 24: Boredom and downtime",
+          "intro": "Now that the big triggers are getting easier, the quieter ones like boredom start showing up more clearly.",
+          "tasks": [
+            {
+              "id": "d24t1",
+              "type": "action",
+              "title": "Update your boredom list",
+              "text": "Add one new activity to your boredom list from chapter one based on what you have learned so far."
+            },
+            {
+              "id": "d24t2",
+              "type": "game",
+              "title": "Use a game during downtime",
+              "text": "Next time you have a quiet moment with nothing to do, open a mini game instead of feeling restless."
+            },
+            {
+              "id": "d24t3",
+              "type": "checkin",
+              "title": "Log today's craving count",
+              "text": "Log roughly how many cravings you noticed today, even mild ones."
+            },
+            {
+              "id": "d24t4",
+              "type": "fact",
+              "title": "See your progress chart",
+              "text": "Look at your craving frequency chart and notice the overall direction since day one."
+            }
+          ]
+        },
+        {
+          "day": 25,
+          "title": "Day 25: What you have replaced",
+          "intro": "By now you likely have several small new habits running in the background. Today is about noticing them.",
+          "tasks": [
+            {
+              "id": "d25t1",
+              "type": "journal",
+              "title": "List your new habits",
+              "text": "Write down every small replacement habit you have built so far, even tiny ones."
+            },
+            {
+              "id": "d25t2",
+              "type": "fact",
+              "title": "See your cigarettes avoided",
+              "text": "Open your stats and see roughly how many cigarettes you have not smoked since starting."
+            },
+            {
+              "id": "d25t3",
+              "type": "action",
+              "title": "Strengthen your weakest habit",
+              "text": "Pick the replacement habit that feels least solid and do it on purpose today, even without a craving."
+            },
+            {
+              "id": "d25t4",
+              "type": "social",
+              "title": "Read about someone in chapter two",
+              "text": "Read one community post from someone also in their first month."
+            }
+          ]
+        },
+        {
+          "day": 26,
+          "title": "Day 26: Alcohol and smoking links",
+          "intro": "For a lot of people, drinking and smoking were tightly linked. This trigger deserves its own attention before it catches you off guard.",
+          "tasks": [
+            {
+              "id": "d26t1",
+              "type": "fact",
+              "title": "Know the alcohol risk",
+              "text": "Drinking lowers inhibition and is one of the most common situations linked to relapse, because the automatic hand to mouth habit can return without you fully deciding it."
+            },
+            {
+              "id": "d26t2",
+              "type": "action",
+              "title": "Make a drinking plan",
+              "text": "If you plan to drink soon, decide in advance how you will handle the moment when others light up around you."
+            },
+            {
+              "id": "d26t3",
+              "type": "checkin",
+              "title": "Rate this trigger's strength for you",
+              "text": "Rate from one to five how strong the alcohol and smoking link feels for you personally."
+            },
+            {
+              "id": "d26t4",
+              "type": "journal",
+              "title": "Recall a past drinking and smoking moment",
+              "text": "Write about one specific memory of smoking while drinking, and what you could do differently next time."
+            }
+          ]
+        },
+        {
+          "day": 27,
+          "title": "Day 27: Almost one month",
+          "intro": "You are days away from your first full month. Most of the worst of the physical habit is behind you now.",
+          "tasks": [
+            {
+              "id": "d27t1",
+              "type": "journal",
+              "title": "Look back at chapter two",
+              "text": "Write two or three sentences about what changed for you during this habit building chapter."
+            },
+            {
+              "id": "d27t2",
+              "type": "fact",
+              "title": "See your health timeline",
+              "text": "Open your health progress tab and see which markers have moved the most in the last two weeks."
+            },
+            {
+              "id": "d27t3",
+              "type": "action",
+              "title": "Prepare for the one month mark",
+              "text": "Decide how you want to mark hitting one full month, even something small."
+            },
+            {
+              "id": "d27t4",
+              "type": "checkin",
+              "title": "Rate your readiness for chapter three",
+              "text": "Rate how ready you feel to handle social situations and stress without smoking."
+            }
+          ]
+        },
+        {
+          "day": 28,
+          "title": "Day 28: Four weeks free",
+          "intro": "Four full weeks. Your daily life now runs on habits that do not include cigarettes, even if some days are still harder than others.",
+          "tasks": [
+            {
+              "id": "d28t1",
+              "type": "reward",
+              "title": "Claim your four week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d28t2",
+              "type": "fact",
+              "title": "See your overall risk drop",
+              "text": "Within the first month, the risk of certain heart related issues linked to smoking already begins to decrease compared to someone who continues smoking."
+            },
+            {
+              "id": "d28t3",
+              "type": "social",
+              "title": "Share your one month story",
+              "text": "Post a short update in the community about reaching four weeks."
+            },
+            {
+              "id": "d28t4",
+              "type": "game",
+              "title": "Celebrate with a quick game",
+              "text": "Play a mini game just for fun today, no craving needed."
+            }
+          ]
+        },
+        {
+          "day": 29,
+          "title": "Day 29: Tools you trust now",
+          "intro": "You have used a lot of tools over the past month. Today is about knowing which ones actually work for you.",
+          "tasks": [
+            {
+              "id": "d29t1",
+              "type": "journal",
+              "title": "Rank your go to tools",
+              "text": "Write down which craving tools, breathing, games, or sounds have worked best for you personally."
+            },
+            {
+              "id": "d29t2",
+              "type": "checkin",
+              "title": "Set a chapter three intention",
+              "text": "Write or pick one thing you want to focus on as you move into social situations and stress."
+            },
+            {
+              "id": "d29t3",
+              "type": "fact",
+              "title": "See your full month numbers",
+              "text": "Open your stats and look at total days, money saved, and cigarettes avoided over the past month."
+            },
+            {
+              "id": "d29t4",
+              "type": "action",
+              "title": "Plan one upcoming challenge",
+              "text": "Think of one event coming up in the next month that could be a real test, and note it down."
+            }
+          ]
+        },
+        {
+          "day": 30,
+          "title": "Day 30: One month smoke free",
+          "intro": "Thirty days. A full month without a single cigarette. You did not just survive, you built new habits that are starting to feel normal. Chapter three is about proving they hold up under real pressure.",
+          "tasks": [
+            {
+              "id": "d30t1",
+              "type": "reward",
+              "title": "Claim your one month badge",
+              "text": "Open your badges tab and collect the one month milestone, one of the biggest ones yet."
+            },
+            {
+              "id": "d30t2",
+              "type": "fact",
+              "title": "See your one month transformation",
+              "text": "Open your full health and stats overview and see everything that has changed for you in just thirty days."
+            },
+            {
+              "id": "d30t3",
+              "type": "journal",
+              "title": "Write a letter to day one you",
+              "text": "Write a short letter to yourself on day one, telling them what the first month was really like."
+            },
+            {
+              "id": "d30t4",
+              "type": "action",
+              "title": "Look ahead to chapter three",
+              "text": "Read the chapter three intro and set one goal for handling social situations smoke free."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 3,
+      "name": "New normal",
+      "role": "Social situations, stress, alcohol, work, stay smoke-free",
+      "day_start": 31,
+      "day_end": 60,
+      "days": [
+        {
+          "day": 31,
+          "title": "Day 31: Welcome to chapter three",
+          "intro": "The habit building phase is done. Now it is about proving your new normal holds up in real situations, not just quiet routines.",
+          "tasks": [
+            {
+              "id": "d31t1",
+              "type": "journal",
+              "title": "List your upcoming social events",
+              "text": "Write down any parties, dinners, or gatherings coming up in the next two weeks."
+            },
+            {
+              "id": "d31t2",
+              "type": "fact",
+              "title": "Know what chapter three covers",
+              "text": "This chapter focuses on the situations that trip up a lot of quitters after the first month, like parties, drinking, stress at work, and being around old smoking friends."
+            },
+            {
+              "id": "d31t3",
+              "type": "checkin",
+              "title": "Set your chapter three goal",
+              "text": "Pick one specific situation you want to handle smoke free this month."
+            },
+            {
+              "id": "d31t4",
+              "type": "action",
+              "title": "Prepare one social script",
+              "text": "Write one short sentence you can say if someone offers you a cigarette, so you do not have to think of it on the spot."
+            }
+          ]
+        },
+        {
+          "day": 32,
+          "title": "Day 32: Saying no without explaining",
+          "intro": "You do not owe anyone a long explanation for not smoking. A short, confident no is enough.",
+          "tasks": [
+            {
+              "id": "d32t1",
+              "type": "action",
+              "title": "Practice your no",
+              "text": "Say your prepared response out loud once today so it feels natural if you need it."
+            },
+            {
+              "id": "d32t2",
+              "type": "fact",
+              "title": "Know you do not need to justify it",
+              "text": "Quitting is a complete reason on its own, you are allowed to decline without giving a backstory."
+            },
+            {
+              "id": "d32t3",
+              "type": "checkin",
+              "title": "Rate your confidence in social settings",
+              "text": "Rate from one to five how confident you feel turning down a cigarette in front of others."
+            }
+          ]
+        },
+        {
+          "day": 33,
+          "title": "Day 33: Old smoking friends",
+          "intro": "Some friendships were built partly around smoking together. That does not mean the friendship has to end, but it might need to change shape.",
+          "tasks": [
+            {
+              "id": "d33t1",
+              "type": "journal",
+              "title": "Think about one specific friend",
+              "text": "Write about one friend you used to smoke with and how your time together might look now."
+            },
+            {
+              "id": "d33t2",
+              "type": "action",
+              "title": "Suggest a different hangout",
+              "text": "If you are seeing a smoking friend soon, suggest doing something that is not centered around smoke breaks."
+            },
+            {
+              "id": "d33t3",
+              "type": "fact",
+              "title": "Know this gets easier",
+              "text": "The strong pull to join a friend's smoke break usually fades the more times you are around it without smoking yourself."
+            }
+          ]
+        },
+        {
+          "day": 34,
+          "title": "Day 34: Stress at work",
+          "intro": "Work stress used to send a lot of people straight to a cigarette break. Today is about a different release valve.",
+          "tasks": [
+            {
+              "id": "d34t1",
+              "type": "breathing",
+              "title": "Use breathing during a work stress moment",
+              "text": "Next time work stress hits today, step away for one minute and use the breathing tool instead of a smoke break."
+            },
+            {
+              "id": "d34t2",
+              "type": "action",
+              "title": "Take a real break, just not a smoke one",
+              "text": "Take a two minute walk away from your desk today as your new version of a break."
+            },
+            {
+              "id": "d34t3",
+              "type": "checkin",
+              "title": "Log your stress level today",
+              "text": "Rate how stressful work felt today on a simple scale."
+            }
+          ]
+        },
+        {
+          "day": 35,
+          "title": "Day 35: Five weeks free",
+          "intro": "Five weeks in, and you have already handled more triggering situations than you probably expected to.",
+          "tasks": [
+            {
+              "id": "d35t1",
+              "type": "reward",
+              "title": "Claim your five week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d35t2",
+              "type": "fact",
+              "title": "See your progress so far",
+              "text": "Open your stats and look at your full streak alongside your money saved and cigarettes avoided."
+            },
+            {
+              "id": "d35t3",
+              "type": "social",
+              "title": "Encourage someone newer than you",
+              "text": "Find someone in their first two weeks and send them one encouraging message."
+            }
+          ]
+        },
+        {
+          "day": 36,
+          "title": "Day 36: Drinking out",
+          "intro": "Going out for drinks is one of the highest risk situations for relapse. Today is about going in with a plan.",
+          "tasks": [
+            {
+              "id": "d36t1",
+              "type": "action",
+              "title": "Set a drink limit if you are going out",
+              "text": "If you are drinking soon, decide your limit in advance, since lower inhibition makes old habits easier to slip back into."
+            },
+            {
+              "id": "d36t2",
+              "type": "fact",
+              "title": "Know the real risk window",
+              "text": "The risk moment is usually not the first drink, it is later in the night when tiredness and lowered guard combine with people smoking outside."
+            },
+            {
+              "id": "d36t3",
+              "type": "checkin",
+              "title": "Rate how risky tonight feels",
+              "text": "If you are going out tonight, rate how risky the situation feels for you in advance."
+            }
+          ]
+        },
+        {
+          "day": 37,
+          "title": "Day 37: After a night out",
+          "intro": "If last night was a test, today is about checking in honestly, whether it went well or not.",
+          "tasks": [
+            {
+              "id": "d37t1",
+              "type": "journal",
+              "title": "Reflect on last night",
+              "text": "Write about how last night went if you were in a social or drinking situation, including any close calls."
+            },
+            {
+              "id": "d37t2",
+              "type": "fact",
+              "title": "A close call is not a failure",
+              "text": "Feeling tempted and not smoking is a win on its own, even if it felt hard, it still counts as a successful day."
+            }
+          ]
+        },
+        {
+          "day": 38,
+          "title": "Day 38: Celebrations and good news",
+          "intro": "People often forget that good moments, not just stressful ones, used to come with a cigarette too.",
+          "tasks": [
+            {
+              "id": "d38t1",
+              "type": "journal",
+              "title": "Notice the celebration trigger",
+              "text": "Write down if you have ever wanted to smoke after good news rather than bad, and what that felt like."
+            },
+            {
+              "id": "d38t2",
+              "type": "action",
+              "title": "Plan a new way to celebrate",
+              "text": "Pick one new way to mark good news that has nothing to do with smoking, like a favorite snack or telling someone."
+            },
+            {
+              "id": "d38t3",
+              "type": "fact",
+              "title": "Know both ends of the trigger",
+              "text": "Smoking habits often get triggered by strong emotion in either direction, both stress and excitement, so both deserve a plan."
+            }
+          ]
+        },
+        {
+          "day": 39,
+          "title": "Day 39: Family gatherings",
+          "intro": "Family events can bring out old habits fast, especially around relatives who still smoke.",
+          "tasks": [
+            {
+              "id": "d39t1",
+              "type": "action",
+              "title": "Prepare for your next family event",
+              "text": "If a family gathering is coming up, decide where you will go and what you will do during any smoke breaks others take."
+            },
+            {
+              "id": "d39t2",
+              "type": "checkin",
+              "title": "Rate family pressure",
+              "text": "Rate how much pressure you feel from family or relatives around your quitting."
+            }
+          ]
+        },
+        {
+          "day": 40,
+          "title": "Day 40: Forty days strong",
+          "intro": "Forty days is a serious stretch by any measure. Patterns that used to run your day automatically no longer do.",
+          "tasks": [
+            {
+              "id": "d40t1",
+              "type": "fact",
+              "title": "See how your lungs are doing",
+              "text": "By this stage many ex smokers notice noticeably easier breathing during light exercise as airways continue to heal."
+            },
+            {
+              "id": "d40t2",
+              "type": "journal",
+              "title": "Write your biggest surprise",
+              "text": "Write about the thing that has surprised you most since you quit, good or hard."
+            },
+            {
+              "id": "d40t3",
+              "type": "action",
+              "title": "Test a harder situation on purpose",
+              "text": "Put yourself in a moderately triggering situation on purpose today and notice you get through it."
+            }
+          ]
+        },
+        {
+          "day": 41,
+          "title": "Day 41: The one cigarette myth",
+          "intro": "Just one will not hurt is one of the most dangerous thoughts a quitter can have. Today is about understanding why.",
+          "tasks": [
+            {
+              "id": "d41t1",
+              "type": "fact",
+              "title": "Know why one is rarely just one",
+              "text": "Nicotine reactivates the brain's craving pathways quickly, which is why one cigarette after weeks off often leads straight back to daily smoking rather than staying a one time thing."
+            },
+            {
+              "id": "d41t2",
+              "type": "journal",
+              "title": "Write your own warning note",
+              "text": "Write a short note to your future self about why one cigarette is not worth the risk, to read if you are ever tempted."
+            }
+          ]
+        },
+        {
+          "day": 42,
+          "title": "Day 42: Six weeks free",
+          "intro": "Six weeks. Your body chemistry, your routines, and your confidence have all shifted since day one.",
+          "tasks": [
+            {
+              "id": "d42t1",
+              "type": "reward",
+              "title": "Claim your six week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d42t2",
+              "type": "fact",
+              "title": "See your numbers at six weeks",
+              "text": "Open your stats tab and look at your full progress, money, days, and cigarettes avoided."
+            },
+            {
+              "id": "d42t3",
+              "type": "social",
+              "title": "Share a six week update",
+              "text": "Post a short update in the community about reaching six weeks."
+            }
+          ]
+        },
+        {
+          "day": 43,
+          "title": "Day 43: Travel and routine breaks",
+          "intro": "Travel, even for fun, breaks your normal routine, and broken routines can loosen the grip of new habits.",
+          "tasks": [
+            {
+              "id": "d43t1",
+              "type": "action",
+              "title": "Plan for your next trip",
+              "text": "If you have travel coming up, think about which of your usual routines will be missing and what you will do instead."
+            },
+            {
+              "id": "d43t2",
+              "type": "checkin",
+              "title": "Rate how stable your routine feels",
+              "text": "Rate how solid your smoke free routine feels right now, even without travel."
+            }
+          ]
+        },
+        {
+          "day": 44,
+          "title": "Day 44: Identity check in",
+          "intro": "Somewhere around now, many people start thinking of themselves less as a smoker who quit and more as simply a non smoker.",
+          "tasks": [
+            {
+              "id": "d44t1",
+              "type": "journal",
+              "title": "How do you describe yourself now",
+              "text": "Write down how you would describe your relationship with smoking today compared to two months ago."
+            },
+            {
+              "id": "d44t2",
+              "type": "fact",
+              "title": "Identity matters more than willpower",
+              "text": "Long term quitters often describe a shift from fighting cravings to simply being someone who does not smoke, which takes less daily effort than constant willpower."
+            }
+          ]
+        },
+        {
+          "day": 45,
+          "title": "Day 45: Halfway to chapter four",
+          "intro": "You are halfway through chapter three. Stress, social pressure, and alcohol have all come up by now, and you have handled them.",
+          "tasks": [
+            {
+              "id": "d45t1",
+              "type": "checkin",
+              "title": "Rate this chapter so far",
+              "text": "Rate how chapter three has gone for you overall compared to chapter two."
+            },
+            {
+              "id": "d45t2",
+              "type": "fact",
+              "title": "See your stats halfway through chapter three",
+              "text": "Check your full stats overview and notice your trend since day thirty one."
+            },
+            {
+              "id": "d45t3",
+              "type": "game",
+              "title": "Take a quick mental break",
+              "text": "Play a mini game for two minutes just to reset, no craving required."
+            }
+          ]
+        },
+        {
+          "day": 46,
+          "title": "Day 46: Anger and irritability",
+          "intro": "Some people used cigarettes to cool down after getting angry or frustrated. That release needs a new outlet too.",
+          "tasks": [
+            {
+              "id": "d46t1",
+              "type": "breathing",
+              "title": "Use breathing for anger, not just craving",
+              "text": "Next time you feel frustrated today, use the breathing tool before reacting."
+            },
+            {
+              "id": "d46t2",
+              "type": "journal",
+              "title": "Recall an angry smoking moment",
+              "text": "Write about a time you used to smoke specifically because you were angry or frustrated."
+            }
+          ]
+        },
+        {
+          "day": 47,
+          "title": "Day 47: Weekend triggers",
+          "intro": "Weekends often had a different smoking rhythm than weekdays, more free time, more social time, more downtime.",
+          "tasks": [
+            {
+              "id": "d47t1",
+              "type": "action",
+              "title": "Plan your weekend differently",
+              "text": "Think about your usual weekend pattern and pick one part of it to handle differently this week."
+            },
+            {
+              "id": "d47t2",
+              "type": "checkin",
+              "title": "Rate weekend difficulty",
+              "text": "Rate how hard weekends feel for you compared to weekdays right now."
+            }
+          ]
+        },
+        {
+          "day": 48,
+          "title": "Day 48: Seven weeks free",
+          "intro": "Seven weeks. The space between you and your last cigarette keeps growing, and so does your evidence that you can do this.",
+          "tasks": [
+            {
+              "id": "d48t1",
+              "type": "reward",
+              "title": "Claim your seven week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d48t2",
+              "type": "fact",
+              "title": "See your circulation improving",
+              "text": "By this stage circulation has generally improved further, which can make physical activity feel noticeably easier than it did when you smoked."
+            }
+          ]
+        },
+        {
+          "day": 49,
+          "title": "Day 49: Coffee and smoking",
+          "intro": "Coffee and cigarettes were a classic pair for a lot of smokers. If that link is still strong for you, today is about loosening it.",
+          "tasks": [
+            {
+              "id": "d49t1",
+              "type": "journal",
+              "title": "Check your coffee link",
+              "text": "Write down whether you still feel a pull to smoke specifically when drinking coffee."
+            },
+            {
+              "id": "d49t2",
+              "type": "action",
+              "title": "Change your coffee setting",
+              "text": "Try drinking your coffee in a different location or with a different activity today."
+            }
+          ]
+        },
+        {
+          "day": 50,
+          "title": "Day 50: Fifty days",
+          "intro": "Fifty days without a cigarette is a number a lot of people never reach. You are well past it.",
+          "tasks": [
+            {
+              "id": "d50t1",
+              "type": "fact",
+              "title": "See your full fifty day overview",
+              "text": "Open your stats and look at everything you have built since day one, streak, money, and health markers."
+            },
+            {
+              "id": "d50t2",
+              "type": "journal",
+              "title": "Write your fifty day reflection",
+              "text": "Write a few sentences on what has changed in how you think about smoking since you started."
+            },
+            {
+              "id": "d50t3",
+              "type": "social",
+              "title": "Share your fifty day milestone",
+              "text": "Post an update in the community about reaching fifty days."
+            }
+          ]
+        },
+        {
+          "day": 51,
+          "title": "Day 51: Boredom revisited",
+          "intro": "Boredom triggers tend to come back in new forms as life settles into a routine again.",
+          "tasks": [
+            {
+              "id": "d51t1",
+              "type": "checkin",
+              "title": "Rate today's boredom level",
+              "text": "Rate how bored you felt today and whether it connected to any craving."
+            },
+            {
+              "id": "d51t2",
+              "type": "game",
+              "title": "Use a game for boredom",
+              "text": "Next time boredom hits today, use a mini game instead of letting your mind wander toward smoking."
+            }
+          ]
+        },
+        {
+          "day": 52,
+          "title": "Day 52: Watching others smoke",
+          "intro": "Seeing someone else smoke can still trigger a flicker of craving even after weeks free. That flicker does not mean you are failing.",
+          "tasks": [
+            {
+              "id": "d52t1",
+              "type": "fact",
+              "title": "Know that visual triggers are normal",
+              "text": "Seeing or smelling someone else's cigarette can trigger a brief urge even long after quitting, this is a normal association, not a sign you are about to relapse."
+            },
+            {
+              "id": "d52t2",
+              "type": "journal",
+              "title": "Describe your reaction",
+              "text": "Write about how you felt the last time you saw someone smoking nearby."
+            }
+          ]
+        },
+        {
+          "day": 53,
+          "title": "Day 53: Your support system",
+          "intro": "Quitting is easier with people around you who know what you are doing and why.",
+          "tasks": [
+            {
+              "id": "d53t1",
+              "type": "social",
+              "title": "Connect with the community",
+              "text": "Comment on or react to two other people's posts in the community today."
+            },
+            {
+              "id": "d53t2",
+              "type": "journal",
+              "title": "Who supports you most",
+              "text": "Write down who in your life has been most supportive of your quitting so far."
+            }
+          ]
+        },
+        {
+          "day": 54,
+          "title": "Day 54: Eight weeks free",
+          "intro": "Eight weeks. Two full months of mornings, meals, stress, and nights out, all without a cigarette.",
+          "tasks": [
+            {
+              "id": "d54t1",
+              "type": "reward",
+              "title": "Claim your eight week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d54t2",
+              "type": "fact",
+              "title": "See your two month health gains",
+              "text": "Open your health progress tab and see how far your key markers have moved over two months."
+            }
+          ]
+        },
+        {
+          "day": 55,
+          "title": "Day 55: Slips happen, plans matter",
+          "intro": "Even with a strong streak, it helps to know exactly what you would do if you ever did slip.",
+          "tasks": [
+            {
+              "id": "d55t1",
+              "type": "action",
+              "title": "Write your slip recovery plan",
+              "text": "Write down exactly what you would do in the first hour after a slip, who you would tell and what your next step would be."
+            },
+            {
+              "id": "d55t2",
+              "type": "fact",
+              "title": "A slip is not the end",
+              "text": "Many successful quitters had at least one slip along the way, what mattered most was getting back to zero immediately instead of treating it as total failure."
+            }
+          ]
+        },
+        {
+          "day": 56,
+          "title": "Day 56: Reviewing chapter three",
+          "intro": "You are almost through chapter three. Social pressure, stress, alcohol, and old habits have all been tested.",
+          "tasks": [
+            {
+              "id": "d56t1",
+              "type": "journal",
+              "title": "Pick your hardest situation this chapter",
+              "text": "Write about the single hardest situation you faced in chapter three and how you got through it."
+            },
+            {
+              "id": "d56t2",
+              "type": "checkin",
+              "title": "Rate your overall chapter three",
+              "text": "Rate chapter three overall on how well you think you handled it."
+            }
+          ]
+        },
+        {
+          "day": 57,
+          "title": "Day 57: Confidence check",
+          "intro": "By now you have real evidence, not just hope, that you can handle hard moments without smoking.",
+          "tasks": [
+            {
+              "id": "d57t1",
+              "type": "fact",
+              "title": "Look at your evidence",
+              "text": "Open your stats and count how many days you have now successfully gotten through, each one is proof."
+            },
+            {
+              "id": "d57t2",
+              "type": "checkin",
+              "title": "Rate your confidence for the future",
+              "text": "Rate how confident you feel about staying smoke free for the next thirty days."
+            }
+          ]
+        },
+        {
+          "day": 58,
+          "title": "Day 58: Almost two months",
+          "intro": "Two days from a two month milestone. Worth noticing how much less you think about cigarettes day to day now.",
+          "tasks": [
+            {
+              "id": "d58t1",
+              "type": "journal",
+              "title": "How often do you think about it now",
+              "text": "Write about how often cigarettes cross your mind now compared to your first week."
+            },
+            {
+              "id": "d58t2",
+              "type": "action",
+              "title": "Plan your two month mark",
+              "text": "Decide how you want to acknowledge hitting two full months in two days."
+            }
+          ]
+        },
+        {
+          "day": 59,
+          "title": "Day 59: One day to go",
+          "intro": "Tomorrow closes chapter three. You have made it through the situations most likely to cause a relapse.",
+          "tasks": [
+            {
+              "id": "d59t1",
+              "type": "fact",
+              "title": "Know what is coming next",
+              "text": "Chapter four focuses on relapse traps, boredom, and celebrations, building toward your three month milestone."
+            },
+            {
+              "id": "d59t2",
+              "type": "checkin",
+              "title": "Rate how ready you feel",
+              "text": "Rate how ready you feel for the next chapter."
+            }
+          ]
+        },
+        {
+          "day": 60,
+          "title": "Day 60: Two months smoke free",
+          "intro": "Sixty days. You have handled parties, drinks, stress, family, and boredom, all without smoking. That is not luck, that is a skill you have built.",
+          "tasks": [
+            {
+              "id": "d60t1",
+              "type": "reward",
+              "title": "Claim your two month badge",
+              "text": "Open your badges tab and collect this major milestone."
+            },
+            {
+              "id": "d60t2",
+              "type": "fact",
+              "title": "See your two month transformation",
+              "text": "Open your full stats and health overview to see everything that has changed since day one."
+            },
+            {
+              "id": "d60t3",
+              "type": "journal",
+              "title": "Write your chapter three summary",
+              "text": "Write a few sentences summarizing what you learned during chapter three."
+            },
+            {
+              "id": "d60t4",
+              "type": "action",
+              "title": "Look ahead to chapter four",
+              "text": "Read the chapter four intro and set one goal for staying strong toward your three month mark."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "name": "Stay strong",
+      "role": "Relapse traps, boredom, celebrations, 3-month milestone",
+      "day_start": 61,
+      "day_end": 90,
+      "days": [
+        {
+          "day": 61,
+          "title": "Day 61: Welcome to chapter four",
+          "intro": "You are in the stretch where confidence is high and that is exactly when guard can slip. This chapter is about staying sharp on the way to three months.",
+          "tasks": [
+            {
+              "id": "d61t1",
+              "type": "fact",
+              "title": "Know the complacency trap",
+              "text": "Many relapses happen after the two month mark, not because life gets harder, but because people stop treating cravings seriously once they feel like they have already won."
+            },
+            {
+              "id": "d61t2",
+              "type": "checkin",
+              "title": "Set your chapter four goal",
+              "text": "Pick one thing you want to stay alert about over the next month."
+            },
+            {
+              "id": "d61t3",
+              "type": "journal",
+              "title": "Name your current biggest risk",
+              "text": "Write down the one situation you think is most likely to challenge you in the next thirty days."
+            }
+          ]
+        },
+        {
+          "day": 62,
+          "title": "Day 62: The just checking trap",
+          "intro": "Some people convince themselves that having just one to test their willpower is harmless curiosity. It rarely is.",
+          "tasks": [
+            {
+              "id": "d62t1",
+              "type": "fact",
+              "title": "Know why testing yourself backfires",
+              "text": "Trying a single cigarette to prove you can handle it puts nicotine back in your system, which can trigger real cravings again rather than proving anything."
+            },
+            {
+              "id": "d62t2",
+              "type": "journal",
+              "title": "Have you had this thought",
+              "text": "Write honestly whether the idea of just one to test yourself has crossed your mind recently."
+            }
+          ]
+        },
+        {
+          "day": 63,
+          "title": "Day 63: Boredom as a long game",
+          "intro": "Boredom does not go away forever, it just becomes less frequent. Today is about keeping your boredom tools sharp.",
+          "tasks": [
+            {
+              "id": "d63t1",
+              "type": "game",
+              "title": "Refresh your boredom toolkit",
+              "text": "Try a mini game you have not used in a while during a slow moment today."
+            },
+            {
+              "id": "d63t2",
+              "type": "action",
+              "title": "Add a new boredom activity",
+              "text": "Add one new activity to your boredom list that you have not tried before."
+            }
+          ]
+        },
+        {
+          "day": 64,
+          "title": "Day 64: Nine weeks free",
+          "intro": "Nine weeks. Your old smoking schedule probably feels distant by now.",
+          "tasks": [
+            {
+              "id": "d64t1",
+              "type": "reward",
+              "title": "Claim your nine week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d64t2",
+              "type": "fact",
+              "title": "See your progress at nine weeks",
+              "text": "Open your stats and review your streak, money saved, and health markers."
+            }
+          ]
+        },
+        {
+          "day": 65,
+          "title": "Day 65: Celebration triggers again",
+          "intro": "Good news, promotions, achievements, and parties can quietly bring back the urge to celebrate the old way.",
+          "tasks": [
+            {
+              "id": "d65t1",
+              "type": "journal",
+              "title": "Recall a recent good moment",
+              "text": "Write about a recent piece of good news and whether any urge to smoke came with it."
+            },
+            {
+              "id": "d65t2",
+              "type": "action",
+              "title": "Plan your next celebration",
+              "text": "Decide in advance how you will celebrate your three month milestone when it arrives."
+            }
+          ]
+        },
+        {
+          "day": 66,
+          "title": "Day 66: Holidays and special days",
+          "intro": "Special occasions, even small ones, can carry old associations with smoking.",
+          "tasks": [
+            {
+              "id": "d66t1",
+              "type": "checkin",
+              "title": "Rate upcoming occasion risk",
+              "text": "If you have a birthday, holiday, or event coming up soon, rate how risky it feels."
+            },
+            {
+              "id": "d66t2",
+              "type": "fact",
+              "title": "Plan beats willpower",
+              "text": "Going into a special occasion with a plan for smoke breaks and toasts works better than relying purely on willpower in the moment."
+            }
+          ]
+        },
+        {
+          "day": 67,
+          "title": "Day 67: Old friends, old habits",
+          "intro": "Reconnecting with someone from your smoking past can bring back more than just memories.",
+          "tasks": [
+            {
+              "id": "d67t1",
+              "type": "journal",
+              "title": "Think about an old smoking friend",
+              "text": "Write about anyone from your past you associate strongly with smoking, even if you do not see them often now."
+            },
+            {
+              "id": "d67t2",
+              "type": "action",
+              "title": "Decide your approach in advance",
+              "text": "If you might see that person soon, decide now how you will handle it if they offer you a cigarette."
+            }
+          ]
+        },
+        {
+          "day": 68,
+          "title": "Day 68: Ten weeks free",
+          "intro": "Ten weeks. You are deep into proving this is not a phase, it is who you are now.",
+          "tasks": [
+            {
+              "id": "d68t1",
+              "type": "reward",
+              "title": "Claim your ten week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d68t2",
+              "type": "fact",
+              "title": "See your full ten week stats",
+              "text": "Open your stats tab and review everything you have built over ten weeks."
+            }
+          ]
+        },
+        {
+          "day": 69,
+          "title": "Day 69: Tiredness and low energy",
+          "intro": "Being exhausted lowers everyone's guard, including around old habits.",
+          "tasks": [
+            {
+              "id": "d69t1",
+              "type": "journal",
+              "title": "Notice tiredness and cravings",
+              "text": "Write down whether you have noticed any link between being very tired and wanting a cigarette."
+            },
+            {
+              "id": "d69t2",
+              "type": "audio",
+              "title": "Rest with a calming sound",
+              "text": "Use a relaxing sound for a few minutes today if you are feeling run down."
+            }
+          ]
+        },
+        {
+          "day": 70,
+          "title": "Day 70: Seventy days strong",
+          "intro": "Seventy days. The number itself is a reminder of how consistent you have been.",
+          "tasks": [
+            {
+              "id": "d70t1",
+              "type": "fact",
+              "title": "See your seventy day overview",
+              "text": "Open your stats and look at your full progress across streak, money, and health."
+            },
+            {
+              "id": "d70t2",
+              "type": "social",
+              "title": "Share a seventy day update",
+              "text": "Post a quick update in the community about hitting seventy days."
+            }
+          ]
+        },
+        {
+          "day": 71,
+          "title": "Day 71: Watching for warning signs",
+          "intro": "Small warning signs, like more frequent thoughts about smoking, are worth catching early.",
+          "tasks": [
+            {
+              "id": "d71t1",
+              "type": "checkin",
+              "title": "Rate your current craving frequency",
+              "text": "Rate how often you have thought about smoking in the past three days."
+            },
+            {
+              "id": "d71t2",
+              "type": "action",
+              "title": "Address any rising risk",
+              "text": "If your cravings have felt stronger lately, pick one extra tool to use this week, like more breathing sessions or community check ins."
+            }
+          ]
+        },
+        {
+          "day": 72,
+          "title": "Day 72: The mental bargaining trap",
+          "intro": "After a while just this once thoughts can get more convincing sounding, even though the risk has not changed.",
+          "tasks": [
+            {
+              "id": "d72t1",
+              "type": "fact",
+              "title": "Know the bargaining pattern",
+              "text": "The mind sometimes builds a very convincing case for one exception, special occasion, bad day, just this once, but the underlying risk to your streak stays the same no matter how reasonable it sounds."
+            },
+            {
+              "id": "d72t2",
+              "type": "journal",
+              "title": "Write your counter argument",
+              "text": "Write one strong sentence to counter any just this once thought, to have ready in advance."
+            }
+          ]
+        },
+        {
+          "day": 73,
+          "title": "Day 73: Checking your why",
+          "intro": "Reconnecting with your original reason for quitting keeps it from fading into the background.",
+          "tasks": [
+            {
+              "id": "d73t1",
+              "type": "journal",
+              "title": "Revisit your original reason",
+              "text": "Write down the main reason you decided to quit in the first place, and whether it still feels just as important now."
+            },
+            {
+              "id": "d73t2",
+              "type": "fact",
+              "title": "See your saved money grow",
+              "text": "Open your money saved tab and notice how much it has grown since day one."
+            }
+          ]
+        },
+        {
+          "day": 74,
+          "title": "Day 74: Eleven weeks free",
+          "intro": "Eleven weeks. One more week stands between you and three full months.",
+          "tasks": [
+            {
+              "id": "d74t1",
+              "type": "reward",
+              "title": "Claim your eleven week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d74t2",
+              "type": "checkin",
+              "title": "Rate your readiness for three months",
+              "text": "Rate how ready you feel for the three month milestone coming up."
+            }
+          ]
+        },
+        {
+          "day": 75,
+          "title": "Day 75: Helping someone else",
+          "intro": "Supporting another person trying to quit can strengthen your own resolve at the same time.",
+          "tasks": [
+            {
+              "id": "d75t1",
+              "type": "social",
+              "title": "Support someone earlier in their journey",
+              "text": "Find someone in their first month and offer one piece of encouragement or advice."
+            },
+            {
+              "id": "d75t2",
+              "type": "journal",
+              "title": "What would you tell day one you",
+              "text": "Write the single most useful thing you would tell yourself on day one, knowing what you know now."
+            }
+          ]
+        },
+        {
+          "day": 76,
+          "title": "Day 76: Physical activity boost",
+          "intro": "Many people notice their physical stamina improving noticeably by this stage.",
+          "tasks": [
+            {
+              "id": "d76t1",
+              "type": "fact",
+              "title": "See your stamina gains",
+              "text": "By around three months, lung function for many ex smokers has improved enough that everyday activities like stairs or brisk walking feel noticeably easier."
+            },
+            {
+              "id": "d76t2",
+              "type": "action",
+              "title": "Test your stamina",
+              "text": "Do one physical activity today, even a short walk or stairs, and notice how it feels compared to when you smoked."
+            }
+          ]
+        },
+        {
+          "day": 77,
+          "title": "Day 77: Mental clarity check",
+          "intro": "Improved focus and mental clarity are commonly reported benefits around this stage of quitting.",
+          "tasks": [
+            {
+              "id": "d77t1",
+              "type": "journal",
+              "title": "Notice your focus",
+              "text": "Write about whether your concentration or mental clarity has felt different since you quit."
+            },
+            {
+              "id": "d77t2",
+              "type": "checkin",
+              "title": "Rate your overall wellbeing",
+              "text": "Rate how you feel overall today on a simple scale."
+            }
+          ]
+        },
+        {
+          "day": 78,
+          "title": "Day 78: Twelve weeks free",
+          "intro": "Twelve weeks. Three months are now just two days away.",
+          "tasks": [
+            {
+              "id": "d78t1",
+              "type": "reward",
+              "title": "Claim your twelve week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d78t2",
+              "type": "action",
+              "title": "Finalize your three month plan",
+              "text": "Decide exactly how you want to mark hitting three full months in two days."
+            }
+          ]
+        },
+        {
+          "day": 79,
+          "title": "Day 79: One day before three months",
+          "intro": "Tomorrow is a major milestone. Today is just about staying steady.",
+          "tasks": [
+            {
+              "id": "d79t1",
+              "type": "fact",
+              "title": "Look back at your whole journey",
+              "text": "Open your stats and scroll through your entire history from day one to today."
+            },
+            {
+              "id": "d79t2",
+              "type": "journal",
+              "title": "Write what tomorrow means to you",
+              "text": "Write a sentence or two about what reaching three months represents for you personally."
+            }
+          ]
+        },
+        {
+          "day": 80,
+          "title": "Day 80: Three months smoke free",
+          "intro": "Ninety days. A full quarter of a year without a single cigarette. This is one of the biggest milestones in quitting, both medically and mentally.",
+          "tasks": [
+            {
+              "id": "d80t1",
+              "type": "reward",
+              "title": "Claim your three month badge",
+              "text": "Open your badges tab and collect this major milestone."
+            },
+            {
+              "id": "d80t2",
+              "type": "fact",
+              "title": "See your three month transformation",
+              "text": "By three months, lung function and circulation have generally improved substantially for most ex smokers compared to when they were still smoking."
+            },
+            {
+              "id": "d80t3",
+              "type": "social",
+              "title": "Share your three month milestone",
+              "text": "Post your three month update in the community."
+            },
+            {
+              "id": "d80t4",
+              "type": "journal",
+              "title": "Write your full journey summary",
+              "text": "Write a few sentences summarizing your journey from day one to day ninety."
+            }
+          ]
+        },
+        {
+          "day": 81,
+          "title": "Day 81: After the big milestone",
+          "intro": "It is normal for motivation to dip slightly right after a major milestone passes. Knowing this in advance helps.",
+          "tasks": [
+            {
+              "id": "d81t1",
+              "type": "fact",
+              "title": "Know the post milestone dip",
+              "text": "Motivation often drops slightly after a big milestone passes simply because the immediate goal is gone, this is normal and temporary."
+            },
+            {
+              "id": "d81t2",
+              "type": "checkin",
+              "title": "Set your next personal goal",
+              "text": "Pick a new personal goal to aim for now that three months is behind you."
+            }
+          ]
+        },
+        {
+          "day": 82,
+          "title": "Day 82: Routine maintenance",
+          "intro": "At this stage, the goal shifts from building new habits to simply maintaining the ones that work.",
+          "tasks": [
+            {
+              "id": "d82t1",
+              "type": "journal",
+              "title": "List your core habits",
+              "text": "Write down the three or four replacement habits that have become most automatic for you."
+            },
+            {
+              "id": "d82t2",
+              "type": "action",
+              "title": "Keep one habit fresh",
+              "text": "Do one of your core replacement habits on purpose today, even without needing it."
+            }
+          ]
+        },
+        {
+          "day": 83,
+          "title": "Day 83: Long term money goal",
+          "intro": "Three months of saved money adds up to a real amount. Today is about thinking bigger with it.",
+          "tasks": [
+            {
+              "id": "d83t1",
+              "type": "fact",
+              "title": "See your three month savings",
+              "text": "Open your money saved tab and look at the total since day one."
+            },
+            {
+              "id": "d83t2",
+              "type": "action",
+              "title": "Set a savings goal",
+              "text": "Pick something specific you want to put your smoking money toward over the next few months."
+            }
+          ]
+        },
+        {
+          "day": 84,
+          "title": "Day 84: Twelve full weeks plus",
+          "intro": "You are well past three months now, deep into territory where smoking is genuinely becoming part of your past.",
+          "tasks": [
+            {
+              "id": "d84t1",
+              "type": "checkin",
+              "title": "Rate how distant smoking feels",
+              "text": "Rate how far away your smoking days feel compared to right after you quit."
+            },
+            {
+              "id": "d84t2",
+              "type": "game",
+              "title": "Quick mental reset",
+              "text": "Play a mini game for a couple minutes just as a small break in your day."
+            }
+          ]
+        },
+        {
+          "day": 85,
+          "title": "Day 85: Watching for boredom relapse",
+          "intro": "Even at this stage, plain boredom remains one of the sneakier relapse triggers.",
+          "tasks": [
+            {
+              "id": "d85t1",
+              "type": "fact",
+              "title": "Boredom never fully disappears",
+              "text": "Even experienced ex smokers can feel an occasional pull during very boring stretches, having a plan ready matters more than expecting the urge to vanish completely."
+            },
+            {
+              "id": "d85t2",
+              "type": "action",
+              "title": "Refresh your distraction list",
+              "text": "Update your list of go to activities for boring moments with anything new you have discovered."
+            }
+          ]
+        },
+        {
+          "day": 86,
+          "title": "Day 86: Reflecting on identity",
+          "intro": "Many people notice that by now, they think of themselves simply as someone who does not smoke, rather than someone fighting urges all day.",
+          "tasks": [
+            {
+              "id": "d86t1",
+              "type": "journal",
+              "title": "How would a stranger describe you",
+              "text": "Write how you think someone meeting you today, with no history, would describe your relationship with smoking."
+            },
+            {
+              "id": "d86t2",
+              "type": "fact",
+              "title": "Identity shift is a real milestone",
+              "text": "Shifting from quitting smoker to simply non smoker in your own mind is one of the strongest predictors of staying smoke free long term."
+            }
+          ]
+        },
+        {
+          "day": 87,
+          "title": "Day 87: Helping shape your plan",
+          "intro": "You have been following missions for almost three months now. Today is about noticing what you actually need going forward.",
+          "tasks": [
+            {
+              "id": "d87t1",
+              "type": "checkin",
+              "title": "Rate which tools you still use",
+              "text": "Rate how often you still use the craving toolkit compared to your first month."
+            },
+            {
+              "id": "d87t2",
+              "type": "journal",
+              "title": "What do you need less of now",
+              "text": "Write about which part of the app or plan you feel you need less support from now."
+            }
+          ]
+        },
+        {
+          "day": 88,
+          "title": "Day 88: Almost chapter five",
+          "intro": "Chapter four is almost done. The next chapter moves into identity, health wins, and confidence as a non smoker.",
+          "tasks": [
+            {
+              "id": "d88t1",
+              "type": "fact",
+              "title": "Know what is coming next",
+              "text": "Chapter five focuses on identity as a non smoker, ongoing health wins, and building lasting confidence."
+            },
+            {
+              "id": "d88t2",
+              "type": "action",
+              "title": "Set an intention for chapter five",
+              "text": "Write one intention for how you want to think about yourself going into the next chapter."
+            }
+          ]
+        },
+        {
+          "day": 89,
+          "title": "Day 89: One day before the end of chapter four",
+          "intro": "Tomorrow wraps up a chapter built around staying sharp during the highest complacency risk window.",
+          "tasks": [
+            {
+              "id": "d89t1",
+              "type": "journal",
+              "title": "Reflect on staying strong",
+              "text": "Write about a moment in this chapter where you almost let your guard down but did not."
+            },
+            {
+              "id": "d89t2",
+              "type": "checkin",
+              "title": "Rate chapter four overall",
+              "text": "Rate how well you think you handled chapter four."
+            }
+          ]
+        },
+        {
+          "day": 90,
+          "title": "Day 90: Three months and counting",
+          "intro": "Ninety days behind you, and the riskiest complacency window has passed with your streak intact. From here, the work shifts from staying strong to truly becoming who you are now.",
+          "tasks": [
+            {
+              "id": "d90t1",
+              "type": "reward",
+              "title": "Claim your ninety day badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d90t2",
+              "type": "fact",
+              "title": "See your full ninety day overview",
+              "text": "Open your stats and look at everything across streak, money, cigarettes avoided, and health since day one."
+            },
+            {
+              "id": "d90t3",
+              "type": "social",
+              "title": "Share your chapter four completion",
+              "text": "Post in the community about finishing chapter four and reaching the three month mark."
+            },
+            {
+              "id": "d90t4",
+              "type": "action",
+              "title": "Look ahead to chapter five",
+              "text": "Read the chapter five intro and set one goal around your identity as a non smoker."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 5,
+      "name": "Who you are now",
+      "role": "Identity as non-smoker, health wins, confidence",
+      "day_start": 91,
+      "day_end": 120,
+      "days": [
+        {
+          "day": 91,
+          "title": "Day 91: Welcome to chapter five",
+          "intro": "This chapter is less about fighting cravings and more about settling into who you are now, a non smoker, not a smoker who is resisting.",
+          "tasks": [
+            {
+              "id": "d91t1",
+              "type": "journal",
+              "title": "Finish this sentence",
+              "text": "Write a few words completing this sentence, I am someone who."
+            },
+            {
+              "id": "d91t2",
+              "type": "checkin",
+              "title": "Set your chapter five goal",
+              "text": "Pick one thing you want to focus on around identity and confidence this month."
+            }
+          ]
+        },
+        {
+          "day": 92,
+          "title": "Day 92: Your health report card",
+          "intro": "Three months in, your body has made real, measurable progress.",
+          "tasks": [
+            {
+              "id": "d92t1",
+              "type": "fact",
+              "title": "Review your key health gains",
+              "text": "Open your health progress tab and review every marker that has improved since day one."
+            },
+            {
+              "id": "d92t2",
+              "type": "journal",
+              "title": "Which change matters most to you",
+              "text": "Write about which physical change you have noticed has meant the most to you personally."
+            }
+          ]
+        },
+        {
+          "day": 93,
+          "title": "Day 93: No longer the exception",
+          "intro": "Turning down a cigarette no longer needs to feel like a special act of willpower, it is simply what you do.",
+          "tasks": [
+            {
+              "id": "d93t1",
+              "type": "checkin",
+              "title": "Rate how automatic saying no feels",
+              "text": "Rate how automatic it feels to decline a cigarette now compared to your first month."
+            },
+            {
+              "id": "d93t2",
+              "type": "action",
+              "title": "Notice it happen without effort",
+              "text": "Pay attention today to any moment where you did not even consciously think about not smoking, it simply did not come up."
+            }
+          ]
+        },
+        {
+          "day": 94,
+          "title": "Day 94: Thirteen weeks free",
+          "intro": "Thirteen weeks. A full quarter year and one extra week.",
+          "tasks": [
+            {
+              "id": "d94t1",
+              "type": "reward",
+              "title": "Claim your thirteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d94t2",
+              "type": "fact",
+              "title": "See your thirteen week numbers",
+              "text": "Open your stats and review your streak, money, and cigarettes avoided."
+            }
+          ]
+        },
+        {
+          "day": 95,
+          "title": "Day 95: Confidence in new situations",
+          "intro": "By now you have likely faced a new situation, a new job, a new social group, fully smoke free from the start.",
+          "tasks": [
+            {
+              "id": "d95t1",
+              "type": "journal",
+              "title": "Recall a new situation handled smoke free",
+              "text": "Write about any new situation you have entered since quitting and handled without smoking."
+            },
+            {
+              "id": "d95t2",
+              "type": "fact",
+              "title": "This is proof, not luck",
+              "text": "Successfully navigating new situations smoke free is direct evidence of a stable new identity, not a coincidence."
+            }
+          ]
+        },
+        {
+          "day": 96,
+          "title": "Day 96: Physical performance check",
+          "intro": "Stamina and recovery from exercise often continue improving well past the three month mark.",
+          "tasks": [
+            {
+              "id": "d96t1",
+              "type": "action",
+              "title": "Push your activity a little",
+              "text": "Do a slightly more demanding physical activity than usual today and notice how your body responds."
+            },
+            {
+              "id": "d96t2",
+              "type": "checkin",
+              "title": "Rate your physical stamina",
+              "text": "Rate how your overall stamina feels compared to when you smoked."
+            }
+          ]
+        },
+        {
+          "day": 97,
+          "title": "Day 97: Skin and appearance",
+          "intro": "Smoking affects more than lungs, skin and overall appearance often improve too over time.",
+          "tasks": [
+            {
+              "id": "d97t1",
+              "type": "fact",
+              "title": "Know the appearance benefits",
+              "text": "Better blood flow and oxygen delivery after quitting can lead to improved skin tone and slower visible aging compared to continued smoking."
+            },
+            {
+              "id": "d97t2",
+              "type": "journal",
+              "title": "Have you noticed a change",
+              "text": "Write about whether anyone has commented on your appearance since you quit, or if you have noticed anything yourself."
+            }
+          ]
+        },
+        {
+          "day": 98,
+          "title": "Day 98: Fourteen weeks free",
+          "intro": "Fourteen weeks. Each one adds more proof that this is simply how you live now.",
+          "tasks": [
+            {
+              "id": "d98t1",
+              "type": "reward",
+              "title": "Claim your fourteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d98t2",
+              "type": "social",
+              "title": "Share a confidence win",
+              "text": "Post in the community about a moment recently where you felt fully confident as a non smoker."
+            }
+          ]
+        },
+        {
+          "day": 99,
+          "title": "Day 99: Mentoring others",
+          "intro": "By now, you likely have real, specific advice that could help someone just starting out.",
+          "tasks": [
+            {
+              "id": "d99t1",
+              "type": "social",
+              "title": "Give specific advice to a beginner",
+              "text": "Find someone in chapter one or two and give them one specific tip that worked for you."
+            },
+            {
+              "id": "d99t2",
+              "type": "journal",
+              "title": "Write your top three tips",
+              "text": "Write the three pieces of advice you would give anyone starting day one today."
+            }
+          ]
+        },
+        {
+          "day": 100,
+          "title": "Day 100: One hundred days",
+          "intro": "One hundred days without a cigarette. This number alone tells a clear story about who you have become.",
+          "tasks": [
+            {
+              "id": "d100t1",
+              "type": "reward",
+              "title": "Claim your one hundred day badge",
+              "text": "Open your badges tab and collect this major milestone."
+            },
+            {
+              "id": "d100t2",
+              "type": "fact",
+              "title": "See your full one hundred day stats",
+              "text": "Open your stats and look across streak, money saved, cigarettes avoided, and health gains."
+            },
+            {
+              "id": "d100t3",
+              "type": "journal",
+              "title": "Write your one hundred day reflection",
+              "text": "Write a few sentences on what one hundred days smoke free means to you."
+            },
+            {
+              "id": "d100t4",
+              "type": "social",
+              "title": "Celebrate publicly",
+              "text": "Share your one hundred day milestone with the community."
+            }
+          ]
+        },
+        {
+          "day": 101,
+          "title": "Day 101: Past the headline number",
+          "intro": "The big round number is behind you. The work now is steady, quiet consistency.",
+          "tasks": [
+            {
+              "id": "d101t1",
+              "type": "checkin",
+              "title": "Set a new personal target",
+              "text": "Pick a new personal milestone to aim for, like a specific date or event."
+            },
+            {
+              "id": "d101t2",
+              "type": "fact",
+              "title": "Consistency beats big moments",
+              "text": "Long term success comes from many ordinary days handled well, not from any single milestone, however big it feels."
+            }
+          ]
+        },
+        {
+          "day": 102,
+          "title": "Day 102: Stress resilience now",
+          "intro": "Compare how you handle stress today to how you handled it on day five.",
+          "tasks": [
+            {
+              "id": "d102t1",
+              "type": "journal",
+              "title": "Compare stress responses",
+              "text": "Write about how your reaction to a stressful moment today compares to early on in your quit."
+            },
+            {
+              "id": "d102t2",
+              "type": "checkin",
+              "title": "Rate your stress resilience",
+              "text": "Rate how well you currently handle stress without thinking of smoking."
+            }
+          ]
+        },
+        {
+          "day": 103,
+          "title": "Day 103: Fifteen weeks free",
+          "intro": "Fifteen weeks. Over a third of the way to six months.",
+          "tasks": [
+            {
+              "id": "d103t1",
+              "type": "reward",
+              "title": "Claim your fifteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d103t2",
+              "type": "fact",
+              "title": "See your fifteen week stats",
+              "text": "Open your stats and review your overall progress."
+            }
+          ]
+        },
+        {
+          "day": 104,
+          "title": "Day 104: Your new normal day",
+          "intro": "Picture an average day now compared to an average day when you smoked.",
+          "tasks": [
+            {
+              "id": "d104t1",
+              "type": "journal",
+              "title": "Describe a normal day now",
+              "text": "Write what a typical day looks like for you now, without any reference to smoking at all."
+            },
+            {
+              "id": "d104t2",
+              "type": "fact",
+              "title": "Notice what is missing",
+              "text": "Notice that your description likely did not need to mention cigarettes at all, that absence is the real win."
+            }
+          ]
+        },
+        {
+          "day": 105,
+          "title": "Day 105: Confidence in hard rooms",
+          "intro": "Being in a room full of smokers no longer has to feel like a test of strength.",
+          "tasks": [
+            {
+              "id": "d105t1",
+              "type": "checkin",
+              "title": "Rate your comfort around smokers",
+              "text": "Rate how comfortable you feel now being around people smoking, compared to month one."
+            },
+            {
+              "id": "d105t2",
+              "type": "action",
+              "title": "Stay present in a smoking environment",
+              "text": "If you are around smokers today, notice you can stay relaxed without needing to leave or react."
+            }
+          ]
+        },
+        {
+          "day": 106,
+          "title": "Day 106: What smoking used to cost you",
+          "intro": "Beyond money, smoking had other costs, time, smell, health worry. Today is about naming those too.",
+          "tasks": [
+            {
+              "id": "d106t1",
+              "type": "journal",
+              "title": "List non money costs",
+              "text": "Write down three things smoking used to cost you that were not about money, like time, smell, or constant worry."
+            },
+            {
+              "id": "d106t2",
+              "type": "fact",
+              "title": "See your total money saved",
+              "text": "Open your money saved tab and look at the full total since day one."
+            }
+          ]
+        },
+        {
+          "day": 107,
+          "title": "Day 107: Sixteen weeks free",
+          "intro": "Sixteen weeks. Four full months of consistency.",
+          "tasks": [
+            {
+              "id": "d107t1",
+              "type": "reward",
+              "title": "Claim your sixteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d107t2",
+              "type": "social",
+              "title": "Share your four month update",
+              "text": "Post a short update in the community about reaching four months."
+            }
+          ]
+        },
+        {
+          "day": 108,
+          "title": "Day 108: Reframing your past",
+          "intro": "How you talk about your smoking past shapes how solid your non smoking present feels.",
+          "tasks": [
+            {
+              "id": "d108t1",
+              "type": "journal",
+              "title": "Write your past in one paragraph",
+              "text": "Write a short paragraph about your smoking past as something that happened, not something that defines you."
+            },
+            {
+              "id": "d108t2",
+              "type": "checkin",
+              "title": "Rate how you feel about your past self",
+              "text": "Rate how much shame or judgment you still feel toward your past smoking self."
+            }
+          ]
+        },
+        {
+          "day": 109,
+          "title": "Day 109: Encouraging long term thinking",
+          "intro": "It helps to occasionally picture yourself a year or more from now, still smoke free.",
+          "tasks": [
+            {
+              "id": "d109t1",
+              "type": "journal",
+              "title": "Picture one year from now",
+              "text": "Write a few sentences imagining yourself one year from today, still smoke free."
+            },
+            {
+              "id": "d109t2",
+              "type": "action",
+              "title": "Set a one year intention",
+              "text": "Write one thing you want to be true about your life a year from now because you quit."
+            }
+          ]
+        },
+        {
+          "day": 110,
+          "title": "Day 110: Energy and mood",
+          "intro": "Many people report steadier energy and mood by this stage compared to the rollercoaster of regular nicotine use.",
+          "tasks": [
+            {
+              "id": "d110t1",
+              "type": "fact",
+              "title": "Know the mood stability benefit",
+              "text": "Without the rise and fall of nicotine levels throughout the day, many ex smokers experience steadier mood and energy rather than the dips smoking used to cause between cigarettes."
+            },
+            {
+              "id": "d110t2",
+              "type": "checkin",
+              "title": "Rate your mood stability",
+              "text": "Rate how stable your mood has felt this week."
+            }
+          ]
+        },
+        {
+          "day": 111,
+          "title": "Day 111: Seventeen weeks free",
+          "intro": "Seventeen weeks. Getting close to chapter six and the second half of your guided plan.",
+          "tasks": [
+            {
+              "id": "d111t1",
+              "type": "reward",
+              "title": "Claim your seventeen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d111t2",
+              "type": "fact",
+              "title": "See your seventeen week stats",
+              "text": "Open your stats and review your full progress so far."
+            }
+          ]
+        },
+        {
+          "day": 112,
+          "title": "Day 112: Teaching what you know",
+          "intro": "Explaining your own process to someone else often reveals how much you actually understand now.",
+          "tasks": [
+            {
+              "id": "d112t1",
+              "type": "social",
+              "title": "Answer a question in the community",
+              "text": "Find a question from a newer member and answer it with something specific that worked for you."
+            },
+            {
+              "id": "d112t2",
+              "type": "journal",
+              "title": "Explain your craving strategy",
+              "text": "Write out, as if teaching someone else, exactly how you personally get through a craving now."
+            }
+          ]
+        },
+        {
+          "day": 113,
+          "title": "Day 113: Checking old triggers",
+          "intro": "Revisit the original trigger list you made back in chapter one and see how much has changed.",
+          "tasks": [
+            {
+              "id": "d113t1",
+              "type": "journal",
+              "title": "Compare to your original triggers",
+              "text": "Think back to the triggers you listed in chapter one and write about how much power each one still has over you now."
+            },
+            {
+              "id": "d113t2",
+              "type": "checkin",
+              "title": "Rate your strongest remaining trigger",
+              "text": "Rate the strength of whichever trigger still feels strongest today."
+            }
+          ]
+        },
+        {
+          "day": 114,
+          "title": "Day 114: Eighteen weeks free",
+          "intro": "Eighteen weeks. Almost four and a half months in.",
+          "tasks": [
+            {
+              "id": "d114t1",
+              "type": "reward",
+              "title": "Claim your eighteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d114t2",
+              "type": "fact",
+              "title": "See your eighteen week numbers",
+              "text": "Open your stats and review streak, money, and health progress."
+            }
+          ]
+        },
+        {
+          "day": 115,
+          "title": "Day 115: Non smoker, fully",
+          "intro": "Today is simply about sitting with the fact that you are, plainly and fully, a non smoker now.",
+          "tasks": [
+            {
+              "id": "d115t1",
+              "type": "journal",
+              "title": "Write the plain fact",
+              "text": "Write one simple sentence stating that you are a non smoker, without qualifiers or conditions."
+            },
+            {
+              "id": "d115t2",
+              "type": "checkin",
+              "title": "Rate how true that feels",
+              "text": "Rate how true that sentence feels to you right now."
+            }
+          ]
+        },
+        {
+          "day": 116,
+          "title": "Day 116: Health momentum",
+          "intro": "Health improvements from quitting keep compounding well beyond the early months.",
+          "tasks": [
+            {
+              "id": "d116t1",
+              "type": "fact",
+              "title": "Know the long term momentum",
+              "text": "Many health benefits from quitting continue to build for months and years, with risk reduction for several serious conditions increasing the longer you stay smoke free."
+            },
+            {
+              "id": "d116t2",
+              "type": "action",
+              "title": "Do something for your future health",
+              "text": "Do one thing today that supports your long term health, like a walk, water, or a good meal."
+            }
+          ]
+        },
+        {
+          "day": 117,
+          "title": "Day 117: Nineteen weeks free",
+          "intro": "Nineteen weeks. One week away from chapter six.",
+          "tasks": [
+            {
+              "id": "d117t1",
+              "type": "reward",
+              "title": "Claim your nineteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d117t2",
+              "type": "checkin",
+              "title": "Rate your overall chapter five experience",
+              "text": "Rate how chapter five has felt for you overall."
+            }
+          ]
+        },
+        {
+          "day": 118,
+          "title": "Day 118: Preparing for hard days ahead",
+          "intro": "Chapter six is about preparing for harder stretches, stress, slips, and tough seasons. Today is the bridge into it.",
+          "tasks": [
+            {
+              "id": "d118t1",
+              "type": "fact",
+              "title": "Know what chapter six covers",
+              "text": "The next chapter focuses on preparing for genuinely hard days, including stress, possible slips, and tricky seasons like winter or holidays."
+            },
+            {
+              "id": "d118t2",
+              "type": "journal",
+              "title": "Think about your hardest season",
+              "text": "Write about which time of year or type of situation you expect to be hardest for you going forward."
+            }
+          ]
+        },
+        {
+          "day": 119,
+          "title": "Day 119: One day before chapter six",
+          "intro": "Tomorrow closes out a chapter focused on identity and confidence, and opens one about real world resilience.",
+          "tasks": [
+            {
+              "id": "d119t1",
+              "type": "journal",
+              "title": "Reflect on chapter five",
+              "text": "Write a few sentences about how your sense of identity has shifted during this chapter."
+            },
+            {
+              "id": "d119t2",
+              "type": "checkin",
+              "title": "Rate your confidence going into chapter six",
+              "text": "Rate how prepared you feel for handling genuinely hard days ahead."
+            }
+          ]
+        },
+        {
+          "day": 120,
+          "title": "Day 120: Four months and a strong identity",
+          "intro": "One hundred and twenty days. You are no longer someone trying to quit smoking, you are someone who quit. Chapter six prepares you for the days that test that the most.",
+          "tasks": [
+            {
+              "id": "d120t1",
+              "type": "reward",
+              "title": "Claim your four month badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d120t2",
+              "type": "fact",
+              "title": "See your four month transformation",
+              "text": "Open your full stats and health overview to see your entire journey from day one to day one hundred twenty."
+            },
+            {
+              "id": "d120t3",
+              "type": "journal",
+              "title": "Write your chapter five summary",
+              "text": "Write a short summary of what changed in how you see yourself during this chapter."
+            },
+            {
+              "id": "d120t4",
+              "type": "action",
+              "title": "Look ahead to chapter six",
+              "text": "Read the chapter six intro and set one intention for handling hard days ahead."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 6,
+      "name": "Hard days ahead",
+      "role": "Prepare for stress, slips, winter/holidays, old friends who smoke",
+      "day_start": 121,
+      "day_end": 150,
+      "days": [
+        {
+          "day": 121,
+          "title": "Day 121: Welcome to chapter six",
+          "intro": "This chapter is not about doubting your progress, it is about making sure you are ready for the genuinely hard days that life still has in store.",
+          "tasks": [
+            {
+              "id": "d121t1",
+              "type": "fact",
+              "title": "Know why this chapter exists",
+              "text": "Even strong long term quitters can face serious tests, like grief, major stress, or tough seasons, and preparing for them in advance lowers the risk of a slip."
+            },
+            {
+              "id": "d121t2",
+              "type": "checkin",
+              "title": "Set your chapter six goal",
+              "text": "Pick one type of hard day you want to feel more prepared for by the end of this chapter."
+            }
+          ]
+        },
+        {
+          "day": 122,
+          "title": "Day 122: Defining your worst case",
+          "intro": "It helps to know, specifically, what your hardest possible day might look like.",
+          "tasks": [
+            {
+              "id": "d122t1",
+              "type": "journal",
+              "title": "Describe your toughest scenario",
+              "text": "Write a description of the single hardest situation you can imagine facing while staying smoke free."
+            },
+            {
+              "id": "d122t2",
+              "type": "action",
+              "title": "Write your emergency plan",
+              "text": "Write down exactly what you will do if that hardest scenario actually happens, step by step."
+            }
+          ]
+        },
+        {
+          "day": 123,
+          "title": "Day 123: Grief and major stress",
+          "intro": "Major life stress, loss, or grief is one of the highest risk situations for relapse, even far into a quit.",
+          "tasks": [
+            {
+              "id": "d123t1",
+              "type": "fact",
+              "title": "Know the grief risk",
+              "text": "Major emotional events like loss or grief are linked to relapse even after long smoke free periods, because the urge to cope the old way can return strongly during intense pain."
+            },
+            {
+              "id": "d123t2",
+              "type": "action",
+              "title": "Build a crisis contact list",
+              "text": "Write down two or three people you would reach out to first if you were going through something very difficult."
+            }
+          ]
+        },
+        {
+          "day": 124,
+          "title": "Day 124: Seventeen weeks free",
+          "intro": "Seventeen weeks behind you, more than four months of consistency.",
+          "tasks": [
+            {
+              "id": "d124t1",
+              "type": "reward",
+              "title": "Claim your seventeen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d124t2",
+              "type": "fact",
+              "title": "See your stats so far",
+              "text": "Open your stats and review your full progress at this stage."
+            }
+          ]
+        },
+        {
+          "day": 125,
+          "title": "Day 125: Preparing for winter",
+          "intro": "Colder months can bring more indoor gatherings, holiday stress, and shorter days, all of which can affect mood and habits.",
+          "tasks": [
+            {
+              "id": "d125t1",
+              "type": "journal",
+              "title": "Think about winter risks",
+              "text": "Write about which parts of colder months or holidays might be harder for you specifically."
+            },
+            {
+              "id": "d125t2",
+              "type": "action",
+              "title": "Plan one winter strategy",
+              "text": "Pick one specific plan for handling holiday gatherings or shorter, darker days without smoking."
+            }
+          ]
+        },
+        {
+          "day": 126,
+          "title": "Day 126: Old friends returning",
+          "intro": "Sometimes people from your smoking past resurface unexpectedly, a reunion, an old coworker, a returning friend.",
+          "tasks": [
+            {
+              "id": "d126t1",
+              "type": "checkin",
+              "title": "Rate this risk for you",
+              "text": "Rate how likely it feels that an old smoking friend could reappear in your life soon."
+            },
+            {
+              "id": "d126t2",
+              "type": "action",
+              "title": "Prepare your reaction in advance",
+              "text": "Decide now exactly what you will say or do if an old smoking friend offers you a cigarette unexpectedly."
+            }
+          ]
+        },
+        {
+          "day": 127,
+          "title": "Day 127: Eighteen weeks free",
+          "intro": "Eighteen weeks. Another full week of staying ready, not just staying free.",
+          "tasks": [
+            {
+              "id": "d127t1",
+              "type": "reward",
+              "title": "Claim your eighteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d127t2",
+              "type": "fact",
+              "title": "See your trend over time",
+              "text": "Open your stats and look at how your craving frequency has trended over the past month."
+            }
+          ]
+        },
+        {
+          "day": 128,
+          "title": "Day 128: What if you do slip",
+          "intro": "Preparing for a possible slip is not the same as expecting one, it is simply being ready either way.",
+          "tasks": [
+            {
+              "id": "d128t1",
+              "type": "journal",
+              "title": "Revisit your slip recovery plan",
+              "text": "Look back at the slip recovery plan you wrote earlier and update it with anything you have learned since."
+            },
+            {
+              "id": "d128t2",
+              "type": "fact",
+              "title": "One slip does not erase your progress",
+              "text": "If a slip ever happens, your accumulated health gains and skills do not disappear, the priority is simply getting back to zero immediately."
+            }
+          ]
+        },
+        {
+          "day": 129,
+          "title": "Day 129: Loneliness and isolation",
+          "intro": "Feeling isolated or lonely can quietly increase the pull toward old habits.",
+          "tasks": [
+            {
+              "id": "d129t1",
+              "type": "journal",
+              "title": "Notice any isolation",
+              "text": "Write honestly about whether you have been feeling isolated or disconnected lately."
+            },
+            {
+              "id": "d129t2",
+              "type": "social",
+              "title": "Reach out in the community",
+              "text": "Post something in the community today, even just checking in, to stay connected."
+            }
+          ]
+        },
+        {
+          "day": 130,
+          "title": "Day 130: Nineteen weeks free",
+          "intro": "Nineteen weeks. Roughly four and a half months of steady progress.",
+          "tasks": [
+            {
+              "id": "d130t1",
+              "type": "reward",
+              "title": "Claim your nineteen week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d130t2",
+              "type": "checkin",
+              "title": "Rate your overall resilience",
+              "text": "Rate how resilient you feel right now compared to chapter one."
+            }
+          ]
+        },
+        {
+          "day": 131,
+          "title": "Day 131: Anniversary dates",
+          "intro": "Anniversaries connected to smoking, like the date you used to buy a pack weekly, can carry quiet emotional weight.",
+          "tasks": [
+            {
+              "id": "d131t1",
+              "type": "journal",
+              "title": "Think about meaningful dates",
+              "text": "Write about any specific dates or anniversaries connected to your smoking past that might affect you."
+            },
+            {
+              "id": "d131t2",
+              "type": "action",
+              "title": "Plan around a tough date",
+              "text": "If you know of a specific date coming up that might be hard, write down how you will handle it."
+            }
+          ]
+        },
+        {
+          "day": 132,
+          "title": "Day 132: Financial stress and smoking",
+          "intro": "Money worries used to be both a reason people smoked for stress relief and a reason they wanted to quit to save money.",
+          "tasks": [
+            {
+              "id": "d132t1",
+              "type": "fact",
+              "title": "See your long term savings",
+              "text": "Open your money saved tab and look at the total amount kept since day one as a reminder of the financial upside."
+            },
+            {
+              "id": "d132t2",
+              "type": "checkin",
+              "title": "Rate your current financial stress",
+              "text": "Rate how much financial stress you are currently feeling, regardless of smoking."
+            }
+          ]
+        },
+        {
+          "day": 133,
+          "title": "Day 133: Twenty weeks free",
+          "intro": "Twenty weeks. Five full months of consistency stand behind you now.",
+          "tasks": [
+            {
+              "id": "d133t1",
+              "type": "reward",
+              "title": "Claim your twenty week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d133t2",
+              "type": "fact",
+              "title": "See your five month overview",
+              "text": "Open your stats and review your full progress at the five month mark."
+            }
+          ]
+        },
+        {
+          "day": 134,
+          "title": "Day 134: Reviewing your whole plan",
+          "intro": "You are well into chapter six. Today is about looking at the whole arc of your journey so far.",
+          "tasks": [
+            {
+              "id": "d134t1",
+              "type": "journal",
+              "title": "Summarize your full journey",
+              "text": "Write a short paragraph summarizing your journey from day one through today."
+            },
+            {
+              "id": "d134t2",
+              "type": "fact",
+              "title": "See your full overview",
+              "text": "Open your stats and scroll through your entire history from the very beginning."
+            }
+          ]
+        },
+        {
+          "day": 135,
+          "title": "Day 135: Handling unexpected stress",
+          "intro": "Not every hard day can be predicted. Today is about your general readiness for the unexpected.",
+          "tasks": [
+            {
+              "id": "d135t1",
+              "type": "breathing",
+              "title": "Practice your fastest reset",
+              "text": "Use the breathing tool today and notice how quickly it helps you settle, this is your fastest tool for sudden stress."
+            },
+            {
+              "id": "d135t2",
+              "type": "checkin",
+              "title": "Rate your readiness for surprises",
+              "text": "Rate how ready you feel to handle a sudden stressful event without smoking."
+            }
+          ]
+        },
+        {
+          "day": 136,
+          "title": "Day 136: Twenty one weeks free",
+          "intro": "Twenty one weeks of evidence that hard moments do not have to mean smoking again.",
+          "tasks": [
+            {
+              "id": "d136t1",
+              "type": "reward",
+              "title": "Claim your twenty one week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d136t2",
+              "type": "fact",
+              "title": "See your stats at this stage",
+              "text": "Open your stats and review your progress so far this chapter."
+            }
+          ]
+        },
+        {
+          "day": 137,
+          "title": "Day 137: Tough seasons, not just tough days",
+          "intro": "Sometimes it is not one bad day but a whole stretch, a busy season at work, a hard winter, a string of stressful weeks.",
+          "tasks": [
+            {
+              "id": "d137t1",
+              "type": "journal",
+              "title": "Think about a hard season",
+              "text": "Write about a stretch of time, past or upcoming, that tends to be harder for you than a single day."
+            },
+            {
+              "id": "d137t2",
+              "type": "fact",
+              "title": "Tough seasons need a different plan",
+              "text": "A hard season often needs more frequent small check ins with yourself rather than one big plan, since the pressure builds gradually instead of all at once."
+            }
+          ]
+        },
+        {
+          "day": 138,
+          "title": "Day 138: Checking in honestly",
+          "intro": "Chapter six works best with honest self check ins, not just motivational pushes.",
+          "tasks": [
+            {
+              "id": "d138t1",
+              "type": "checkin",
+              "title": "Rate how today went",
+              "text": "Rate today honestly, including anything that felt hard."
+            },
+            {
+              "id": "d138t2",
+              "type": "action",
+              "title": "Address one real concern",
+              "text": "If something has been quietly worrying you about staying smoke free, write it down and note one step to address it."
+            }
+          ]
+        },
+        {
+          "day": 139,
+          "title": "Day 139: Twenty two weeks free",
+          "intro": "Twenty two weeks. Each one stacks on the last, building a record that is hard to argue with.",
+          "tasks": [
+            {
+              "id": "d139t1",
+              "type": "reward",
+              "title": "Claim your twenty two week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d139t2",
+              "type": "journal",
+              "title": "Write tonight's reflection",
+              "text": "Write one sentence about how you feel right now in your journey."
+            }
+          ]
+        },
+        {
+          "day": 140,
+          "title": "Day 140: One hundred forty days",
+          "intro": "One hundred and forty days smoke free. You are deep into the final preparation chapter before the guided plan's home stretch begins.",
+          "tasks": [
+            {
+              "id": "d140t1",
+              "type": "reward",
+              "title": "Claim your one hundred forty day badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d140t2",
+              "type": "fact",
+              "title": "See your progress so far",
+              "text": "Open your full stats and health overview to see your entire journey across one hundred forty days."
+            },
+            {
+              "id": "d140t3",
+              "type": "social",
+              "title": "Share an update",
+              "text": "Post a short update in the community about where you are in your journey."
+            },
+            {
+              "id": "d140t4",
+              "type": "journal",
+              "title": "Write a quick reflection",
+              "text": "Write a sentence or two about how this stretch of your journey has felt."
+            }
+          ]
+        },
+        {
+          "day": 141,
+          "title": "Day 141: Ten days left in chapter six",
+          "intro": "Ten more days remain in this chapter before the final stretch of the guided plan begins.",
+          "tasks": [
+            {
+              "id": "d141t1",
+              "type": "checkin",
+              "title": "Set a goal for the rest of this chapter",
+              "text": "Pick one thing you want to focus on for the remaining days of chapter six."
+            },
+            {
+              "id": "d141t2",
+              "type": "fact",
+              "title": "Know what is ahead",
+              "text": "Chapter seven is the final chapter of your guided plan, leading up to your six month milestone and graduation into independent smoke free living."
+            }
+          ]
+        },
+        {
+          "day": 142,
+          "title": "Day 142: Reflecting on six chapters",
+          "intro": "You have now nearly completed survival, habit building, social situations, staying strong, identity, and preparing for hard days.",
+          "tasks": [
+            {
+              "id": "d142t1",
+              "type": "journal",
+              "title": "Pick your hardest chapter",
+              "text": "Write about which chapter so far felt hardest for you and why."
+            },
+            {
+              "id": "d142t2",
+              "type": "journal",
+              "title": "Pick your proudest moment",
+              "text": "Write about the single proudest moment from your entire journey so far."
+            }
+          ]
+        },
+        {
+          "day": 143,
+          "title": "Day 143: Tools you no longer need daily",
+          "intro": "Some tools that were essential early on may now be used rarely, and that is a good sign, not a problem.",
+          "tasks": [
+            {
+              "id": "d143t1",
+              "type": "checkin",
+              "title": "Rate your current tool usage",
+              "text": "Rate how often you currently use the craving toolkit compared to chapter one."
+            },
+            {
+              "id": "d143t2",
+              "type": "fact",
+              "title": "Less use can mean more progress",
+              "text": "Needing the craving tools less often is usually a sign of progress, not a reason to worry, though they remain available whenever needed."
+            }
+          ]
+        },
+        {
+          "day": 144,
+          "title": "Day 144: Staying humble about risk",
+          "intro": "Even with months behind you, treating every day as worth protecting keeps your guard appropriately up.",
+          "tasks": [
+            {
+              "id": "d144t1",
+              "type": "journal",
+              "title": "Write your ongoing commitment",
+              "text": "Write one sentence describing your ongoing commitment to staying smoke free, regardless of how many months have passed."
+            },
+            {
+              "id": "d144t2",
+              "type": "fact",
+              "title": "Long term success stays active",
+              "text": "People who stay smoke free long term generally still treat occasional strong cravings seriously rather than assuming they are permanently immune."
+            }
+          ]
+        },
+        {
+          "day": 145,
+          "title": "Day 145: Supporting the community at scale",
+          "intro": "With months of experience behind you, your perspective carries real weight for people earlier in their journey.",
+          "tasks": [
+            {
+              "id": "d145t1",
+              "type": "social",
+              "title": "Write a longer support message",
+              "text": "Write a more detailed message of support or advice for someone struggling in the community right now."
+            },
+            {
+              "id": "d145t2",
+              "type": "checkin",
+              "title": "Rate how it feels to give back",
+              "text": "Rate how meaningful it feels to support others at this stage of your journey."
+            }
+          ]
+        },
+        {
+          "day": 146,
+          "title": "Day 146: Five days to the final chapter",
+          "intro": "Chapter seven is close, the final stretch of the structured plan before you graduate into independent maintenance.",
+          "tasks": [
+            {
+              "id": "d146t1",
+              "type": "fact",
+              "title": "Know what graduation means",
+              "text": "Graduating the guided plan does not mean the app stops being useful, it means you move from daily structured missions to lighter, long term maintenance support."
+            },
+            {
+              "id": "d146t2",
+              "type": "journal",
+              "title": "What do you want maintenance to look like",
+              "text": "Write about what kind of ongoing support you think you will want after the guided plan ends."
+            }
+          ]
+        },
+        {
+          "day": 147,
+          "title": "Day 147: Reviewing your badges",
+          "intro": "Looking back at every milestone collected so far is a concrete reminder of consistency over time.",
+          "tasks": [
+            {
+              "id": "d147t1",
+              "type": "fact",
+              "title": "Review your full badge collection",
+              "text": "Open your badges tab and look through every milestone you have earned from day one to today."
+            },
+            {
+              "id": "d147t2",
+              "type": "journal",
+              "title": "Pick your favorite badge",
+              "text": "Write about which badge meant the most to you and why."
+            }
+          ]
+        },
+        {
+          "day": 148,
+          "title": "Day 148: Almost chapter seven",
+          "intro": "Two days remain in chapter six. You have built real readiness for hard days, whether or not they ever fully arrive.",
+          "tasks": [
+            {
+              "id": "d148t1",
+              "type": "checkin",
+              "title": "Rate your overall chapter six experience",
+              "text": "Rate how prepared chapter six has made you feel for genuinely hard days."
+            },
+            {
+              "id": "d148t2",
+              "type": "action",
+              "title": "Tie up any loose plans",
+              "text": "Review any emergency or hard day plans you wrote this chapter and make sure they still feel solid."
+            }
+          ]
+        },
+        {
+          "day": 149,
+          "title": "Day 149: One day before the final chapter",
+          "intro": "Tomorrow opens the last chapter of your guided plan, the stretch that leads to six months free and graduation.",
+          "tasks": [
+            {
+              "id": "d149t1",
+              "type": "journal",
+              "title": "Reflect on chapter six",
+              "text": "Write a few sentences about how prepared you feel for hard days compared to when this chapter started."
+            },
+            {
+              "id": "d149t2",
+              "type": "fact",
+              "title": "Look ahead one more time",
+              "text": "Chapter seven will focus on maintaining your progress with a lighter weekly focus as you graduate the structured plan."
+            }
+          ]
+        },
+        {
+          "day": 150,
+          "title": "Day 150: Ready for hard days, ready for anything",
+          "intro": "One hundred and fifty days. You have not just avoided hard days, you have actively prepared for them. The final chapter is about carrying this forward for good.",
+          "tasks": [
+            {
+              "id": "d150t1",
+              "type": "reward",
+              "title": "Claim your one hundred fifty day badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d150t2",
+              "type": "fact",
+              "title": "See your full chapter six overview",
+              "text": "Open your stats and health overview to see your full progress through chapter six."
+            },
+            {
+              "id": "d150t3",
+              "type": "journal",
+              "title": "Write your chapter six summary",
+              "text": "Write a short summary of what you learned about preparing for hard days during this chapter."
+            },
+            {
+              "id": "d150t4",
+              "type": "action",
+              "title": "Look ahead to chapter seven",
+              "text": "Read the chapter seven intro and set one intention for your final stretch toward six months free and graduation."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 7,
+      "name": "Six months free",
+      "role": "Maintain, light weekly focus, graduate the guided plan",
+      "day_start": 151,
+      "day_end": 180,
+      "days": [
+        {
+          "day": 151,
+          "title": "Day 151: Welcome to the final chapter",
+          "intro": "This is the last chapter of your guided plan. The daily load gets lighter from here, because the goal now is maintenance, not building from scratch.",
+          "tasks": [
+            {
+              "id": "d151t1",
+              "type": "fact",
+              "title": "Know how this chapter works",
+              "text": "Chapter seven uses a lighter weekly focus instead of dense daily tasks, since by now most of the heavy lifting of quitting is already behind you."
+            },
+            {
+              "id": "d151t2",
+              "type": "checkin",
+              "title": "Set your graduation goal",
+              "text": "Pick one thing you want to be true about your relationship with smoking by the time you graduate this plan."
+            }
+          ]
+        },
+        {
+          "day": 152,
+          "title": "Day 152: This week's focus, routine check",
+          "intro": "A simple check on whether your daily replacement habits are still solid.",
+          "tasks": [
+            {
+              "id": "d152t1",
+              "type": "journal",
+              "title": "Review your core routines",
+              "text": "Write down your current morning and evening routines and whether they still feel automatic."
+            }
+          ]
+        },
+        {
+          "day": 153,
+          "title": "Day 153: Twenty three weeks free",
+          "intro": "Twenty three weeks. Almost five and a half months.",
+          "tasks": [
+            {
+              "id": "d153t1",
+              "type": "reward",
+              "title": "Claim your twenty three week badge",
+              "text": "Open your badges tab and collect this milestone."
+            }
+          ]
+        },
+        {
+          "day": 154,
+          "title": "Day 154: Quick craving check",
+          "intro": "A simple pulse check on where cravings stand now.",
+          "tasks": [
+            {
+              "id": "d154t1",
+              "type": "checkin",
+              "title": "Rate this week's cravings",
+              "text": "Rate how often, if at all, you noticed a craving this week."
+            }
+          ]
+        },
+        {
+          "day": 155,
+          "title": "Day 155: Community check in",
+          "intro": "Staying lightly connected to the community helps even after the daily missions ease up.",
+          "tasks": [
+            {
+              "id": "d155t1",
+              "type": "social",
+              "title": "Check the community",
+              "text": "Spend a couple minutes in the community today, reading or replying to others."
+            }
+          ]
+        },
+        {
+          "day": 156,
+          "title": "Day 156: Money milestone glance",
+          "intro": "A quick look at how much your saved money has grown.",
+          "tasks": [
+            {
+              "id": "d156t1",
+              "type": "fact",
+              "title": "See your savings",
+              "text": "Open your money saved tab and look at your current total."
+            }
+          ]
+        },
+        {
+          "day": 157,
+          "title": "Day 157: Twenty four weeks free",
+          "intro": "Twenty four weeks, a clean six month count by weeks alone.",
+          "tasks": [
+            {
+              "id": "d157t1",
+              "type": "reward",
+              "title": "Claim your twenty four week badge",
+              "text": "Open your badges tab and collect this milestone."
+            }
+          ]
+        },
+        {
+          "day": 158,
+          "title": "Day 158: This week's focus, trigger check",
+          "intro": "A light check on whether any old triggers have quietly resurfaced.",
+          "tasks": [
+            {
+              "id": "d158t1",
+              "type": "journal",
+              "title": "Scan for resurfacing triggers",
+              "text": "Write about whether any old trigger has felt slightly stronger lately, even faintly."
+            }
+          ]
+        },
+        {
+          "day": 159,
+          "title": "Day 159: Health glance",
+          "intro": "A quick look at how your health progress has continued to build.",
+          "tasks": [
+            {
+              "id": "d159t1",
+              "type": "fact",
+              "title": "See your health overview",
+              "text": "Open your health progress tab and notice how things have continued improving since chapter five."
+            }
+          ]
+        },
+        {
+          "day": 160,
+          "title": "Day 160: One hundred sixty days",
+          "intro": "One hundred and sixty days. Twenty days remain until you graduate the guided plan entirely.",
+          "tasks": [
+            {
+              "id": "d160t1",
+              "type": "reward",
+              "title": "Claim your one hundred sixty day badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d160t2",
+              "type": "checkin",
+              "title": "Rate how maintenance feels",
+              "text": "Rate how natural staying smoke free feels now compared to needing daily structure."
+            }
+          ]
+        },
+        {
+          "day": 161,
+          "title": "Day 161: This week's focus, gratitude",
+          "intro": "A simple moment to notice what quitting has given you, not just what it took away.",
+          "tasks": [
+            {
+              "id": "d161t1",
+              "type": "journal",
+              "title": "Write one thing you are grateful for",
+              "text": "Write one specific thing about quitting smoking that you are genuinely grateful for."
+            }
+          ]
+        },
+        {
+          "day": 162,
+          "title": "Day 162: Twenty five weeks free",
+          "intro": "Twenty five weeks. The numbers keep climbing quietly in the background of your normal life.",
+          "tasks": [
+            {
+              "id": "d162t1",
+              "type": "reward",
+              "title": "Claim your twenty five week badge",
+              "text": "Open your badges tab and collect this milestone."
+            }
+          ]
+        },
+        {
+          "day": 163,
+          "title": "Day 163: Mentorship check",
+          "intro": "A light prompt to keep supporting others as you near graduation.",
+          "tasks": [
+            {
+              "id": "d163t1",
+              "type": "social",
+              "title": "Help one newer member",
+              "text": "Find one person earlier in their journey and offer a piece of encouragement or advice."
+            }
+          ]
+        },
+        {
+          "day": 164,
+          "title": "Day 164: This week's focus, identity",
+          "intro": "A quick reminder of how far your sense of self has shifted since day one.",
+          "tasks": [
+            {
+              "id": "d164t1",
+              "type": "journal",
+              "title": "Describe yourself in one line",
+              "text": "Write one line describing how you see yourself now in relation to smoking."
+            }
+          ]
+        },
+        {
+          "day": 165,
+          "title": "Day 165: Twenty six weeks free",
+          "intro": "Twenty six weeks, exactly half a year by the week count.",
+          "tasks": [
+            {
+              "id": "d165t1",
+              "type": "reward",
+              "title": "Claim your twenty six week badge",
+              "text": "Open your badges tab and collect this milestone."
+            },
+            {
+              "id": "d165t2",
+              "type": "fact",
+              "title": "See your half year stats",
+              "text": "Open your stats and review your full progress at the half year mark by weeks."
+            }
+          ]
+        },
+        {
+          "day": 166,
+          "title": "Day 166: Stats glance",
+          "intro": "A quick look at your full numbers as graduation approaches.",
+          "tasks": [
+            {
+              "id": "d166t1",
+              "type": "fact",
+              "title": "Review your full stats",
+              "text": "Open your stats tab and look across streak, money saved, and cigarettes avoided."
+            }
+          ]
+        },
+        {
+          "day": 167,
+          "title": "Day 167: This week's focus, future planning",
+          "intro": "A light prompt to think about life as a permanent non smoker, beyond this app's guided structure.",
+          "tasks": [
+            {
+              "id": "d167t1",
+              "type": "journal",
+              "title": "Picture life after graduation",
+              "text": "Write a few sentences about how you want to maintain your smoke free life once the guided plan ends."
+            }
+          ]
+        },
+        {
+          "day": 168,
+          "title": "Day 168: One hundred sixty eight days",
+          "intro": "Twelve days remain until you complete the full guided plan and reach six months.",
+          "tasks": [
+            {
+              "id": "d168t1",
+              "type": "reward",
+              "title": "Claim your one hundred sixty eight day badge",
+              "text": "Open your badges tab and collect this milestone."
+            }
+          ]
+        },
+        {
+          "day": 169,
+          "title": "Day 169: Quick check in",
+          "intro": "A simple pulse check as the final stretch begins.",
+          "tasks": [
+            {
+              "id": "d169t1",
+              "type": "checkin",
+              "title": "Rate how ready you feel for graduation",
+              "text": "Rate how ready you feel to move beyond the structured daily plan."
+            }
+          ]
+        },
+        {
+          "day": 170,
+          "title": "Day 170: This week's focus, full circle",
+          "intro": "A reflective prompt looking back at the entire plan you are about to complete.",
+          "tasks": [
+            {
+              "id": "d170t1",
+              "type": "journal",
+              "title": "Write your full circle reflection",
+              "text": "Write a few sentences reflecting on your journey from day one to day one hundred seventy."
+            }
+          ]
+        },
+        {
+          "day": 171,
+          "title": "Day 171: Nine days left",
+          "intro": "Nine days remain until you graduate the guided plan and reach your six month milestone.",
+          "tasks": [
+            {
+              "id": "d171t1",
+              "type": "fact",
+              "title": "See your progress so far",
+              "text": "Open your stats and look at how close you are to the six month milestone."
+            }
+          ]
+        },
+        {
+          "day": 172,
+          "title": "Day 172: Community thank you",
+          "intro": "A light prompt to acknowledge the people who supported you along the way.",
+          "tasks": [
+            {
+              "id": "d172t1",
+              "type": "social",
+              "title": "Thank someone in the community",
+              "text": "Send a thank you message to anyone in the community who helped you along your journey."
+            }
+          ]
+        },
+        {
+          "day": 173,
+          "title": "Day 173: Seven days left",
+          "intro": "One week remains until you complete the full guided plan.",
+          "tasks": [
+            {
+              "id": "d173t1",
+              "type": "checkin",
+              "title": "Rate this final week's confidence",
+              "text": "Rate how confident you feel heading into your final week of the guided plan."
+            }
+          ]
+        },
+        {
+          "day": 174,
+          "title": "Day 174: Planning your graduation",
+          "intro": "Six days remain. Time to think about how you want to mark finishing the entire guided plan.",
+          "tasks": [
+            {
+              "id": "d174t1",
+              "type": "action",
+              "title": "Plan your six month celebration",
+              "text": "Decide how you want to celebrate reaching six months and finishing the guided plan in six days."
+            }
+          ]
+        },
+        {
+          "day": 175,
+          "title": "Day 175: Five days left",
+          "intro": "Five days until graduation. A short reflective prompt as the finish line nears.",
+          "tasks": [
+            {
+              "id": "d175t1",
+              "type": "journal",
+              "title": "Write what graduation means",
+              "text": "Write a few sentences about what completing this entire guided plan means to you."
+            }
+          ]
+        },
+        {
+          "day": 176,
+          "title": "Day 176: Four days left",
+          "intro": "Four days until you complete every chapter of the guided plan.",
+          "tasks": [
+            {
+              "id": "d176t1",
+              "type": "fact",
+              "title": "Look back at chapter one",
+              "text": "Open your history from chapter one and notice how different that version of you felt compared to now."
+            }
+          ]
+        },
+        {
+          "day": 177,
+          "title": "Day 177: Three days left",
+          "intro": "Three days. Almost every milestone in this plan now sits behind you.",
+          "tasks": [
+            {
+              "id": "d177t1",
+              "type": "checkin",
+              "title": "Rate your full plan experience",
+              "text": "Rate your overall experience of the guided plan from day one to now."
+            }
+          ]
+        },
+        {
+          "day": 178,
+          "title": "Day 178: Two days left",
+          "intro": "Two days remain. Soon you will officially graduate from structured daily missions.",
+          "tasks": [
+            {
+              "id": "d178t1",
+              "type": "journal",
+              "title": "Write a note for future you",
+              "text": "Write a short note to read on a hard day after graduation, reminding yourself why you quit."
+            }
+          ]
+        },
+        {
+          "day": 179,
+          "title": "Day 179: One day left",
+          "intro": "Tomorrow is the day, six full months smoke free and the official end of your guided plan.",
+          "tasks": [
+            {
+              "id": "d179t1",
+              "type": "fact",
+              "title": "Look back one more time",
+              "text": "Open your full stats and scroll through your entire journey from day one to today."
+            },
+            {
+              "id": "d179t2",
+              "type": "journal",
+              "title": "Write tonight's reflection",
+              "text": "Write one sentence about how you feel the night before reaching six months."
+            }
+          ]
+        },
+        {
+          "day": 180,
+          "title": "Day 180: Six months free, plan complete",
+          "intro": "One hundred and eighty days. Six full months without a single cigarette, and the complete guided plan finished from start to end. From here, you continue smoke free on your own, with every tool still in your pocket whenever you need it.",
+          "tasks": [
+            {
+              "id": "d180t1",
+              "type": "reward",
+              "title": "Claim your six month badge",
+              "text": "Open your badges tab and collect this major milestone, the biggest one in the guided plan."
+            },
+            {
+              "id": "d180t2",
+              "type": "fact",
+              "title": "See your full six month transformation",
+              "text": "Open your full stats and health overview to see your entire journey across all six months and every chapter."
+            },
+            {
+              "id": "d180t3",
+              "type": "journal",
+              "title": "Write your graduation letter",
+              "text": "Write a letter to your day one self, telling them everything that happened between day one and day one hundred eighty."
+            },
+            {
+              "id": "d180t4",
+              "type": "social",
+              "title": "Share your graduation",
+              "text": "Post in the community that you have completed the full guided plan and reached six months smoke free."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
