@@ -100,9 +100,23 @@ model QuitAttempt {
   slipCigarettesSmoked Int       @default(0) @map("slip_cigarettes_smoked")
   closingSlipEvent     SlipEvent?
   goals                UserGoal[]
+  economicsSegments    AttemptEconomicsSegment[]
 
   @@unique([user_id, attemptNumber])
   @@map("quit_attempts")
+}
+
+model AttemptEconomicsSegment {
+  segment_id          Int         @id @default(autoincrement())
+  attempt_id          Int         @map("attempt_id")
+  attempt             QuitAttempt @relation(fields: [attempt_id], references: [attempt_id], onDelete: Cascade)
+  effective_from      DateTime    @map("effective_from") @db.Timestamptz(3)
+  cigarettes_per_day  Int         @map("cigarettes_per_day")
+  cigarettes_per_pack Int         @map("cigarettes_per_pack")
+  pack_price          String?     @map("pack_price")
+
+  @@index([attempt_id, effective_from])
+  @@map("attempt_economics_segments")
 }
 
 model UserGoal {

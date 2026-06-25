@@ -70,6 +70,41 @@ export class UsersRepository {
       .then((result) => result._sum.cigarettesCount ?? 0);
   }
 
+  sumSlipCigarettesBetween(
+    userId: number,
+    from: Date,
+    to: Date,
+  ): Promise<number> {
+    return this.prisma.slipEvent
+      .aggregate({
+        where: {
+          user_id: userId,
+          loggedAt: { gte: from, lt: to },
+          cigarettesCount: { not: null },
+        },
+        _sum: { cigarettesCount: true },
+      })
+      .then((result) => result._sum.cigarettesCount ?? 0);
+  }
+
+  listSlipEventsBetween(
+    userId: number,
+    from: Date,
+    to: Date,
+  ): Promise<{ loggedAt: Date; cigarettesCount: number | null }[]> {
+    return this.prisma.slipEvent.findMany({
+      where: {
+        user_id: userId,
+        loggedAt: { gte: from, lt: to },
+      },
+      select: {
+        loggedAt: true,
+        cigarettesCount: true,
+      },
+      orderBy: { loggedAt: 'asc' },
+    });
+  }
+
   updateDevicePreferences(
     userId: number,
     data: UserDevicePreferencesUpdate,
@@ -108,6 +143,24 @@ export class UsersRepository {
     });
   }
 
+  updateHabitSettings(
+    userId: number,
+    economics: {
+      cigarettesPerDay: number;
+      cigarettesPerPack: number;
+      packPrice: string | null;
+    },
+  ): Promise<User> {
+    return this.prisma.user.update({
+      where: { user_id: userId },
+      data: {
+        cigarettesPerDay: economics.cigarettesPerDay,
+        cigarettesPerPack: economics.cigarettesPerPack,
+        packPrice: economics.packPrice,
+      },
+    });
+  }
+
   updateLastOfflineAt(userId: number, at: Date): Promise<User> {
     return this.prisma.user.update({
       where: { user_id: userId },
@@ -116,7 +169,11 @@ export class UsersRepository {
   }
 
   /** Wipes quit progress and restarts the user at day zero (keeps account + profile). */
-  async resetJourneyProgress(userId: number, startedAt: Date): Promise<void> {
+  async resetJourneyProgress(
+    userId: number,
+    startedAt: Date,
+    quitDatePreset: string,
+  ): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       await tx.userGoal.deleteMany({ where: { user_id: userId } });
       await tx.slipEvent.deleteMany({ where: { user_id: userId } });
@@ -130,7 +187,7 @@ export class UsersRepository {
         data: {
           quitDate: startedAt,
           streakStart: startedAt,
-          quitDatePreset: 'Now',
+          quitDatePreset,
           freedomPoints: 0,
           motivationCardIndex: 0,
           tipsCardIndex: 0,

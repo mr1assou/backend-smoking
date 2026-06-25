@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_service_1 = require("../attempts/attempts.service");
+const economics_segments_repository_1 = require("../attempts/economics-segments.repository");
+const attempts_repository_1 = require("../attempts/attempts.repository");
 const badges_service_1 = require("../badges/badges.service");
 const freedom_points_service_1 = require("../freedom-points/freedom-points.service");
 const utc_instant_1 = require("../common/utc-instant");
@@ -21,13 +23,17 @@ const users_repository_1 = require("./users.repository");
 const user_roles_1 = require("./lib/user-roles");
 let UsersService = class UsersService {
     usersRepository;
+    attemptsRepository;
     attemptsService;
+    economicsSegmentsRepository;
     storageService;
     badgesService;
     freedomPointsService;
-    constructor(usersRepository, attemptsService, storageService, badgesService, freedomPointsService) {
+    constructor(usersRepository, attemptsRepository, attemptsService, economicsSegmentsRepository, storageService, badgesService, freedomPointsService) {
         this.usersRepository = usersRepository;
+        this.attemptsRepository = attemptsRepository;
         this.attemptsService = attemptsService;
+        this.economicsSegmentsRepository = economicsSegmentsRepository;
         this.storageService = storageService;
         this.badgesService = badgesService;
         this.freedomPointsService = freedomPointsService;
@@ -58,21 +64,52 @@ let UsersService = class UsersService {
         }
         const result = await this.usersRepository.updateOnboarding(userId, data);
         if (data.quitDate) {
-            await this.attemptsService.ensureFirstAttempt(userId, data.quitDate);
+            await this.attemptsService.ensureFirstAttempt(userId, data.quitDate, {
+                cigarettesPerDay: data.cigarettesPerDay ?? 0,
+                cigarettesPerPack: data.cigarettesPerPack ?? 20,
+                packPrice: data.packPrice,
+            });
             await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
             await this.badgesService.syncEarnedBadges(userId);
         }
         return result;
     }
-    async resetJourney(userId) {
+    async resetJourney(userId, dto = {}) {
         const user = await this.usersRepository.findById(userId);
         if (!user)
             throw new common_1.NotFoundException('User not found');
         if (!user.username?.trim()) {
             throw new common_1.NotFoundException('Complete onboarding before resetting your journey');
         }
-        const startedAt = (0, utc_instant_1.utcInstantNow)();
-        await this.usersRepository.resetJourneyProgress(userId, startedAt);
+        const preset = dto.quitDatePreset === 'Custom' ? 'Custom' : 'Now';
+        const startedAt = this.resolveQuitDateInstant({
+            quitDatePreset: preset,
+            quitDate: dto.quitDate,
+        });
+        await this.usersRepository.resetJourneyProgress(userId, startedAt, preset);
+        const userAfterReset = await this.usersRepository.findById(userId);
+        const active = await this.attemptsRepository.findActive(userId);
+        if (active && userAfterReset) {
+            await this.attemptsService.seedEconomicsForAttempt(active.attempt_id, startedAt, (0, economics_segments_repository_1.habitEconomicsFromUser)(userAfterReset));
+        }
+        return this.getMe(userId);
+    }
+    async updateHabitSettings(userId, dto) {
+        const user = await this.usersRepository.findById(userId);
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        const packPrice = dto.packPrice?.trim() ||
+            (dto.packCost !== undefined ? String(dto.packCost) : user.packPrice);
+        const economics = {
+            cigarettesPerDay: dto.cigarettesPerDay,
+            cigarettesPerPack: dto.cigarettesPerPack,
+            packPrice: packPrice ?? null,
+        };
+        await this.usersRepository.updateHabitSettings(userId, economics);
+        const active = await this.attemptsRepository.findActive(userId);
+        if (active) {
+            await this.economicsSegmentsRepository.appendIfChanged(active.attempt_id, (0, utc_instant_1.utcInstantNow)(), economics);
+        }
         return this.getMe(userId);
     }
     async updatePreferences(userId, dto) {
@@ -110,6 +147,14 @@ let UsersService = class UsersService {
             ? await this.usersRepository.sumSlipCigarettesSince(userId, activeAttempt.startedAt)
             : 0;
         const earnedBadgeIds = badgeSync.earnedBadgeIds;
+        const economicsSegments = activeAttempt
+            ? (await this.economicsSegmentsRepository.listForAttempt(activeAttempt.attempt_id)).map((segment) => ({
+                effectiveFrom: (0, utc_instant_1.toUtcIso)(segment.effective_from),
+                cigarettesPerDay: segment.cigarettes_per_day,
+                cigarettesPerPack: segment.cigarettes_per_pack,
+                packPrice: segment.pack_price ?? undefined,
+            }))
+            : undefined;
         return {
             userId: user.user_id,
             email: user.email,
@@ -135,6 +180,7 @@ let UsersService = class UsersService {
             freedomPoints: fpSync.totalFreedomPoints,
             goalsCompleted: await this.badgesService.countCompletedGoals(userId),
             earnedBadgeIds,
+            economicsSegments,
             role: user.role ?? user_roles_1.DEFAULT_USER_ROLE,
         };
     }
@@ -160,6 +206,16 @@ let UsersService = class UsersService {
             cigarettesPerPack: dto.step6.cigarettesPerPack ?? null,
         };
     }
+    resolveQuitDateInstant(input) {
+        if (input.quitDatePreset === 'Now') {
+            return (0, utc_instant_1.utcInstantNow)();
+        }
+        if (input.quitDate?.trim()) {
+            const parsed = new Date(input.quitDate);
+            return Number.isNaN(parsed.getTime()) ? (0, utc_instant_1.utcInstantNow)() : parsed;
+        }
+        return (0, utc_instant_1.utcInstantNow)();
+    }
     resolveQuitDate(step5) {
         if (step5.quitDatePreset === 'Now') {
             return (0, utc_instant_1.utcInstantNow)();
@@ -175,7 +231,9 @@ exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_repository_1.UsersRepository,
+        attempts_repository_1.AttemptsRepository,
         attempts_service_1.AttemptsService,
+        economics_segments_repository_1.EconomicsSegmentsRepository,
         storage_service_1.StorageService,
         badges_service_1.BadgesService,
         freedom_points_service_1.FreedomPointsService])

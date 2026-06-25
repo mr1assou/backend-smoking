@@ -8,13 +8,12 @@ import type { AttemptImpactSnapshot } from './attempt-impact';
 
 export async function buildAttemptsList(
   userId: number,
-  economics: ReturnType<AttemptsService['buildEconomics']>,
+  activeTimelineStart: Date | null,
   active: QuitAttempt | null,
   activeSnapshot: AttemptImpactSnapshot | null,
   now: Date,
   attemptsRepository: AttemptsRepository,
   attemptsService: AttemptsService,
-  usersRepository: UsersRepository,
 ): Promise<AttemptStatsRow[]> {
   const rows = await attemptsRepository.listAllForUser(userId);
 
@@ -39,15 +38,13 @@ export async function buildAttemptsList(
       }
 
       if (isActive) {
-        const slipCigarettes = await usersRepository.sumSlipCigarettesSince(
+        const timelineStart =
+          activeTimelineStart ?? row.startedAt;
+        const snapshot = await attemptsService.computeSegmentedSnapshot(
           userId,
-          row.startedAt,
-        );
-        const snapshot = attemptsService.computeSnapshot(
-          economics,
-          row.startedAt,
+          row,
+          timelineStart,
           now,
-          slipCigarettes,
         );
         return {
           attemptNumber: row.attemptNumber,

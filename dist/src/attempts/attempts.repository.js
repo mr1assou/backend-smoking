@@ -94,6 +94,31 @@ let AttemptsRepository = class AttemptsRepository {
             },
         });
     }
+    sumSlipCigarettesBetween(userId, from, to) {
+        return this.prisma.slipEvent
+            .aggregate({
+            where: {
+                user_id: userId,
+                loggedAt: { gte: from, lt: to },
+                cigarettesCount: { not: null },
+            },
+            _sum: { cigarettesCount: true },
+        })
+            .then((result) => result._sum.cigarettesCount ?? 0);
+    }
+    listSlipEventsBetween(userId, from, to) {
+        return this.prisma.slipEvent.findMany({
+            where: {
+                user_id: userId,
+                loggedAt: { gte: from, lt: to },
+            },
+            select: {
+                loggedAt: true,
+                cigarettesCount: true,
+            },
+            orderBy: { loggedAt: 'asc' },
+        });
+    }
 };
 exports.AttemptsRepository = AttemptsRepository;
 exports.AttemptsRepository = AttemptsRepository = __decorate([

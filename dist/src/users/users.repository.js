@@ -71,6 +71,31 @@ let UsersRepository = class UsersRepository {
         })
             .then((result) => result._sum.cigarettesCount ?? 0);
     }
+    sumSlipCigarettesBetween(userId, from, to) {
+        return this.prisma.slipEvent
+            .aggregate({
+            where: {
+                user_id: userId,
+                loggedAt: { gte: from, lt: to },
+                cigarettesCount: { not: null },
+            },
+            _sum: { cigarettesCount: true },
+        })
+            .then((result) => result._sum.cigarettesCount ?? 0);
+    }
+    listSlipEventsBetween(userId, from, to) {
+        return this.prisma.slipEvent.findMany({
+            where: {
+                user_id: userId,
+                loggedAt: { gte: from, lt: to },
+            },
+            select: {
+                loggedAt: true,
+                cigarettesCount: true,
+            },
+            orderBy: { loggedAt: 'asc' },
+        });
+    }
     updateDevicePreferences(userId, data) {
         return this.prisma.user.update({
             where: { user_id: userId },
@@ -96,13 +121,23 @@ let UsersRepository = class UsersRepository {
             data: { image_url: imageUrl },
         });
     }
+    updateHabitSettings(userId, economics) {
+        return this.prisma.user.update({
+            where: { user_id: userId },
+            data: {
+                cigarettesPerDay: economics.cigarettesPerDay,
+                cigarettesPerPack: economics.cigarettesPerPack,
+                packPrice: economics.packPrice,
+            },
+        });
+    }
     updateLastOfflineAt(userId, at) {
         return this.prisma.user.update({
             where: { user_id: userId },
             data: { last_offline_at: at },
         });
     }
-    async resetJourneyProgress(userId, startedAt) {
+    async resetJourneyProgress(userId, startedAt, quitDatePreset) {
         await this.prisma.$transaction(async (tx) => {
             await tx.userGoal.deleteMany({ where: { user_id: userId } });
             await tx.slipEvent.deleteMany({ where: { user_id: userId } });
@@ -115,7 +150,7 @@ let UsersRepository = class UsersRepository {
                 data: {
                     quitDate: startedAt,
                     streakStart: startedAt,
-                    quitDatePreset: 'Now',
+                    quitDatePreset,
                     freedomPoints: 0,
                     motivationCardIndex: 0,
                     tipsCardIndex: 0,

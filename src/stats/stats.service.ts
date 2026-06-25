@@ -29,13 +29,12 @@ export class StatsService {
 
     const attempts = await buildAttemptsList(
       userId,
-      context.economics,
+      context.activeTimelineStart,
       context.active,
       context.activeSnapshot,
       context.now,
       this.attemptsRepository,
       this.attemptsService,
-      this.usersRepository,
     );
 
     return {
@@ -63,13 +62,12 @@ export class StatsService {
 
     const attempts = await buildAttemptsList(
       userId,
-      context.economics,
+      context.activeTimelineStart,
       context.active,
       context.activeSnapshot,
       context.now,
       this.attemptsRepository,
       this.attemptsService,
-      this.usersRepository,
     );
 
     return {

@@ -1,4 +1,6 @@
 import type { Request } from 'express';
+import { ResetJourneyDto } from './dto/reset-journey.dto';
+import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
@@ -35,6 +37,12 @@ export declare class UsersController {
         freedomPoints: number;
         goalsCompleted: number;
         earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
         role: string;
     }>;
     saveOnboarding(req: Request & {
@@ -50,9 +58,6 @@ export declare class UsersController {
             userId: number;
         };
     }, dto: UpdateUserPreferencesDto): Promise<{
-        username: string | null;
-        quitDate: Date | null;
-        streakStart: Date | null;
         user_id: number;
         email: string;
         password: string;
@@ -61,11 +66,14 @@ export declare class UsersController {
         motivation: string | null;
         priorQuitAttempts: string | null;
         primaryInterests: string[];
+        username: string | null;
         sex: string | null;
         country: string | null;
         countryFlag: string | null;
         currency: string | null;
         quitDatePreset: string | null;
+        quitDate: Date | null;
+        streakStart: Date | null;
         cigarettesPerDay: number | null;
         cigarettesPerDayNote: string | null;
         packPrice: string | null;
@@ -89,11 +97,11 @@ export declare class UsersController {
     }, dto: UpdateProfileImageDto): Promise<{
         image_url: string;
     }>;
-    resetJourney(req: Request & {
+    updateHabitSettings(req: Request & {
         user: {
             userId: number;
         };
-    }): Promise<{
+    }, dto: UpdateHabitSettingsDto): Promise<{
         userId: number;
         email: string;
         name: string | undefined;
@@ -118,6 +126,49 @@ export declare class UsersController {
         freedomPoints: number;
         goalsCompleted: number;
         earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
+        role: string;
+    }>;
+    resetJourney(req: Request & {
+        user: {
+            userId: number;
+        };
+    }, dto: ResetJourneyDto): Promise<{
+        userId: number;
+        email: string;
+        name: string | undefined;
+        hasCompletedOnboarding: boolean;
+        sex: string | undefined;
+        country: string | undefined;
+        countryFlag: string | undefined;
+        currency: string | undefined;
+        quitDatePreset: string | undefined;
+        quitDate: string | undefined;
+        streakStart: string | undefined;
+        cigarettesPerDay: number | undefined;
+        cigarettesPerPack: number | undefined;
+        packPrice: string | undefined;
+        motivationCardIndex: number;
+        tipsCardIndex: number;
+        savedTipCardIds: string[];
+        savedMotivationCardIds: string[];
+        imageUrl: string | undefined;
+        slipCigarettesTotal: number;
+        currentAttemptNumber: number;
+        freedomPoints: number;
+        goalsCompleted: number;
+        earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
         role: string;
     }>;
 }

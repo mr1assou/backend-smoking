@@ -11,22 +11,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttemptsService = void 0;
 const common_1 = require("@nestjs/common");
-const attempt_impact_1 = require("../stats/lib/attempt-impact");
+const segmented_attempt_impact_1 = require("../stats/lib/segmented-attempt-impact");
+const economics_segments_repository_1 = require("./economics-segments.repository");
 const attempts_repository_1 = require("./attempts.repository");
+const attempt_impact_1 = require("../stats/lib/attempt-impact");
 let AttemptsService = class AttemptsService {
     attemptsRepository;
-    constructor(attemptsRepository) {
+    economicsSegmentsRepository;
+    constructor(attemptsRepository, economicsSegmentsRepository) {
         this.attemptsRepository = attemptsRepository;
+        this.economicsSegmentsRepository = economicsSegmentsRepository;
     }
-    async ensureFirstAttempt(userId, startedAt) {
+    async ensureFirstAttempt(userId, startedAt, economics) {
         const active = await this.attemptsRepository.findActive(userId);
         if (active)
             return active;
         const count = await this.attemptsRepository.countForUser(userId);
-        if (count > 0) {
-            return this.attemptsRepository.createNext(userId, count + 1, startedAt);
+        const attempt = count > 0
+            ? await this.attemptsRepository.createNext(userId, count + 1, startedAt)
+            : await this.attemptsRepository.createFirst(userId, startedAt);
+        if (economics) {
+            await this.economicsSegmentsRepository.seedInitial(attempt.attempt_id, startedAt, economics);
         }
-        return this.attemptsRepository.createFirst(userId, startedAt);
+        return attempt;
+    }
+    async seedEconomicsForAttempt(attemptId, effectiveFrom, economics) {
+        const existing = await this.economicsSegmentsRepository.listForAttempt(attemptId);
+        if (existing.length > 0)
+            return;
+        await this.economicsSegmentsRepository.seedInitial(attemptId, effectiveFrom, economics);
     }
     buildEconomics(user) {
         return {
@@ -37,6 +50,26 @@ let AttemptsService = class AttemptsService {
     }
     computeSnapshot(economics, startedAt, endedAt, slipCigarettesSmoked) {
         return (0, attempt_impact_1.computeAttemptImpact)(economics, startedAt, endedAt, slipCigarettesSmoked);
+    }
+    async computeSegmentedSnapshot(userId, attempt, timelineStart, endedAt, pendingSlip) {
+        const segments = await this.economicsSegmentsRepository.listForAttempt(attempt.attempt_id);
+        const slipEvents = await this.attemptsRepository.listSlipEventsBetween(userId, timelineStart, endedAt);
+        if (pendingSlip) {
+            slipEvents.push({
+                loggedAt: pendingSlip.loggedAt,
+                cigarettesCount: pendingSlip.cigarettesCount,
+            });
+        }
+        if (segments.length === 0) {
+            const economics = this.buildEconomics({
+                cigarettesPerDay: 0,
+                cigarettesPerPack: 20,
+                packPrice: null,
+            });
+            const slipCigarettes = slipEvents.reduce((sum, event) => sum + Math.max(0, event.cigarettesCount ?? 0), 0);
+            return this.computeSnapshot(economics, timelineStart, endedAt, slipCigarettes);
+        }
+        return (0, segmented_attempt_impact_1.computeSegmentedAttemptImpact)(segments.map(segmented_attempt_impact_1.mapEconomicsSegmentRow), timelineStart, endedAt, slipEvents);
     }
     async getActiveAttempt(userId) {
         return this.attemptsRepository.findActive(userId);
@@ -63,6 +96,7 @@ let AttemptsService = class AttemptsService {
 exports.AttemptsService = AttemptsService;
 exports.AttemptsService = AttemptsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [attempts_repository_1.AttemptsRepository])
+    __metadata("design:paramtypes", [attempts_repository_1.AttemptsRepository,
+        economics_segments_repository_1.EconomicsSegmentsRepository])
 ], AttemptsService);
 //# sourceMappingURL=attempts.service.js.map

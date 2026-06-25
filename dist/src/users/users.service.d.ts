@@ -1,19 +1,25 @@
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
+import { EconomicsSegmentsRepository } from '../attempts/economics-segments.repository';
+import { AttemptsRepository } from '../attempts/attempts.repository';
 import { BadgesService } from '../badges/badges.service';
 import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { StorageService } from '../storage/storage.service';
+import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
+import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersRepository } from './users.repository';
 export declare class UsersService {
     private readonly usersRepository;
+    private readonly attemptsRepository;
     private readonly attemptsService;
+    private readonly economicsSegmentsRepository;
     private readonly storageService;
     private readonly badgesService;
     private readonly freedomPointsService;
-    constructor(usersRepository: UsersRepository, attemptsService: AttemptsService, storageService: StorageService, badgesService: BadgesService, freedomPointsService: FreedomPointsService);
+    constructor(usersRepository: UsersRepository, attemptsRepository: AttemptsRepository, attemptsService: AttemptsService, economicsSegmentsRepository: EconomicsSegmentsRepository, storageService: StorageService, badgesService: BadgesService, freedomPointsService: FreedomPointsService);
     createWithHashedPassword(email: string, hashedPassword: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
     findById(userId: number): Promise<User | null>;
@@ -25,7 +31,7 @@ export declare class UsersService {
         user_id: number;
         email: string;
     }>;
-    resetJourney(userId: number): Promise<{
+    resetJourney(userId: number, dto?: ResetJourneyDto): Promise<{
         userId: number;
         email: string;
         name: string | undefined;
@@ -50,12 +56,48 @@ export declare class UsersService {
         freedomPoints: number;
         goalsCompleted: number;
         earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
+        role: string;
+    }>;
+    updateHabitSettings(userId: number, dto: UpdateHabitSettingsDto): Promise<{
+        userId: number;
+        email: string;
+        name: string | undefined;
+        hasCompletedOnboarding: boolean;
+        sex: string | undefined;
+        country: string | undefined;
+        countryFlag: string | undefined;
+        currency: string | undefined;
+        quitDatePreset: string | undefined;
+        quitDate: string | undefined;
+        streakStart: string | undefined;
+        cigarettesPerDay: number | undefined;
+        cigarettesPerPack: number | undefined;
+        packPrice: string | undefined;
+        motivationCardIndex: number;
+        tipsCardIndex: number;
+        savedTipCardIds: string[];
+        savedMotivationCardIds: string[];
+        imageUrl: string | undefined;
+        slipCigarettesTotal: number;
+        currentAttemptNumber: number;
+        freedomPoints: number;
+        goalsCompleted: number;
+        earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
         role: string;
     }>;
     updatePreferences(userId: number, dto: UpdateUserPreferencesDto): Promise<{
-        username: string | null;
-        quitDate: Date | null;
-        streakStart: Date | null;
         user_id: number;
         email: string;
         password: string;
@@ -64,11 +106,14 @@ export declare class UsersService {
         motivation: string | null;
         priorQuitAttempts: string | null;
         primaryInterests: string[];
+        username: string | null;
         sex: string | null;
         country: string | null;
         countryFlag: string | null;
         currency: string | null;
         quitDatePreset: string | null;
+        quitDate: Date | null;
+        streakStart: Date | null;
         cigarettesPerDay: number | null;
         cigarettesPerDayNote: string | null;
         packPrice: string | null;
@@ -114,8 +159,15 @@ export declare class UsersService {
         freedomPoints: number;
         goalsCompleted: number;
         earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
         role: string;
     }>;
     private mapOnboardingDtoToData;
+    private resolveQuitDateInstant;
     private resolveQuitDate;
 }

@@ -93,12 +93,14 @@ export class ChatRepository {
     });
   }
 
-  listThreadsForUser(userId: number) {
+  listThreadsForUser(userId: number, offset = 0, limit = 30) {
     return this.prisma.chatThread.findMany({
       where: {
         OR: [{ user_one_id: userId }, { user_two_id: userId }],
       },
       orderBy: { updated_at: 'desc' },
+      skip: offset,
+      take: limit + 1,
       include: {
         userOne: { select: PEER_SELECT },
         userTwo: { select: PEER_SELECT },

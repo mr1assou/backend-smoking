@@ -8,6 +8,11 @@ export type CloseAttemptData = AttemptImpactSnapshot & {
   endOutcome: string;
 };
 
+export type SlipEventSlice = {
+  loggedAt: Date;
+  cigarettesCount: number | null;
+};
+
 @Injectable()
 export class AttemptsRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -100,6 +105,41 @@ export class AttemptsRepository {
         lifeMinutesGained: 0,
         slipCigarettesSmoked: 0,
       },
+    });
+  }
+
+  sumSlipCigarettesBetween(
+    userId: number,
+    from: Date,
+    to: Date,
+  ): Promise<number> {
+    return this.prisma.slipEvent
+      .aggregate({
+        where: {
+          user_id: userId,
+          loggedAt: { gte: from, lt: to },
+          cigarettesCount: { not: null },
+        },
+        _sum: { cigarettesCount: true },
+      })
+      .then((result) => result._sum.cigarettesCount ?? 0);
+  }
+
+  listSlipEventsBetween(
+    userId: number,
+    from: Date,
+    to: Date,
+  ): Promise<SlipEventSlice[]> {
+    return this.prisma.slipEvent.findMany({
+      where: {
+        user_id: userId,
+        loggedAt: { gte: from, lt: to },
+      },
+      select: {
+        loggedAt: true,
+        cigarettesCount: true,
+      },
+      orderBy: { loggedAt: 'asc' },
     });
   }
 }

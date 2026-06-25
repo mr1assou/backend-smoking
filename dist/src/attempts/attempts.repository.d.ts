@@ -5,6 +5,10 @@ export type CloseAttemptData = AttemptImpactSnapshot & {
     endedAt: Date;
     endOutcome: string;
 };
+export type SlipEventSlice = {
+    loggedAt: Date;
+    cigarettesCount: number | null;
+};
 export declare class AttemptsRepository {
     private readonly prisma;
     constructor(prisma: PrismaService);
@@ -18,4 +22,6 @@ export declare class AttemptsRepository {
     close(attemptId: number, data: CloseAttemptData): Promise<QuitAttempt>;
     deleteById(attemptId: number): Promise<void>;
     reopen(attemptId: number): Promise<QuitAttempt>;
+    sumSlipCigarettesBetween(userId: number, from: Date, to: Date): Promise<number>;
+    listSlipEventsBetween(userId: number, from: Date, to: Date): Promise<SlipEventSlice[]>;
 }

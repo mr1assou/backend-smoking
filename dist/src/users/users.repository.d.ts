@@ -10,6 +10,11 @@ export declare class UsersRepository {
     findById(userId: number): Promise<User | null>;
     findMeProfile(userId: number): Promise<UserMeProfile | null>;
     sumSlipCigarettesSince(userId: number, since: Date): Promise<number>;
+    sumSlipCigarettesBetween(userId: number, from: Date, to: Date): Promise<number>;
+    listSlipEventsBetween(userId: number, from: Date, to: Date): Promise<{
+        loggedAt: Date;
+        cigarettesCount: number | null;
+    }[]>;
     updateDevicePreferences(userId: number, data: UserDevicePreferencesUpdate): Promise<User>;
     updateOnboarding(userId: number, data: UserOnboardingData): Promise<{
         user_id: number;
@@ -17,6 +22,11 @@ export declare class UsersRepository {
     }>;
     updateRefreshToken(userId: number, hashedRefreshToken: string | null): Promise<User>;
     updateProfileImage(userId: number, imageUrl: string): Promise<User>;
+    updateHabitSettings(userId: number, economics: {
+        cigarettesPerDay: number;
+        cigarettesPerPack: number;
+        packPrice: string | null;
+    }): Promise<User>;
     updateLastOfflineAt(userId: number, at: Date): Promise<User>;
-    resetJourneyProgress(userId: number, startedAt: Date): Promise<void>;
+    resetJourneyProgress(userId: number, startedAt: Date, quitDatePreset: string): Promise<void>;
 }

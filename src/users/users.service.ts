@@ -1,10 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
+import {
+  EconomicsSegmentsRepository,
+  habitEconomicsFromUser,
+} from '../attempts/economics-segments.repository';
+import { AttemptsRepository } from '../attempts/attempts.repository';
 import { BadgesService } from '../badges/badges.service';
 import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { toUtcIso, utcInstantNow } from '../common/utc-instant';
 import { StorageService } from '../storage/storage.service';
+import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
+import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
@@ -18,7 +25,9 @@ import { DEFAULT_USER_ROLE } from './lib/user-roles';
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly attemptsRepository: AttemptsRepository,
     private readonly attemptsService: AttemptsService,
+    private readonly economicsSegmentsRepository: EconomicsSegmentsRepository,
     private readonly storageService: StorageService,
     private readonly badgesService: BadgesService,
     private readonly freedomPointsService: FreedomPointsService,
@@ -71,7 +80,15 @@ export class UsersService {
     const result = await this.usersRepository.updateOnboarding(userId, data);
 
     if (data.quitDate) {
-      await this.attemptsService.ensureFirstAttempt(userId, data.quitDate);
+      await this.attemptsService.ensureFirstAttempt(
+        userId,
+        data.quitDate,
+        {
+          cigarettesPerDay: data.cigarettesPerDay ?? 0,
+          cigarettesPerPack: data.cigarettesPerPack ?? 20,
+          packPrice: data.packPrice,
+        },
+      );
       await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
       await this.badgesService.syncEarnedBadges(userId);
     }
@@ -79,7 +96,7 @@ export class UsersService {
     return result;
   }
 
-  async resetJourney(userId: number) {
+  async resetJourney(userId: number, dto: ResetJourneyDto = {}) {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
     if (!user.username?.trim()) {
@@ -88,8 +105,52 @@ export class UsersService {
       );
     }
 
-    const startedAt = utcInstantNow();
-    await this.usersRepository.resetJourneyProgress(userId, startedAt);
+    const preset = dto.quitDatePreset === 'Custom' ? 'Custom' : 'Now';
+    const startedAt = this.resolveQuitDateInstant({
+      quitDatePreset: preset,
+      quitDate: dto.quitDate,
+    });
+
+    await this.usersRepository.resetJourneyProgress(userId, startedAt, preset);
+
+    const userAfterReset = await this.usersRepository.findById(userId);
+    const active = await this.attemptsRepository.findActive(userId);
+    if (active && userAfterReset) {
+      await this.attemptsService.seedEconomicsForAttempt(
+        active.attempt_id,
+        startedAt,
+        habitEconomicsFromUser(userAfterReset),
+      );
+    }
+
+    return this.getMe(userId);
+  }
+
+  async updateHabitSettings(userId: number, dto: UpdateHabitSettingsDto) {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const packPrice =
+      dto.packPrice?.trim() ||
+      (dto.packCost !== undefined ? String(dto.packCost) : user.packPrice);
+
+    const economics = {
+      cigarettesPerDay: dto.cigarettesPerDay,
+      cigarettesPerPack: dto.cigarettesPerPack,
+      packPrice: packPrice ?? null,
+    };
+
+    await this.usersRepository.updateHabitSettings(userId, economics);
+
+    const active = await this.attemptsRepository.findActive(userId);
+    if (active) {
+      await this.economicsSegmentsRepository.appendIfChanged(
+        active.attempt_id,
+        utcInstantNow(),
+        economics,
+      );
+    }
+
     return this.getMe(userId);
   }
 
@@ -141,6 +202,19 @@ export class UsersService {
       : 0;
     const earnedBadgeIds = badgeSync.earnedBadgeIds;
 
+    const economicsSegments = activeAttempt
+      ? (
+          await this.economicsSegmentsRepository.listForAttempt(
+            activeAttempt.attempt_id,
+          )
+        ).map((segment) => ({
+          effectiveFrom: toUtcIso(segment.effective_from),
+          cigarettesPerDay: segment.cigarettes_per_day,
+          cigarettesPerPack: segment.cigarettes_per_pack,
+          packPrice: segment.pack_price ?? undefined,
+        }))
+      : undefined;
+
     return {
       userId: user.user_id,
       email: user.email,
@@ -166,6 +240,7 @@ export class UsersService {
       freedomPoints: fpSync.totalFreedomPoints,
       goalsCompleted: await this.badgesService.countCompletedGoals(userId),
       earnedBadgeIds,
+      economicsSegments,
       role: user.role ?? DEFAULT_USER_ROLE,
     };
   }
@@ -192,6 +267,21 @@ export class UsersService {
       yearsSmoking: dto.step6.yearsSmoking ?? null,
       cigarettesPerPack: dto.step6.cigarettesPerPack ?? null,
     };
+  }
+
+  /** `Now` → server UTC instant; custom → client ISO instant (device-local day). */
+  private resolveQuitDateInstant(input: {
+    quitDatePreset: string;
+    quitDate?: string;
+  }): Date {
+    if (input.quitDatePreset === 'Now') {
+      return utcInstantNow();
+    }
+    if (input.quitDate?.trim()) {
+      const parsed = new Date(input.quitDate);
+      return Number.isNaN(parsed.getTime()) ? utcInstantNow() : parsed;
+    }
+    return utcInstantNow();
   }
 
   /** `Now` → server UTC instant; custom → client ISO instant. */

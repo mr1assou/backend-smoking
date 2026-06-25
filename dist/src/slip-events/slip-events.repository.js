@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SlipEventsRepository = void 0;
 const common_1 = require("@nestjs/common");
+const economics_segments_repository_1 = require("../attempts/economics-segments.repository");
 const attempts_service_1 = require("../attempts/attempts.service");
 const utc_instant_1 = require("../common/utc-instant");
 const goals_repository_1 = require("../goals/goals.repository");
@@ -19,10 +20,12 @@ const lib_1 = require("./lib");
 let SlipEventsRepository = class SlipEventsRepository {
     prisma;
     attemptsService;
+    economicsSegmentsRepository;
     goalsRepository;
-    constructor(prisma, attemptsService, goalsRepository) {
+    constructor(prisma, attemptsService, economicsSegmentsRepository, goalsRepository) {
         this.prisma = prisma;
         this.attemptsService = attemptsService;
+        this.economicsSegmentsRepository = economicsSegmentsRepository;
         this.goalsRepository = goalsRepository;
     }
     findOwnedById(userId, slipEventId) {
@@ -42,41 +45,36 @@ let SlipEventsRepository = class SlipEventsRepository {
         })
             .then((result) => result._sum.cigarettesCount ?? 0);
     }
-    createWithAttemptRotation(data) {
+    async createWithAttemptRotation(data) {
         const now = (0, utc_instant_1.utcInstantNow)();
         const cigarettesCount = (0, lib_1.resolveSlipCigarettesCount)(data.outcome, data.cigarettesCount);
-        const economics = this.attemptsService.buildEconomics({
+        const slipThisEvent = cigarettesCount ?? 0;
+        const habitEconomics = (0, economics_segments_repository_1.habitEconomicsFromUser)({
             cigarettesPerDay: data.cigarettesPerDay,
             cigarettesPerPack: data.cigarettesPerPack,
             packPrice: data.packPrice,
         });
-        return this.prisma.$transaction(async (tx) => {
-            let activeAttempt = await tx.quitAttempt.findFirst({
-                where: { user_id: data.userId, endedAt: null },
-                orderBy: { attemptNumber: 'desc' },
-            });
-            if (!activeAttempt) {
-                activeAttempt = await tx.quitAttempt.create({
-                    data: {
-                        user_id: data.userId,
-                        attemptNumber: 1,
-                        startedAt: data.previousQuitDate,
-                    },
-                });
-            }
-            const priorSlipSum = await tx.slipEvent.aggregate({
-                where: {
+        let activeAttempt = await this.prisma.quitAttempt.findFirst({
+            where: { user_id: data.userId, endedAt: null },
+            orderBy: { attemptNumber: 'desc' },
+        });
+        if (!activeAttempt) {
+            activeAttempt = await this.prisma.quitAttempt.create({
+                data: {
                     user_id: data.userId,
-                    loggedAt: { gte: activeAttempt.startedAt },
-                    cigarettesCount: { not: null },
+                    attemptNumber: 1,
+                    startedAt: data.previousQuitDate,
                 },
-                _sum: { cigarettesCount: true },
             });
-            const slipThisEvent = cigarettesCount ?? 0;
-            const totalSlipCigarettes = (priorSlipSum._sum.cigarettesCount ?? 0) + slipThisEvent;
-            const snapshot = this.attemptsService.computeSnapshot(economics, data.previousStreakStart, now, totalSlipCigarettes);
-            const closedAttempt = await tx.quitAttempt.update({
+            await this.economicsSegmentsRepository.seedInitial(activeAttempt.attempt_id, data.previousQuitDate, habitEconomics);
+        }
+        const snapshot = await this.attemptsService.computeSegmentedSnapshot(data.userId, activeAttempt, data.previousStreakStart, now, { loggedAt: now, cigarettesCount: slipThisEvent });
+        return this.prisma.$transaction(async (tx) => {
+            const attempt = await tx.quitAttempt.findFirstOrThrow({
                 where: { attempt_id: activeAttempt.attempt_id },
+            });
+            const closedAttempt = await tx.quitAttempt.update({
+                where: { attempt_id: attempt.attempt_id },
                 data: {
                     endedAt: now,
                     endOutcome: data.outcome,
@@ -90,10 +88,11 @@ let SlipEventsRepository = class SlipEventsRepository {
             const newAttempt = await tx.quitAttempt.create({
                 data: {
                     user_id: data.userId,
-                    attemptNumber: activeAttempt.attemptNumber + 1,
+                    attemptNumber: attempt.attemptNumber + 1,
                     startedAt: now,
                 },
             });
+            await this.economicsSegmentsRepository.seedInitial(newAttempt.attempt_id, now, habitEconomics, tx);
             const event = await tx.slipEvent.create({
                 data: {
                     user_id: data.userId,
@@ -167,6 +166,7 @@ exports.SlipEventsRepository = SlipEventsRepository = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         attempts_service_1.AttemptsService,
+        economics_segments_repository_1.EconomicsSegmentsRepository,
         goals_repository_1.GoalsRepository])
 ], SlipEventsRepository);
 //# sourceMappingURL=slip-events.repository.js.map

@@ -1,4 +1,5 @@
 import { SlipEvent } from '@prisma/client';
+import { EconomicsSegmentsRepository } from '../attempts/economics-segments.repository';
 import { AttemptsService } from '../attempts/attempts.service';
 import { GoalsRepository } from '../goals/goals.repository';
 import { PrismaService } from '../prisma/prisma.service';
@@ -22,8 +23,9 @@ export type SlipCreateResult = {
 export declare class SlipEventsRepository {
     private readonly prisma;
     private readonly attemptsService;
+    private readonly economicsSegmentsRepository;
     private readonly goalsRepository;
-    constructor(prisma: PrismaService, attemptsService: AttemptsService, goalsRepository: GoalsRepository);
+    constructor(prisma: PrismaService, attemptsService: AttemptsService, economicsSegmentsRepository: EconomicsSegmentsRepository, goalsRepository: GoalsRepository);
     findOwnedById(userId: number, slipEventId: number): Promise<SlipEvent | null>;
     sumSlipCigarettesSince(userId: number, since: Date): Promise<number>;
     createWithAttemptRotation(data: CreateSlipEventData): Promise<SlipCreateResult>;

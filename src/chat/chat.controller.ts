@@ -27,8 +27,15 @@ export class ChatController {
 
   @UseGuards(JwtGuard)
   @Get('threads')
-  listThreads(@Req() req: Request & { user: { userId: number } }) {
-    return this.chatService.listThreads(req.user.userId);
+  listThreads(
+    @Req() req: Request & { user: { userId: number } },
+    @Query() query: ListSupportUsersQueryDto,
+  ) {
+    return this.chatService.listThreads(
+      req.user.userId,
+      query.offset ?? 0,
+      query.limit ?? 30,
+    );
   }
 
   @UseGuards(JwtGuard)

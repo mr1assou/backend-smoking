@@ -1,6 +1,7 @@
 import { QuitAttempt } from '@prisma/client';
-import { type AttemptEconomics } from '../stats/lib/attempt-impact';
+import { EconomicsSegmentsRepository, habitEconomicsFromUser } from './economics-segments.repository';
 import { AttemptsRepository } from './attempts.repository';
+import { type AttemptEconomics, type AttemptImpactSnapshot } from '../stats/lib/attempt-impact';
 export type AttemptSummary = {
     attemptId: number;
     attemptNumber: number;
@@ -15,14 +16,20 @@ export type AttemptSummary = {
 };
 export declare class AttemptsService {
     private readonly attemptsRepository;
-    constructor(attemptsRepository: AttemptsRepository);
-    ensureFirstAttempt(userId: number, startedAt: Date): Promise<QuitAttempt>;
+    private readonly economicsSegmentsRepository;
+    constructor(attemptsRepository: AttemptsRepository, economicsSegmentsRepository: EconomicsSegmentsRepository);
+    ensureFirstAttempt(userId: number, startedAt: Date, economics?: ReturnType<typeof habitEconomicsFromUser>): Promise<QuitAttempt>;
+    seedEconomicsForAttempt(attemptId: number, effectiveFrom: Date, economics: ReturnType<typeof habitEconomicsFromUser>): Promise<void>;
     buildEconomics(user: {
         cigarettesPerDay: number | null;
         cigarettesPerPack: number | null;
         packPrice: string | null;
     }): AttemptEconomics;
-    computeSnapshot(economics: AttemptEconomics, startedAt: Date, endedAt: Date, slipCigarettesSmoked: number): import("../stats/lib/attempt-impact").AttemptImpactSnapshot;
+    computeSnapshot(economics: AttemptEconomics, startedAt: Date, endedAt: Date, slipCigarettesSmoked: number): AttemptImpactSnapshot;
+    computeSegmentedSnapshot(userId: number, attempt: QuitAttempt, timelineStart: Date, endedAt: Date, pendingSlip?: {
+        loggedAt: Date;
+        cigarettesCount: number;
+    }): Promise<AttemptImpactSnapshot>;
     getActiveAttempt(userId: number): Promise<QuitAttempt | null>;
     listCompletedAttempts(userId: number): Promise<AttemptSummary[]>;
     toSummary(row: QuitAttempt): AttemptSummary;

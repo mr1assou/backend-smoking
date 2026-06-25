@@ -11,14 +11,15 @@ const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("../prisma/prisma.module");
 const attempts_repository_1 = require("./attempts.repository");
 const attempts_service_1 = require("./attempts.service");
+const economics_segments_repository_1 = require("./economics-segments.repository");
 let AttemptsModule = class AttemptsModule {
 };
 exports.AttemptsModule = AttemptsModule;
 exports.AttemptsModule = AttemptsModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule],
-        providers: [attempts_repository_1.AttemptsRepository, attempts_service_1.AttemptsService],
-        exports: [attempts_repository_1.AttemptsRepository, attempts_service_1.AttemptsService],
+        providers: [attempts_repository_1.AttemptsRepository, attempts_service_1.AttemptsService, economics_segments_repository_1.EconomicsSegmentsRepository],
+        exports: [attempts_repository_1.AttemptsRepository, attempts_service_1.AttemptsService, economics_segments_repository_1.EconomicsSegmentsRepository],
     })
 ], AttemptsModule);
 //# sourceMappingURL=attempts.module.js.map

@@ -30,6 +30,11 @@ export type ChatThreadSummaryDto = {
   updated_at: string;
 };
 
+export type ChatThreadsPageDto = {
+  items: ChatThreadSummaryDto[];
+  has_more: boolean;
+};
+
 export type ChatMessagesPageDto = {
   items: ChatMessageDto[];
   has_more: boolean;

@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_guard_1 = require("../auth/guards/jwt.guard");
+const reset_journey_dto_1 = require("./dto/reset-journey.dto");
+const update_habit_settings_dto_1 = require("./dto/update-habit-settings.dto");
 const update_onboarding_dto_1 = require("./dto/update-onboarding.dto");
 const update_profile_image_dto_1 = require("./dto/update-profile-image.dto");
 const update_user_preferences_dto_1 = require("./dto/update-user-preferences.dto");
@@ -36,8 +38,11 @@ let UsersController = class UsersController {
     updateProfileImage(req, dto) {
         return this.usersService.updateProfileImage(req.user.userId, dto);
     }
-    resetJourney(req) {
-        return this.usersService.resetJourney(req.user.userId);
+    updateHabitSettings(req, dto) {
+        return this.usersService.updateHabitSettings(req.user.userId, dto);
+    }
+    resetJourney(req, dto) {
+        return this.usersService.resetJourney(req.user.userId, dto);
     }
 };
 exports.UsersController = UsersController;
@@ -78,11 +83,21 @@ __decorate([
 ], UsersController.prototype, "updateProfileImage", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Patch)('me/habit-settings'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_habit_settings_dto_1.UpdateHabitSettingsDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateHabitSettings", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Post)('me/reset-journey'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, reset_journey_dto_1.ResetJourneyDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "resetJourney", null);
 exports.UsersController = UsersController = __decorate([

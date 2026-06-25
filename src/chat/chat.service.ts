@@ -23,6 +23,7 @@ import type {
   ChatMessageDto,
   ChatMessagesPageDto,
   ChatThreadSummaryDto,
+  ChatThreadsPageDto,
   MessagesSeenPayload,
   SupportUsersPageDto,
 } from './types/chat.types';
@@ -40,10 +41,23 @@ export class ChatService {
     private readonly storageService: StorageService,
   ) {}
 
-  async listThreads(userId: number): Promise<ChatThreadSummaryDto[]> {
-    const rows = await this.chatRepository.listThreadsForUser(userId);
-    return Promise.all(
-      rows.map(async (row) => {
+  async listThreads(
+    userId: number,
+    offset = 0,
+    limit = 30,
+  ): Promise<ChatThreadsPageDto> {
+    const take = Math.min(Math.max(limit, 1), 50);
+    const safeOffset = Math.max(offset, 0);
+    const rows = await this.chatRepository.listThreadsForUser(
+      userId,
+      safeOffset,
+      take,
+    );
+
+    const hasMore = rows.length > take;
+    const page = hasMore ? rows.slice(0, take) : rows;
+    const items = await Promise.all(
+      page.map(async (row) => {
         const myRead = row.reads.find((read) => read.user_id === userId);
         const unreadCount = await this.chatRepository.countUnreadMessages(
           row.thread_id,
@@ -53,6 +67,8 @@ export class ChatService {
         return this.toThreadSummary(row, userId, unreadCount);
       }),
     );
+
+    return { items, has_more: hasMore };
   }
 
   async listSupportUsers(

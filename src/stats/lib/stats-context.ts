@@ -12,6 +12,7 @@ export type StatsUserContext = {
   now: Date;
   active: QuitAttempt | null;
   activeSnapshot: AttemptImpactSnapshot | null;
+  activeTimelineStart: Date | null;
 };
 
 export async function loadStatsUserContext(
@@ -28,17 +29,15 @@ export async function loadStatsUserContext(
   const active = await attemptsRepository.findActive(userId);
 
   let activeSnapshot: AttemptImpactSnapshot | null = null;
+  const activeTimelineStart =
+    user.streakStart ?? user.quitDate ?? active?.startedAt ?? null;
 
-  if (active) {
-    const slipCigarettes = await usersRepository.sumSlipCigarettesSince(
+  if (active && activeTimelineStart) {
+    activeSnapshot = await attemptsService.computeSegmentedSnapshot(
       userId,
-      active.startedAt,
-    );
-    activeSnapshot = attemptsService.computeSnapshot(
-      economics,
-      active.startedAt,
+      active,
+      activeTimelineStart,
       now,
-      slipCigarettes,
     );
   }
 
@@ -48,5 +47,6 @@ export async function loadStatsUserContext(
     now,
     active,
     activeSnapshot,
+    activeTimelineStart,
   };
 }

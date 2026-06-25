@@ -30,7 +30,7 @@ let StatsService = class StatsService {
     }
     async getOverview(userId) {
         const context = await (0, lib_1.loadStatsUserContext)(userId, this.usersRepository, this.attemptsRepository, this.attemptsService);
-        const attempts = await (0, lib_1.buildAttemptsList)(userId, context.economics, context.active, context.activeSnapshot, context.now, this.attemptsRepository, this.attemptsService, this.usersRepository);
+        const attempts = await (0, lib_1.buildAttemptsList)(userId, context.activeTimelineStart, context.active, context.activeSnapshot, context.now, this.attemptsRepository, this.attemptsService);
         return {
             currency: context.currency,
             economics: {
@@ -43,7 +43,7 @@ let StatsService = class StatsService {
     }
     async getAttempts(userId) {
         const context = await (0, lib_1.loadStatsUserContext)(userId, this.usersRepository, this.attemptsRepository, this.attemptsService);
-        const attempts = await (0, lib_1.buildAttemptsList)(userId, context.economics, context.active, context.activeSnapshot, context.now, this.attemptsRepository, this.attemptsService, this.usersRepository);
+        const attempts = await (0, lib_1.buildAttemptsList)(userId, context.activeTimelineStart, context.active, context.activeSnapshot, context.now, this.attemptsRepository, this.attemptsService);
         return {
             currency: context.currency,
             economics: {
