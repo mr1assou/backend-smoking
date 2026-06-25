@@ -22,7 +22,7 @@ async function bootstrap() {
     expressApp.get('/', (_req, res) => {
         res.json({ message: 'Quit Smoking API' });
     });
-    await app.listen(process.env.PORT ?? 3000);
+    await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 void bootstrap();
 //# sourceMappingURL=main.js.map
