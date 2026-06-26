@@ -78,6 +78,28 @@ let AuthService = class AuthService {
         const tokens = await this.issueTokensForUser(user.user_id, user.email);
         return { ...tokens, isNewUser, email: user.email };
     }
+    async googleLogin(idToken) {
+        const googleUser = await this.googleToken.verifyIdToken(idToken);
+        const email = googleUser.email.trim().toLowerCase();
+        const user = await this.usersService.findByEmail(email);
+        if (!user) {
+            throw new common_1.NotFoundException('No account found for this email');
+        }
+        const tokens = await this.issueTokensForUser(user.user_id, user.email);
+        return { ...tokens, isNewUser: false, email: user.email };
+    }
+    async googleSignup(idToken) {
+        const googleUser = await this.googleToken.verifyIdToken(idToken);
+        const email = googleUser.email.trim().toLowerCase();
+        const existing = await this.usersService.findByEmail(email);
+        if (existing) {
+            throw new common_1.ConflictException('An account already exists for this email');
+        }
+        const password = await argon2.hash((0, crypto_1.randomBytes)(32).toString('hex'));
+        const user = await this.usersService.createWithHashedPassword(email, password);
+        const tokens = await this.issueTokensForUser(user.user_id, user.email);
+        return { ...tokens, isNewUser: true, email: user.email };
+    }
     async login(dto) {
         const user = await this.usersService.findByEmail(dto.email);
         if (!user)

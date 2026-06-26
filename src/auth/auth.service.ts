@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -57,6 +58,39 @@ export class AuthService {
     );
     const tokens = await this.issueTokensForUser(user.user_id, user.email);
     return { ...tokens, isNewUser, email: user.email };
+  }
+
+  /** Google login only — does not create an account if the email is unknown. */
+  async googleLogin(idToken: string): Promise<GoogleAuthResult> {
+    const googleUser = await this.googleToken.verifyIdToken(idToken);
+    const email = googleUser.email.trim().toLowerCase();
+
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('No account found for this email');
+    }
+
+    const tokens = await this.issueTokensForUser(user.user_id, user.email);
+    return { ...tokens, isNewUser: false, email: user.email };
+  }
+
+  /** Google signup only — does not sign in if the email is already registered. */
+  async googleSignup(idToken: string): Promise<GoogleAuthResult> {
+    const googleUser = await this.googleToken.verifyIdToken(idToken);
+    const email = googleUser.email.trim().toLowerCase();
+
+    const existing = await this.usersService.findByEmail(email);
+    if (existing) {
+      throw new ConflictException('An account already exists for this email');
+    }
+
+    const password = await argon2.hash(randomBytes(32).toString('hex'));
+    const user = await this.usersService.createWithHashedPassword(
+      email,
+      password,
+    );
+    const tokens = await this.issueTokensForUser(user.user_id, user.email);
+    return { ...tokens, isNewUser: true, email: user.email };
   }
 
   async login(dto: LoginDto) {

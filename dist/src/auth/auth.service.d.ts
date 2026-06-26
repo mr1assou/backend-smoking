@@ -23,6 +23,8 @@ export declare class AuthService {
         refreshToken: string;
     }>;
     googleSignIn(idToken: string): Promise<GoogleAuthResult>;
+    googleLogin(idToken: string): Promise<GoogleAuthResult>;
+    googleSignup(idToken: string): Promise<GoogleAuthResult>;
     login(dto: LoginDto): Promise<{
         accessToken: string;
         refreshToken: string;

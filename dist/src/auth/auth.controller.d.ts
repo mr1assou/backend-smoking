@@ -21,6 +21,18 @@ export declare class AuthController {
         isNewUser: boolean;
         email: string;
     }>;
+    googleLogin(dto: GoogleAuthDto, res: Response): Promise<{
+        accessToken: string;
+        refreshToken: string;
+        isNewUser: boolean;
+        email: string;
+    }>;
+    googleSignup(dto: GoogleAuthDto, res: Response): Promise<{
+        accessToken: string;
+        refreshToken: string;
+        isNewUser: boolean;
+        email: string;
+    }>;
     login(dto: LoginDto, res: Response): Promise<{
         accessToken: string;
     }>;

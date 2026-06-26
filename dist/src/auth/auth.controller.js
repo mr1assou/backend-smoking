@@ -49,6 +49,16 @@ let AuthController = class AuthController {
         this.setRefreshTokenCookie(res, refreshToken);
         return { accessToken, refreshToken, isNewUser, email };
     }
+    async googleLogin(dto, res) {
+        const { accessToken, refreshToken, isNewUser, email } = await this.authService.googleLogin(dto.idToken);
+        this.setRefreshTokenCookie(res, refreshToken);
+        return { accessToken, refreshToken, isNewUser, email };
+    }
+    async googleSignup(dto, res) {
+        const { accessToken, refreshToken, isNewUser, email } = await this.authService.googleSignup(dto.idToken);
+        this.setRefreshTokenCookie(res, refreshToken);
+        return { accessToken, refreshToken, isNewUser, email };
+    }
     async login(dto, res) {
         const { accessToken, refreshToken } = await this.authService.login(dto);
         this.setRefreshTokenCookie(res, refreshToken);
@@ -107,6 +117,24 @@ __decorate([
     __metadata("design:paramtypes", [google_auth_dto_1.GoogleAuthDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "google", null);
+__decorate([
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, common_1.Post)('google/login'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [google_auth_dto_1.GoogleAuthDto, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleLogin", null);
+__decorate([
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, common_1.Post)('google/signup'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [google_auth_dto_1.GoogleAuthDto, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleSignup", null);
 __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.Post)('login'),

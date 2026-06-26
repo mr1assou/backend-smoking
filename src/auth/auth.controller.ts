@@ -69,6 +69,30 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Post('google/login')
+  async googleLogin(
+    @Body() dto: GoogleAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken, isNewUser, email } =
+      await this.authService.googleLogin(dto.idToken);
+    this.setRefreshTokenCookie(res, refreshToken);
+    return { accessToken, refreshToken, isNewUser, email };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('google/signup')
+  async googleSignup(
+    @Body() dto: GoogleAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken, isNewUser, email } =
+      await this.authService.googleSignup(dto.idToken);
+    this.setRefreshTokenCookie(res, refreshToken);
+    return { accessToken, refreshToken, isNewUser, email };
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(
     @Body() dto: LoginDto,

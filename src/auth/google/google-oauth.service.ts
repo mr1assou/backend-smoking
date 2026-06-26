@@ -112,6 +112,7 @@ export class GoogleOAuthService {
   private isAllowedReturnUrl(url: string): boolean {
     return (
       url.startsWith('exp://') ||
+      url.startsWith('quitify://') ||
       url.startsWith('quitsmoking://') ||
       url.startsWith('http://localhost') ||
       url.startsWith('http://127.0.0.1') ||
