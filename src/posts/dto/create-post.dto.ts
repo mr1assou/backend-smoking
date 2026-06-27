@@ -1,14 +1,17 @@
 import { Type } from 'class-transformer';
 import {
   IsIn,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUrl,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { POST_TAG_IDS } from '../lib/post-tags.constants';
+import { POST_MEDIA_KINDS } from '../lib/post-media.constants';
 import { POST_IMAGE_FRAMES, PostImageCropDto } from './post-image.dto';
 
 export class CreatePostDto {
@@ -39,4 +42,13 @@ export class CreatePostDto {
   @ValidateNested()
   @Type(() => PostImageCropDto)
   image_crop?: PostImageCropDto;
+
+  @IsOptional()
+  @IsIn(POST_MEDIA_KINDS)
+  media_kind?: (typeof POST_MEDIA_KINDS)[number];
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  media_duration_ms?: number;
 }

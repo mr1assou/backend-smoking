@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AttemptsRepository } from '../attempts/attempts.repository';
 import { AttemptsService } from '../attempts/attempts.service';
+import { FreedomPointsRepository } from '../freedom-points/freedom-points.repository';
+import { FreedomPointsService } from '../freedom-points/freedom-points.service';
 import { GoalsRepository } from '../goals/goals.repository';
 import { UsersRepository } from '../users/users.repository';
 import {
@@ -9,7 +11,12 @@ import {
   loadStatsUserContext,
 } from './lib';
 import { toGoalStatsRow } from './lib/goals-stats.builder';
-import type { StatsAttemptsResponse, StatsGoalsResponse, StatsOverviewResponse } from './types';
+import type {
+  StatsAttemptsResponse,
+  StatsFreedomPointsResponse,
+  StatsGoalsResponse,
+  StatsOverviewResponse,
+} from './types';
 @Injectable()
 export class StatsService {
   constructor(
@@ -17,6 +24,8 @@ export class StatsService {
     private readonly attemptsRepository: AttemptsRepository,
     private readonly attemptsService: AttemptsService,
     private readonly goalsRepository: GoalsRepository,
+    private readonly freedomPointsService: FreedomPointsService,
+    private readonly freedomPointsRepository: FreedomPointsRepository,
   ) {}
 
   async getOverview(userId: number): Promise<StatsOverviewResponse> {
@@ -90,6 +99,19 @@ export class StatsService {
     return {
       currency: user.currency ?? 'USD',
       goals: rows.map((row) => toGoalStatsRow(row)),
+    };
+  }
+
+  async getFreedomPoints(userId: number): Promise<StatsFreedomPointsResponse> {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const sync = await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+    const entries = await this.freedomPointsRepository.listLedgerForUser(userId);
+
+    return {
+      totalFreedomPoints: sync.totalFreedomPoints,
+      entries,
     };
   }
 }

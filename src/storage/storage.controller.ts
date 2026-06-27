@@ -2,6 +2,7 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { CreateChatUploadUrlDto } from './dto/create-chat-upload-url.dto';
+import { CreatePostUploadUrlDto } from './dto/create-post-upload-url.dto';
 import { CreateUploadUrlDto } from './dto/create-upload-url.dto';
 import { StorageService } from './storage.service';
 
@@ -14,7 +15,7 @@ export class StorageController {
   @Post('upload-url')
   createUploadUrl(
     @Req() req: Request & { user: { userId: number } },
-    @Body() dto: CreateUploadUrlDto,
+    @Body() dto: CreatePostUploadUrlDto,
   ) {
     return this.storageService.createPostUploadUrl(req.user.userId, dto);
   }

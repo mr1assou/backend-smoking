@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateSlipEventDto = void 0;
 const class_validator_1 = require("class-validator");
+const slip_cigarette_count_1 = require("../lib/slip-cigarette-count");
 const slip_outcome_1 = require("../types/slip-outcome");
 class CreateSlipEventDto {
     outcome;
@@ -22,9 +23,9 @@ __decorate([
     __metadata("design:type", Object)
 ], CreateSlipEventDto.prototype, "outcome", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((dto) => dto.outcome === 'relapse'),
     (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Min)(slip_cigarette_count_1.RELAPSE_MIN_CIGARETTE_COUNT),
     (0, class_validator_1.Max)(100),
     __metadata("design:type", Number)
 ], CreateSlipEventDto.prototype, "cigarettesCount", void 0);

@@ -167,6 +167,28 @@ let UsersRepository = class UsersRepository {
             });
         });
     }
+    async registerPushToken(userId, token, platform) {
+        await this.prisma.$transaction(async (tx) => {
+            await tx.pushToken.deleteMany({
+                where: { user_id: userId, token: { not: token } },
+            });
+            await tx.pushToken.upsert({
+                where: { token },
+                create: { user_id: userId, token, platform },
+                update: { user_id: userId, platform },
+            });
+        });
+    }
+    hasPushToken(userId) {
+        return this.prisma.pushToken
+            .count({ where: { user_id: userId } })
+            .then((count) => count > 0);
+    }
+    clearPushTokensForUser(userId) {
+        return this.prisma.pushToken
+            .deleteMany({ where: { user_id: userId } })
+            .then(() => undefined);
+    }
 };
 exports.UsersRepository = UsersRepository;
 exports.UsersRepository = UsersRepository = __decorate([

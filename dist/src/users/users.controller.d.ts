@@ -3,6 +3,7 @@ import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersService } from './users.service';
 export declare class UsersController {
@@ -170,5 +171,26 @@ export declare class UsersController {
             packPrice: string | undefined;
         }[] | undefined;
         role: string;
+    }>;
+    registerPushToken(req: Request & {
+        user: {
+            userId: number;
+        };
+    }, dto: RegisterPushTokenDto): Promise<{
+        ok: true;
+    }>;
+    getPushTokenStatus(req: Request & {
+        user: {
+            userId: number;
+        };
+    }): Promise<{
+        has_token: boolean;
+    }>;
+    clearPushTokens(req: Request & {
+        user: {
+            userId: number;
+        };
+    }): Promise<{
+        ok: true;
     }>;
 }

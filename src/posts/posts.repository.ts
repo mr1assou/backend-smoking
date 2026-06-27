@@ -39,6 +39,8 @@ const POST_CACHE_SELECT = {
   image_url: true,
   image_frame: true,
   image_crop: true,
+  media_kind: true,
+  media_duration_ms: true,
   upvote_count: true,
   downvote_count: true,
   share_count: true,
@@ -55,6 +57,8 @@ export type CreatePostData = {
   imageUrl?: string;
   imageFrame?: string;
   imageCrop?: Prisma.InputJsonValue;
+  mediaKind?: string;
+  mediaDurationMs?: number;
 };
 
 export type FeedPostRow = Prisma.PostGetPayload<{
@@ -78,6 +82,8 @@ export class PostsRepository {
         image_url: data.imageUrl,
         image_frame: data.imageFrame,
         image_crop: data.imageCrop,
+        media_kind: data.mediaKind,
+        media_duration_ms: data.mediaDurationMs,
       },
     });
   }
@@ -442,6 +448,8 @@ export class PostsRepository {
       imageUrl: dto.image_url,
       imageFrame: dto.image_frame,
       imageCrop: dto.image_crop as Prisma.InputJsonValue | undefined,
+      mediaKind: dto.media_kind,
+      mediaDurationMs: dto.media_duration_ms,
     };
   }
 

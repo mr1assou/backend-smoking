@@ -1,14 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { CreatePostUploadUrlDto } from './dto/create-post-upload-url.dto';
 import { CreateUploadUrlDto } from './dto/create-upload-url.dto';
 import {
   R2_ALLOWED_CHAT_MEDIA_TYPES,
   R2_ALLOWED_IMAGE_TYPES,
+  R2_ALLOWED_POST_MEDIA_TYPES,
   R2_FOLDERS,
   type R2ChatMediaContentType,
   type R2ImageContentType,
+  type R2PostMediaContentType,
 } from './lib/r2.constants';
 import { mimeToExtension } from './lib/mime-to-extension';
 import { StorageRepository } from './storage.repository';
@@ -20,9 +21,9 @@ export class StorageService {
 
   createPostUploadUrl(
     userId: number,
-    dto: CreateUploadUrlDto,
+    dto: CreatePostUploadUrlDto,
   ): Promise<PresignedUpload> {
-    return this.createImageUploadUrl(R2_FOLDERS.POSTS, userId, dto.contentType);
+    return this.createPostMediaUploadUrl(userId, dto.contentType);
   }
 
   createProfileUploadUrl(
@@ -68,21 +69,6 @@ export class StorageService {
     this.assertOwnedImageUrl(R2_FOLDERS.PROFILES, userId, imageUrl, 'profiles');
   }
 
-  /** Copies a bundled default avatar into the user's R2 profiles folder. */
-  async seedDefaultProfileImage(
-    userId: number,
-    fileName: string,
-  ): Promise<string> {
-    const assetPath = join(process.cwd(), 'assets', 'profiles', fileName);
-    const body = await readFile(assetPath);
-    const key = this.storageRepository.buildObjectKey(
-      R2_FOLDERS.PROFILES,
-      userId,
-      `${uuidv4()}.png`,
-    );
-    return this.storageRepository.putObject(key, body, 'image/png');
-  }
-
   assertOwnedChatMediaUrl(userId: number, mediaUrl: string): void {
     this.assertOwnedImageUrl(R2_FOLDERS.MESSAGES, userId, mediaUrl, 'messages');
   }
@@ -99,6 +85,18 @@ export class StorageService {
         `Image URL must be uploaded to your ${label} folder`,
       );
     }
+  }
+
+  private createPostMediaUploadUrl(
+    userId: number,
+    contentType: R2PostMediaContentType,
+  ): Promise<PresignedUpload> {
+    this.assertAllowedPostMediaType(contentType);
+    return this.createMediaUploadUrl(
+      R2_FOLDERS.POSTS,
+      userId,
+      contentType,
+    );
   }
 
   private async createImageUploadUrl(
@@ -156,6 +154,14 @@ export class StorageService {
   private assertAllowedImageType(contentType: R2ImageContentType): void {
     if (!R2_ALLOWED_IMAGE_TYPES.includes(contentType)) {
       throw new BadRequestException('Unsupported image type');
+    }
+  }
+
+  private assertAllowedPostMediaType(
+    contentType: R2PostMediaContentType,
+  ): void {
+    if (!R2_ALLOWED_POST_MEDIA_TYPES.includes(contentType)) {
+      throw new BadRequestException('Unsupported media type');
     }
   }
 

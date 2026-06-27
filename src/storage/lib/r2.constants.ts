@@ -17,6 +17,15 @@ export const R2_ALLOWED_IMAGE_TYPES = [
 
 export type R2ImageContentType = (typeof R2_ALLOWED_IMAGE_TYPES)[number];
 
+export const R2_ALLOWED_POST_MEDIA_TYPES = [
+  ...R2_ALLOWED_IMAGE_TYPES,
+  'video/mp4',
+  'video/quicktime',
+] as const;
+
+export type R2PostMediaContentType =
+  (typeof R2_ALLOWED_POST_MEDIA_TYPES)[number];
+
 export const R2_ALLOWED_CHAT_MEDIA_TYPES = [
   ...R2_ALLOWED_IMAGE_TYPES,
   'video/mp4',

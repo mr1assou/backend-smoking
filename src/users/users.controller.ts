@@ -5,6 +5,7 @@ import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersService } from './users.service';
 
@@ -63,4 +64,28 @@ export class UsersController {
   ) {
     return this.usersService.resetJourney(req.user.userId, dto);
   }
+
+  @UseGuards(JwtGuard)
+  @Post('me/push-token')
+  @HttpCode(HttpStatus.OK)
+  registerPushToken(
+    @Req() req: Request & { user: { userId: number } },
+    @Body() dto: RegisterPushTokenDto,
+  ) {
+    return this.usersService.registerPushToken(req.user.userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('me/push-token')
+  getPushTokenStatus(@Req() req: Request & { user: { userId: number } }) {
+    return this.usersService.getPushTokenStatus(req.user.userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('me/push-token/clear')
+  @HttpCode(HttpStatus.OK)
+  clearPushTokens(@Req() req: Request & { user: { userId: number } }) {
+    return this.usersService.clearPushTokens(req.user.userId);
+  }
 }
+

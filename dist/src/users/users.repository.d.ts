@@ -29,4 +29,7 @@ export declare class UsersRepository {
     }): Promise<User>;
     updateLastOfflineAt(userId: number, at: Date): Promise<User>;
     resetJourneyProgress(userId: number, startedAt: Date, quitDatePreset: string): Promise<void>;
+    registerPushToken(userId: number, token: string, platform: string): Promise<void>;
+    hasPushToken(userId: number): Promise<boolean>;
+    clearPushTokensForUser(userId: number): Promise<void>;
 }

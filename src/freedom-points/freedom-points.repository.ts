@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { toUtcIso } from '../common/utc-instant';
 import { PrismaService } from '../prisma/prisma.service';
+import type { FreedomPointLedgerRow } from './types/freedom-point-ledger-row';
 import { FREEDOM_POINT_SOURCES } from './lib/freedom-points.constants';
 import {
   isLegacyTimestampSmokeFreeDayKey,
@@ -28,6 +30,30 @@ export type GrantFreedomPointsResult = {
 @Injectable()
 export class FreedomPointsRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  listLedgerForUser(userId: number): Promise<FreedomPointLedgerRow[]> {
+    return this.prisma.freedomPointLedger
+      .findMany({
+        where: { user_id: userId },
+        orderBy: { earned_at: 'desc' },
+        select: {
+          ledger_id: true,
+          amount: true,
+          source_type: true,
+          source_key: true,
+          earned_at: true,
+        },
+      })
+      .then((rows) =>
+        rows.map((row) => ({
+          id: row.ledger_id,
+          amount: row.amount,
+          sourceType: row.source_type,
+          sourceKey: row.source_key,
+          earnedAt: toUtcIso(row.earned_at),
+        })),
+      );
+  }
 
   findUserStreakContext(userId: number): Promise<UserStreakContext | null> {
     return this.prisma.user.findUnique({

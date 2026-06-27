@@ -4,10 +4,12 @@ import {
   IsISO8601,
   IsOptional,
   IsString,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { USERNAME_MAX_LENGTH } from '../lib/normalize-username';
 
 class OnboardingStep1Dto {
   @IsArray()
@@ -34,7 +36,13 @@ class OnboardingStep4Dto {
 }
 
 class OnboardingStep5Dto {
+  @Transform(({ value }) =>
+    typeof value === 'string'
+      ? value.trim().toLowerCase().slice(0, USERNAME_MAX_LENGTH)
+      : value,
+  )
   @IsString()
+  @MaxLength(USERNAME_MAX_LENGTH)
   username: string;
 
   @IsOptional()

@@ -18,7 +18,7 @@ const badges_service_1 = require("../badges/badges.service");
 const freedom_points_service_1 = require("../freedom-points/freedom-points.service");
 const utc_instant_1 = require("../common/utc-instant");
 const storage_service_1 = require("../storage/storage.service");
-const default_profile_image_1 = require("./lib/default-profile-image");
+const normalize_username_1 = require("./lib/normalize-username");
 const users_repository_1 = require("./users.repository");
 const user_roles_1 = require("./lib/user-roles");
 let UsersService = class UsersService {
@@ -57,11 +57,6 @@ let UsersService = class UsersService {
     }
     async updateOnboarding(userId, dto) {
         const data = this.mapOnboardingDtoToData(dto);
-        const existing = await this.usersRepository.findById(userId);
-        if (!existing?.image_url) {
-            const fileName = (0, default_profile_image_1.defaultProfileFileName)(data.sex);
-            data.image_url = await this.storageService.seedDefaultProfileImage(userId, fileName);
-        }
         const result = await this.usersRepository.updateOnboarding(userId, data);
         if (data.quitDate) {
             await this.attemptsService.ensureFirstAttempt(userId, data.quitDate, {
@@ -191,7 +186,7 @@ let UsersService = class UsersService {
             motivation: dto.step2.motivation ?? null,
             priorQuitAttempts: dto.step3.priorQuitAttempts ?? null,
             primaryInterests: dto.step4.primaryInterests,
-            username: dto.step5.username.trim() || null,
+            username: (0, normalize_username_1.normalizeStoredUsername)(dto.step5.username) || null,
             sex: dto.step5.sex ?? null,
             country: dto.step5.country ?? null,
             countryFlag: dto.step5.countryFlag?.trim() || null,
@@ -225,6 +220,18 @@ let UsersService = class UsersService {
             return Number.isNaN(parsed.getTime()) ? null : parsed;
         }
         return null;
+    }
+    async registerPushToken(userId, dto) {
+        await this.usersRepository.registerPushToken(userId, dto.token.trim(), dto.platform);
+        return { ok: true };
+    }
+    async getPushTokenStatus(userId) {
+        const has_token = await this.usersRepository.hasPushToken(userId);
+        return { has_token };
+    }
+    async clearPushTokens(userId) {
+        await this.usersRepository.clearPushTokensForUser(userId);
+        return { ok: true };
     }
 };
 exports.UsersService = UsersService;

@@ -19,6 +19,7 @@ const reset_journey_dto_1 = require("./dto/reset-journey.dto");
 const update_habit_settings_dto_1 = require("./dto/update-habit-settings.dto");
 const update_onboarding_dto_1 = require("./dto/update-onboarding.dto");
 const update_profile_image_dto_1 = require("./dto/update-profile-image.dto");
+const register_push_token_dto_1 = require("./dto/register-push-token.dto");
 const update_user_preferences_dto_1 = require("./dto/update-user-preferences.dto");
 const users_service_1 = require("./users.service");
 let UsersController = class UsersController {
@@ -43,6 +44,15 @@ let UsersController = class UsersController {
     }
     resetJourney(req, dto) {
         return this.usersService.resetJourney(req.user.userId, dto);
+    }
+    registerPushToken(req, dto) {
+        return this.usersService.registerPushToken(req.user.userId, dto);
+    }
+    getPushTokenStatus(req) {
+        return this.usersService.getPushTokenStatus(req.user.userId);
+    }
+    clearPushTokens(req) {
+        return this.usersService.clearPushTokens(req.user.userId);
     }
 };
 exports.UsersController = UsersController;
@@ -100,6 +110,33 @@ __decorate([
     __metadata("design:paramtypes", [Object, reset_journey_dto_1.ResetJourneyDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "resetJourney", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('me/push-token'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, register_push_token_dto_1.RegisterPushTokenDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "registerPushToken", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('me/push-token'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getPushTokenStatus", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Post)('me/push-token/clear'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "clearPushTokens", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

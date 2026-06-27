@@ -63,6 +63,7 @@ model User {
 
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsActed    Notification[] @relation("NotificationActor")
+  pushTokens            PushToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -183,9 +184,12 @@ model Post {
   description    String   @default("")
   tag_id         String?
 
-  image_url      String?
-  image_frame    String?
-  image_crop     Json?
+  image_url          String?
+  image_frame        String?
+  image_crop         Json?
+  /// image | video — URL in image_url for both kinds
+  media_kind         String?  @default("image")
+  media_duration_ms  Int?
 
   upvote_count   Int      @default(0)
   downvote_count Int      @default(0)
@@ -358,6 +362,19 @@ model Notification {
   @@index([recipient_id, created_at(sort: Desc)])
   @@index([recipient_id, is_read])
   @@map("notifications")
+}
+
+/// Expo push token for device notifications (updated on sign-up / reinstall).
+model PushToken {
+  push_token_id Int      @id @default(autoincrement())
+  user_id       Int      @map("user_id")
+  user          User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  token         String   @unique
+  platform      String
+  updated_at    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([user_id])
+  @@map("push_tokens")
 }
 
 /// Badges a user has earned (e.g. first-step on signup).

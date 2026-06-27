@@ -9,6 +9,7 @@ import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersRepository } from './users.repository';
 export declare class UsersService {
@@ -170,4 +171,13 @@ export declare class UsersService {
     private mapOnboardingDtoToData;
     private resolveQuitDateInstant;
     private resolveQuitDate;
+    registerPushToken(userId: number, dto: RegisterPushTokenDto): Promise<{
+        ok: true;
+    }>;
+    getPushTokenStatus(userId: number): Promise<{
+        has_token: boolean;
+    }>;
+    clearPushTokens(userId: number): Promise<{
+        ok: true;
+    }>;
 }

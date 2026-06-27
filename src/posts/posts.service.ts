@@ -19,6 +19,7 @@ import {
 import type { UpdatePostDto } from './dto/update-post.dto';
 import type { VotePostDto } from './dto/vote-post.dto';
 import { DEFAULT_POST_FEED_SORT } from './lib/post-feed-sort.constants';
+import { POST_MEDIA_KINDS } from './lib/post-media.constants';
 import { POST_FEED_REDIS_WINDOW_SIZE } from './lib/post-feed-pagination.constants';
 import { smokeFreeDaysFromUser } from './lib/smoke-free-days';
 import {
@@ -462,9 +463,11 @@ export class PostsService {
   }
 
   async createPost(userId: number, dto: CreatePostDto) {
+    this.assertPostMediaPayload(dto.media_kind, dto.image_crop);
+
     if (dto.image_url) {
       this.storageService.assertOwnedPostImageUrl(userId, dto.image_url);
-    } else if (dto.image_frame || dto.image_crop) {
+    } else if (dto.image_frame || dto.image_crop || dto.media_kind === 'video') {
       throw new BadRequestException(
         'image_url is required when image metadata is provided',
       );
@@ -508,11 +511,20 @@ export class PostsService {
   async updatePost(postId: number, userId: number, dto: UpdatePostDto) {
     const existing = await this.requireOwnedPost(postId, userId);
 
+    this.assertPostMediaPayload(
+      dto.media_kind ?? undefined,
+      dto.image_crop ?? undefined,
+    );
+
     if (dto.image_url) {
       this.storageService.assertOwnedPostImageUrl(userId, dto.image_url);
     } else if (dto.image_url === null) {
       // clearing image is allowed
-    } else if (dto.image_frame || dto.image_crop) {
+    } else if (
+      dto.image_frame ||
+      dto.image_crop ||
+      dto.media_kind === 'video'
+    ) {
       throw new BadRequestException(
         'image_url is required when image metadata is provided',
       );
@@ -530,6 +542,9 @@ export class PostsService {
         : {}),
       ...(dto.tag_id !== undefined ? { tag_id: dto.tag_id } : {}),
       ...(dto.image_url !== undefined ? { image_url: dto.image_url } : {}),
+      ...(dto.image_url === null
+        ? { media_kind: null, media_duration_ms: null }
+        : {}),
       ...(dto.image_frame !== undefined
         ? { image_frame: dto.image_frame }
         : {}),
@@ -540,6 +555,12 @@ export class PostsService {
                 ? Prisma.JsonNull
                 : (dto.image_crop as unknown as Prisma.InputJsonValue),
           }
+        : {}),
+      ...(dto.media_kind !== undefined
+        ? { media_kind: dto.media_kind }
+        : {}),
+      ...(dto.media_duration_ms !== undefined
+        ? { media_duration_ms: dto.media_duration_ms }
         : {}),
     });
 
@@ -671,6 +692,8 @@ export class PostsService {
       image_url: row.image_url,
       image_frame: row.image_frame,
       image_crop: row.image_crop,
+      media_kind: row.media_kind,
+      media_duration_ms: row.media_duration_ms,
       upvote_count: row.upvote_count,
       downvote_count: row.downvote_count,
       share_count: row.share_count,
@@ -678,6 +701,19 @@ export class PostsService {
       created_at: row.created_at.toISOString(),
       updated_at: row.updated_at.toISOString(),
     };
+  }
+
+  private assertPostMediaPayload(
+    mediaKind: (typeof POST_MEDIA_KINDS)[number] | null | undefined,
+    imageCrop: unknown,
+  ): void {
+    if (mediaKind && !POST_MEDIA_KINDS.includes(mediaKind)) {
+      throw new BadRequestException('Unsupported media kind');
+    }
+
+    if (mediaKind === 'video' && imageCrop) {
+      throw new BadRequestException('Crop is not supported for video posts');
+    }
   }
 
   private requireOwnedPost(postId: number, userId: number) {
@@ -800,6 +836,8 @@ export class PostsService {
       image_url: row.image_url,
       image_frame: row.image_frame,
       image_crop: row.image_crop,
+      media_kind: row.media_kind,
+      media_duration_ms: row.media_duration_ms,
       upvote_count: row.upvote_count,
       downvote_count: row.downvote_count,
       share_count: row.share_count,
@@ -828,6 +866,8 @@ export class PostsService {
       image_url: card.image_url,
       image_frame: card.image_frame,
       image_crop: card.image_crop,
+      media_kind: card.media_kind,
+      media_duration_ms: card.media_duration_ms,
       upvote_count: card.upvote_count,
       downvote_count: card.downvote_count,
       share_count: card.share_count,

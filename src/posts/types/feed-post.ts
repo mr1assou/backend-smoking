@@ -18,6 +18,8 @@ export type FeedPostResponse = {
   image_url: string | null;
   image_frame: string | null;
   image_crop: unknown;
+  media_kind: string | null;
+  media_duration_ms: number | null;
   upvote_count: number;
   downvote_count: number;
   share_count: number;

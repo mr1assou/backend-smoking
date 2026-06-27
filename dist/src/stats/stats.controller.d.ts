@@ -18,4 +18,9 @@ export declare class StatsController {
             userId: number;
         };
     }): Promise<import("./types").StatsGoalsResponse>;
+    getFreedomPoints(req: Request & {
+        user: {
+            userId: number;
+        };
+    }): Promise<import("./types").StatsFreedomPointsResponse>;
 }

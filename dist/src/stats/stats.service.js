@@ -13,6 +13,8 @@ exports.StatsService = void 0;
 const common_1 = require("@nestjs/common");
 const attempts_repository_1 = require("../attempts/attempts.repository");
 const attempts_service_1 = require("../attempts/attempts.service");
+const freedom_points_repository_1 = require("../freedom-points/freedom-points.repository");
+const freedom_points_service_1 = require("../freedom-points/freedom-points.service");
 const goals_repository_1 = require("../goals/goals.repository");
 const users_repository_1 = require("../users/users.repository");
 const lib_1 = require("./lib");
@@ -22,11 +24,15 @@ let StatsService = class StatsService {
     attemptsRepository;
     attemptsService;
     goalsRepository;
-    constructor(usersRepository, attemptsRepository, attemptsService, goalsRepository) {
+    freedomPointsService;
+    freedomPointsRepository;
+    constructor(usersRepository, attemptsRepository, attemptsService, goalsRepository, freedomPointsService, freedomPointsRepository) {
         this.usersRepository = usersRepository;
         this.attemptsRepository = attemptsRepository;
         this.attemptsService = attemptsService;
         this.goalsRepository = goalsRepository;
+        this.freedomPointsService = freedomPointsService;
+        this.freedomPointsRepository = freedomPointsRepository;
     }
     async getOverview(userId) {
         const context = await (0, lib_1.loadStatsUserContext)(userId, this.usersRepository, this.attemptsRepository, this.attemptsService);
@@ -64,6 +70,17 @@ let StatsService = class StatsService {
             goals: rows.map((row) => (0, goals_stats_builder_1.toGoalStatsRow)(row)),
         };
     }
+    async getFreedomPoints(userId) {
+        const user = await this.usersRepository.findById(userId);
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        const sync = await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+        const entries = await this.freedomPointsRepository.listLedgerForUser(userId);
+        return {
+            totalFreedomPoints: sync.totalFreedomPoints,
+            entries,
+        };
+    }
 };
 exports.StatsService = StatsService;
 exports.StatsService = StatsService = __decorate([
@@ -71,6 +88,8 @@ exports.StatsService = StatsService = __decorate([
     __metadata("design:paramtypes", [users_repository_1.UsersRepository,
         attempts_repository_1.AttemptsRepository,
         attempts_service_1.AttemptsService,
-        goals_repository_1.GoalsRepository])
+        goals_repository_1.GoalsRepository,
+        freedom_points_service_1.FreedomPointsService,
+        freedom_points_repository_1.FreedomPointsRepository])
 ], StatsService);
 //# sourceMappingURL=stats.service.js.map

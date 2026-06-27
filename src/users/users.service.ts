@@ -13,9 +13,10 @@ import { StorageService } from '../storage/storage.service';
 import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
+import { normalizeStoredUsername } from './lib/normalize-username';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
-import { defaultProfileFileName } from './lib/default-profile-image';
 import { UsersRepository } from './users.repository';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
 import type { UserOnboardingData } from './types/user-onboarding-data';
@@ -67,16 +68,6 @@ export class UsersService {
 
   async updateOnboarding(userId: number, dto: UpdateOnboardingDto) {
     const data = this.mapOnboardingDtoToData(dto);
-    const existing = await this.usersRepository.findById(userId);
-
-    if (!existing?.image_url) {
-      const fileName = defaultProfileFileName(data.sex);
-      data.image_url = await this.storageService.seedDefaultProfileImage(
-        userId,
-        fileName,
-      );
-    }
-
     const result = await this.usersRepository.updateOnboarding(userId, data);
 
     if (data.quitDate) {
@@ -253,7 +244,7 @@ export class UsersService {
       motivation: dto.step2.motivation ?? null,
       priorQuitAttempts: dto.step3.priorQuitAttempts ?? null,
       primaryInterests: dto.step4.primaryInterests,
-      username: dto.step5.username.trim() || null,
+      username: normalizeStoredUsername(dto.step5.username) || null,
       sex: dto.step5.sex ?? null,
       country: dto.step5.country ?? null,
       countryFlag: dto.step5.countryFlag?.trim() || null,
@@ -294,5 +285,24 @@ export class UsersService {
       return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
     return null;
+  }
+
+  async registerPushToken(userId: number, dto: RegisterPushTokenDto) {
+    await this.usersRepository.registerPushToken(
+      userId,
+      dto.token.trim(),
+      dto.platform,
+    );
+    return { ok: true as const };
+  }
+
+  async getPushTokenStatus(userId: number) {
+    const has_token = await this.usersRepository.hasPushToken(userId);
+    return { has_token };
+  }
+
+  async clearPushTokens(userId: number) {
+    await this.usersRepository.clearPushTokensForUser(userId);
+    return { ok: true as const };
   }
 }

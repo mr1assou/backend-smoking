@@ -16,6 +16,8 @@ export type PostCacheRow = {
   image_url: string | null;
   image_frame: string | null;
   image_crop: unknown;
+  media_kind: string | null;
+  media_duration_ms: number | null;
   upvote_count: number;
   downvote_count: number;
   share_count: number;
@@ -33,6 +35,8 @@ export type CachedPostCard = {
   image_url: string | null;
   image_frame: string | null;
   image_crop: unknown;
+  media_kind: string | null;
+  media_duration_ms: number | null;
   upvote_count: number;
   downvote_count: number;
   share_count: number;
@@ -241,6 +245,9 @@ export class PostsCacheRepository {
       image_frame: post.image_frame ?? '',
       image_crop:
         post.image_crop == null ? '' : JSON.stringify(post.image_crop),
+      media_kind: post.media_kind ?? 'image',
+      media_duration_ms:
+        post.media_duration_ms == null ? '' : String(post.media_duration_ms),
       created_at: post.created_at.toISOString(),
       updated_at: post.updated_at.toISOString(),
       up: String(post.upvote_count),
@@ -277,6 +284,10 @@ export class PostsCacheRepository {
       image_url: raw.image_url || null,
       image_frame: raw.image_frame || null,
       image_crop: imageCrop,
+      media_kind: raw.media_kind || 'image',
+      media_duration_ms: raw.media_duration_ms
+        ? Number.parseInt(raw.media_duration_ms, 10) || null
+        : null,
       upvote_count: Number.parseInt(raw.up ?? '0', 10) || 0,
       downvote_count: Number.parseInt(raw.down ?? '0', 10) || 0,
       share_count: Number.parseInt(raw.shares ?? '0', 10) || 0,

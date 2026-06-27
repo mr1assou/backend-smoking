@@ -18,6 +18,7 @@
     "db:status": "prisma migrate status",
     "seed:relax-sounds": "node scripts/seed-relax-sounds.mjs",
     "seed:relax-sounds:db": "node scripts/seed-relax-sounds.mjs --db-only",
+    "purge:r2-profiles": "node scripts/purge-r2-profiles.mjs",
     "localize:relax-sound-covers": "node scripts/localize-relax-sound-covers.mjs",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",

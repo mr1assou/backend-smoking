@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateOnboardingDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const normalize_username_1 = require("../lib/normalize-username");
 class OnboardingStep1Dto {
     quitReasons;
 }
@@ -54,7 +55,11 @@ class OnboardingStep5Dto {
     quitDate;
 }
 __decorate([
+    (0, class_transformer_1.Transform)(({ value }) => typeof value === 'string'
+        ? value.trim().toLowerCase().slice(0, normalize_username_1.USERNAME_MAX_LENGTH)
+        : value),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(normalize_username_1.USERNAME_MAX_LENGTH),
     __metadata("design:type", String)
 ], OnboardingStep5Dto.prototype, "username", void 0);
 __decorate([

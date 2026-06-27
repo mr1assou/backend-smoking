@@ -9,3 +9,7 @@ export type {
   StatsOverviewResponse,
 } from './stats-overview-response';
 export type { GoalStatsRow, StatsGoalsResponse } from './stats-goals-response';
+export type {
+  FreedomPointLedgerRow,
+  StatsFreedomPointsResponse,
+} from './stats-freedom-points-response';
