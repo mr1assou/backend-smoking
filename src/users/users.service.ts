@@ -14,6 +14,7 @@ import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { normalizeStoredUsername } from './lib/normalize-username';
+import { defaultProfileImageForSex } from './lib/default-profile-image';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
@@ -257,6 +258,7 @@ export class UsersService {
       packPrice: dto.step6.packPrice ?? null,
       yearsSmoking: dto.step6.yearsSmoking ?? null,
       cigarettesPerPack: dto.step6.cigarettesPerPack ?? null,
+      image_url: defaultProfileImageForSex(dto.step5.sex),
     };
   }
 

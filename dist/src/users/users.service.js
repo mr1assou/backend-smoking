@@ -19,6 +19,7 @@ const freedom_points_service_1 = require("../freedom-points/freedom-points.servi
 const utc_instant_1 = require("../common/utc-instant");
 const storage_service_1 = require("../storage/storage.service");
 const normalize_username_1 = require("./lib/normalize-username");
+const default_profile_image_1 = require("./lib/default-profile-image");
 const users_repository_1 = require("./users.repository");
 const user_roles_1 = require("./lib/user-roles");
 let UsersService = class UsersService {
@@ -199,6 +200,7 @@ let UsersService = class UsersService {
             packPrice: dto.step6.packPrice ?? null,
             yearsSmoking: dto.step6.yearsSmoking ?? null,
             cigarettesPerPack: dto.step6.cigarettesPerPack ?? null,
+            image_url: (0, default_profile_image_1.defaultProfileImageForSex)(dto.step5.sex),
         };
     }
     resolveQuitDateInstant(input) {

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import { resolveRedisConnectionOptions } from './redis-connection.config';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -15,15 +16,15 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly config: ConfigService) {}
 
   async onModuleInit() {
-    const url = this.resolveRedisUrl();
-    this.client = new Redis(url, {
-      maxRetriesPerRequest: null,
+    const options = resolveRedisConnectionOptions(this.config);
+    this.client = new Redis({
+      ...options,
       lazyConnect: true,
     });
 
     await this.client.connect();
     await this.client.ping();
-    this.logger.log(`Connected to Redis at ${url}`);
+    this.logger.log('Connected to Redis');
   }
 
   async onModuleDestroy() {
@@ -38,14 +39,5 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       throw new Error('Redis client is not initialized');
     }
     return this.client;
-  }
-
-  private resolveRedisUrl(): string {
-    const url = this.config.get<string>('REDIS_URL');
-    if (url) return url;
-
-    const host = this.config.get<string>('REDIS_HOST', '127.0.0.1');
-    const port = this.config.get<number>('REDIS_PORT', 6379);
-    return `redis://${host}:${port}`;
   }
 }

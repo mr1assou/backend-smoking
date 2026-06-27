@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const schedule_1 = require("@nestjs/schedule");
 const chat_module_1 = require("./chat/chat.module");
 const auth_module_1 = require("./auth/auth.module");
 const user_profiles_module_1 = require("./user-profiles/user-profiles.module");
@@ -17,6 +18,7 @@ const notifications_module_1 = require("./notifications/notifications.module");
 const presence_module_1 = require("./presence/presence.module");
 const posts_module_1 = require("./posts/posts.module");
 const prisma_module_1 = require("./prisma/prisma.module");
+const push_notifications_module_1 = require("./push-notifications/push-notifications.module");
 const redis_module_1 = require("./redis/redis.module");
 const relax_sounds_module_1 = require("./relax-sounds/relax-sounds.module");
 const storage_module_1 = require("./storage/storage.module");
@@ -27,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true }),
+            schedule_1.ScheduleModule.forRoot(),
             prisma_module_1.PrismaModule,
             redis_module_1.RedisModule,
             presence_module_1.PresenceModule,
@@ -38,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             chat_module_1.ChatModule,
             notifications_module_1.NotificationsModule,
             relax_sounds_module_1.RelaxSoundsModule,
+            push_notifications_module_1.PushNotificationsModule,
         ],
     })
 ], AppModule);

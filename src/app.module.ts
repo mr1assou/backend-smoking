@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { UserProfilesModule } from './user-profiles/user-profiles.module';
@@ -8,6 +9,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PresenceModule } from './presence/presence.module';
 import { PostsModule } from './posts/posts.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { PushNotificationsModule } from './push-notifications/push-notifications.module';
 import { RedisModule } from './redis/redis.module';
 import { RelaxSoundsModule } from './relax-sounds/relax-sounds.module';
 import { StorageModule } from './storage/storage.module';
@@ -15,6 +17,7 @@ import { StorageModule } from './storage/storage.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     RedisModule,
     PresenceModule,
@@ -26,6 +29,7 @@ import { StorageModule } from './storage/storage.module';
     ChatModule,
     NotificationsModule,
     RelaxSoundsModule,
+    PushNotificationsModule,
   ],
 })
 export class AppModule {}
