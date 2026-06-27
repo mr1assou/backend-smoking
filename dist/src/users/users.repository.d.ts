@@ -22,6 +22,7 @@ export declare class UsersRepository {
     }>;
     updateRefreshToken(userId: number, hashedRefreshToken: string | null): Promise<User>;
     updateProfileImage(userId: number, imageUrl: string): Promise<User>;
+    updateUsername(userId: number, username: string): Promise<User>;
     updateHabitSettings(userId: number, economics: {
         cigarettesPerDay: number;
         cigarettesPerPack: number;

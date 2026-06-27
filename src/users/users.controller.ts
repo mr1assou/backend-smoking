@@ -5,6 +5,7 @@ import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { UpdateUsernameDto } from './dto/update-username.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersService } from './users.service';
@@ -44,6 +45,15 @@ export class UsersController {
     @Body() dto: UpdateProfileImageDto,
   ) {
     return this.usersService.updateProfileImage(req.user.userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('me/username')
+  updateUsername(
+    @Req() req: Request & { user: { userId: number } },
+    @Body() dto: UpdateUsernameDto,
+  ) {
+    return this.usersService.updateUsername(req.user.userId, dto);
   }
 
   @UseGuards(JwtGuard)

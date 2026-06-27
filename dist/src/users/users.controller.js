@@ -19,6 +19,7 @@ const reset_journey_dto_1 = require("./dto/reset-journey.dto");
 const update_habit_settings_dto_1 = require("./dto/update-habit-settings.dto");
 const update_onboarding_dto_1 = require("./dto/update-onboarding.dto");
 const update_profile_image_dto_1 = require("./dto/update-profile-image.dto");
+const update_username_dto_1 = require("./dto/update-username.dto");
 const register_push_token_dto_1 = require("./dto/register-push-token.dto");
 const update_user_preferences_dto_1 = require("./dto/update-user-preferences.dto");
 const users_service_1 = require("./users.service");
@@ -38,6 +39,9 @@ let UsersController = class UsersController {
     }
     updateProfileImage(req, dto) {
         return this.usersService.updateProfileImage(req.user.userId, dto);
+    }
+    updateUsername(req, dto) {
+        return this.usersService.updateUsername(req.user.userId, dto);
     }
     updateHabitSettings(req, dto) {
         return this.usersService.updateHabitSettings(req.user.userId, dto);
@@ -91,6 +95,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_profile_image_dto_1.UpdateProfileImageDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateProfileImage", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Patch)('me/username'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_username_dto_1.UpdateUsernameDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateUsername", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Patch)('me/habit-settings'),

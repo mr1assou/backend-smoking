@@ -3,6 +3,7 @@ import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { UpdateUsernameDto } from './dto/update-username.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersService } from './users.service';
@@ -97,6 +98,43 @@ export declare class UsersController {
         };
     }, dto: UpdateProfileImageDto): Promise<{
         image_url: string;
+    }>;
+    updateUsername(req: Request & {
+        user: {
+            userId: number;
+        };
+    }, dto: UpdateUsernameDto): Promise<{
+        userId: number;
+        email: string;
+        name: string | undefined;
+        hasCompletedOnboarding: boolean;
+        sex: string | undefined;
+        country: string | undefined;
+        countryFlag: string | undefined;
+        currency: string | undefined;
+        quitDatePreset: string | undefined;
+        quitDate: string | undefined;
+        streakStart: string | undefined;
+        cigarettesPerDay: number | undefined;
+        cigarettesPerPack: number | undefined;
+        packPrice: string | undefined;
+        motivationCardIndex: number;
+        tipsCardIndex: number;
+        savedTipCardIds: string[];
+        savedMotivationCardIds: string[];
+        imageUrl: string | undefined;
+        slipCigarettesTotal: number;
+        currentAttemptNumber: number;
+        freedomPoints: number;
+        goalsCompleted: number;
+        earnedBadgeIds: string[];
+        economicsSegments: {
+            effectiveFrom: string;
+            cigarettesPerDay: number;
+            cigarettesPerPack: number;
+            packPrice: string | undefined;
+        }[] | undefined;
+        role: string;
     }>;
     updateHabitSettings(req: Request & {
         user: {

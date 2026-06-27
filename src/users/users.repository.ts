@@ -143,6 +143,13 @@ export class UsersRepository {
     });
   }
 
+  updateUsername(userId: number, username: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { user_id: userId },
+      data: { username },
+    });
+  }
+
   updateHabitSettings(
     userId: number,
     economics: {

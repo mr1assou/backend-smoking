@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import {
@@ -16,6 +20,7 @@ import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { normalizeStoredUsername } from './lib/normalize-username';
 import { defaultProfileImageForSex } from './lib/default-profile-image';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { UpdateUsernameDto } from './dto/update-username.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { UsersRepository } from './users.repository';
@@ -167,6 +172,16 @@ export class UsersService {
     this.storageService.assertOwnedProfileImageUrl(userId, dto.image_url);
     await this.usersRepository.updateProfileImage(userId, dto.image_url);
     return { image_url: dto.image_url };
+  }
+
+  async updateUsername(userId: number, dto: UpdateUsernameDto) {
+    const username = normalizeStoredUsername(dto.username);
+    if (!username) {
+      throw new BadRequestException('Username is required');
+    }
+
+    await this.usersRepository.updateUsername(userId, username);
+    return this.getMe(userId);
   }
 
   async setRefreshTokenHash(

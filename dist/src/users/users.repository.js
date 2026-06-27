@@ -121,6 +121,12 @@ let UsersRepository = class UsersRepository {
             data: { image_url: imageUrl },
         });
     }
+    updateUsername(userId, username) {
+        return this.prisma.user.update({
+            where: { user_id: userId },
+            data: { username },
+        });
+    }
     updateHabitSettings(userId, economics) {
         return this.prisma.user.update({
             where: { user_id: userId },

@@ -129,6 +129,14 @@ let UsersService = class UsersService {
         await this.usersRepository.updateProfileImage(userId, dto.image_url);
         return { image_url: dto.image_url };
     }
+    async updateUsername(userId, dto) {
+        const username = (0, normalize_username_1.normalizeStoredUsername)(dto.username);
+        if (!username) {
+            throw new common_1.BadRequestException('Username is required');
+        }
+        await this.usersRepository.updateUsername(userId, username);
+        return this.getMe(userId);
+    }
     async setRefreshTokenHash(userId, hashedRefreshToken) {
         await this.usersRepository.updateRefreshToken(userId, hashedRefreshToken);
     }
