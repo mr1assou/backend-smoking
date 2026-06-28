@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ChatModule } from './chat/chat.module';
+import { CallModule } from './call/call.module';
 import { AuthModule } from './auth/auth.module';
 import { UserProfilesModule } from './user-profiles/user-profiles.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
@@ -27,6 +28,7 @@ import { StorageModule } from './storage/storage.module';
     StorageModule,
     PostsModule,
     ChatModule,
+    CallModule,
     NotificationsModule,
     RelaxSoundsModule,
     PushNotificationsModule,
