@@ -148,6 +148,7 @@ model PlanDayProgress {
   user         User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   plan_day     Int       @map("plan_day")
   task_states  Json      @default("{}") @map("task_states")
+  task_notes   Json      @default("{}") @map("task_notes")
   completed_at DateTime? @map("completed_at") @db.Timestamptz(3)
   created_at   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updated_at   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)

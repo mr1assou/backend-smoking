@@ -1,6 +1,7 @@
 export type PlanDayProgressDto = {
   planDay: number;
   taskStates: Record<string, boolean>;
+  taskNotes: Record<string, string>;
   completedAt: string | null;
 };
 

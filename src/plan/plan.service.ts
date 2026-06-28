@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PlanDayProgress } from '@prisma/client';
 import { UsersRepository } from '../users/users.repository';
-import { areAllPlanTasksDone } from './lib/plan-catalog';
+import { areAllPlanTasksDone, isValidPlanTaskId } from './lib/plan-catalog';
 import {
   getCurrentPlanDay,
   getUnlockedThroughDay,
@@ -15,6 +15,7 @@ import {
 } from './lib/plan-unlock';
 import { PlanRepository } from './plan.repository';
 import type { PlanDayProgressDto, PlanStateResponse } from './types/plan-state.response';
+import { NOTE_MAX_LENGTH } from './dto/save-plan-task-note.dto';
 
 @Injectable()
 export class PlanService {
@@ -112,15 +113,72 @@ export class PlanService {
     return this.getPlanState(userId, timezone);
   }
 
+  async saveTaskNote(
+    userId: number,
+    planDay: number,
+    taskId: string,
+    rawNote: string,
+    timezone: string,
+  ): Promise<PlanStateResponse> {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const streakStart = user.streakStart ?? user.quitDate ?? null;
+    if (!streakStart) {
+      throw new BadRequestException('Plan is not available without a streak start');
+    }
+
+    if (!isValidPlanTaskId(planDay, taskId)) {
+      throw new BadRequestException('Unknown plan task');
+    }
+
+    const now = new Date();
+    const rows = await this.planRepository.findProgressForUser(userId);
+    const completedPlanDays = new Set(
+      rows.filter((row) => row.completed_at).map((row) => row.plan_day),
+    );
+
+    if (!isPlanDayUnlocked(planDay, streakStart, timezone, completedPlanDays, now)) {
+      throw new ForbiddenException('This plan day is not unlocked yet');
+    }
+
+    const note = rawNote.trim().slice(0, NOTE_MAX_LENGTH);
+    const existing = await this.planRepository.findDayProgress(userId, planDay);
+    const taskNotes = this.readTaskNotes(existing);
+
+    if (note) {
+      taskNotes[taskId] = note;
+    } else {
+      delete taskNotes[taskId];
+    }
+
+    await this.planRepository.upsertTaskNote(userId, planDay, taskNotes);
+
+    return this.getPlanState(userId, timezone);
+  }
+
   private readTaskStates(row: PlanDayProgress | null): Record<string, boolean> {
     if (!row?.task_states || typeof row.task_states !== 'object') return {};
     return row.task_states as Record<string, boolean>;
+  }
+
+  private readTaskNotes(row: PlanDayProgress | null): Record<string, string> {
+    if (!row?.task_notes || typeof row.task_notes !== 'object') return {};
+    const entries = Object.entries(row.task_notes as Record<string, unknown>);
+    const notes: Record<string, string> = {};
+    for (const [taskId, value] of entries) {
+      if (typeof value === 'string' && value.trim()) {
+        notes[taskId] = value.trim();
+      }
+    }
+    return notes;
   }
 
   private toDayDto(row: PlanDayProgress): PlanDayProgressDto {
     return {
       planDay: row.plan_day,
       taskStates: this.readTaskStates(row),
+      taskNotes: this.readTaskNotes(row),
       completedAt: row.completed_at?.toISOString() ?? null,
     };
   }

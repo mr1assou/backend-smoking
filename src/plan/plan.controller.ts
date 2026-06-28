@@ -12,6 +12,7 @@ import type { Request } from 'express';
 import { readClientTimezoneHeader } from '../common/client-timezone';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { TogglePlanTaskDto } from './dto/toggle-plan-task.dto';
+import { SavePlanTaskNoteDto } from './dto/save-plan-task-note.dto';
 import { PlanService } from './plan.service';
 
 @Controller('auth/me/plan')
@@ -39,6 +40,24 @@ export class PlanController {
       day,
       taskId,
       body.done,
+      timezone,
+    );
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('days/:day/tasks/:taskId/note')
+  saveTaskNote(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('day', ParseIntPipe) day: number,
+    @Param('taskId') taskId: string,
+    @Body() body: SavePlanTaskNoteDto,
+  ) {
+    const timezone = readClientTimezoneHeader(req.headers['x-timezone']);
+    return this.planService.saveTaskNote(
+      req.user.userId,
+      day,
+      taskId,
+      body.note,
       timezone,
     );
   }

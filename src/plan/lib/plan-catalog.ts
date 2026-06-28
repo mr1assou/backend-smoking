@@ -17,6 +17,10 @@ export function getPlanTaskIds(day: number): string[] {
   return taskIdsByDay.get(day) ?? [];
 }
 
+export function isValidPlanTaskId(day: number, taskId: string): boolean {
+  return getPlanTaskIds(day).includes(taskId);
+}
+
 export function areAllPlanTasksDone(
   day: number,
   taskStates: Record<string, boolean>,

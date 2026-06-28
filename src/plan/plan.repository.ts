@@ -52,4 +52,28 @@ export class PlanRepository {
       },
     });
   }
+
+  upsertTaskNote(
+    userId: number,
+    planDay: number,
+    taskNotes: Record<string, string>,
+  ): Promise<PlanDayProgress> {
+    return this.prisma.planDayProgress.upsert({
+      where: {
+        user_id_plan_day: {
+          user_id: userId,
+          plan_day: planDay,
+        },
+      },
+      create: {
+        user_id: userId,
+        plan_day: planDay,
+        task_states: {},
+        task_notes: taskNotes,
+      },
+      update: {
+        task_notes: taskNotes,
+      },
+    });
+  }
 }
