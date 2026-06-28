@@ -56,4 +56,13 @@ export class PushNotificationsRepository {
         })),
       );
   }
+
+  listPushTokensForUser(userId: number): Promise<string[]> {
+    return this.prisma.pushToken
+      .findMany({
+        where: { user_id: userId },
+        select: { token: true },
+      })
+      .then((rows) => rows.map((row) => row.token));
+  }
 }

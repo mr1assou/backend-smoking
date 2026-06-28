@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { PushNotificationsModule } from '../push-notifications/push-notifications.module';
 import { StorageModule } from '../storage/storage.module';
 import { ChatController } from './chat.controller';
 import { ChatGateway } from './chat.gateway';
@@ -8,7 +9,7 @@ import { ChatRepository } from './chat.repository';
 import { ChatService } from './chat.service';
 
 @Module({
-  imports: [JwtModule.register({}), StorageModule],
+  imports: [JwtModule.register({}), StorageModule, PushNotificationsModule],
   controllers: [ChatController],
   providers: [ChatRepository, ChatService, ChatPubSubService, ChatGateway],
   exports: [ChatService],

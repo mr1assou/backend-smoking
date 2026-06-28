@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { toUtcIso } from '../common/utc-instant';
+import { ChatPushNotificationService } from '../push-notifications/chat-push-notification.service';
 import { StorageService } from '../storage/storage.service';
 import { ChatPubSubService } from './chat-pubsub.service';
 import { ChatRepository } from './chat.repository';
@@ -39,6 +40,7 @@ export class ChatService {
     private readonly chatRepository: ChatRepository,
     private readonly chatPubSub: ChatPubSubService,
     private readonly storageService: StorageService,
+    private readonly chatPushNotification: ChatPushNotificationService,
   ) {}
 
   async listThreads(
@@ -187,6 +189,19 @@ export class ChatService {
       user_one_id,
       user_two_id,
       payload,
+    });
+
+    const recipientUserId = peerUserIdFromThread(thread, userId);
+    const sender =
+      thread.user_one_id === userId ? thread.userOne : thread.userTwo;
+
+    void this.chatPushNotification.notifyNewMessageIfOffline({
+      recipientUserId,
+      senderUserId: userId,
+      senderUsername: sender.username,
+      threadId,
+      messageType: dto.message_type,
+      text: dto.text ?? null,
     });
 
     return payload;

@@ -37,8 +37,8 @@ export class ExpoPushClient {
         priority: 'high',
         channelId: PUSH_ANDROID_CHANNEL_ID,
         data: {
-          type: 'streak',
           ...message.data,
+          type: message.data?.type ?? 'streak',
         },
       }));
 
