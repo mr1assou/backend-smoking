@@ -13,11 +13,13 @@ function messagePreview(
       : 'a message';
   }
 
-  const mediaLabels: Record<Exclude<ChatMessageType, 'text'>, string> = {
+  const mediaLabels: Record<Exclude<ChatMessageType, 'text' | 'call'>, string> = {
     image: 'a photo',
     video: 'a video',
     audio: 'a voice message',
   };
+
+  if (messageType === 'call') return 'a call';
 
   return mediaLabels[messageType];
 }

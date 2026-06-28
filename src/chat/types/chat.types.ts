@@ -1,4 +1,4 @@
-export const CHAT_MESSAGE_TYPES = ['text', 'image', 'video', 'audio'] as const;
+export const CHAT_MESSAGE_TYPES = ['text', 'image', 'video', 'audio', 'call'] as const;
 
 export type ChatMessageType = (typeof CHAT_MESSAGE_TYPES)[number];
 
