@@ -12,7 +12,7 @@ export const PUSH_SCHEDULE = {
   },
   tip: {
     cron: '30 12 * * *',
-    label: '12:30 PM tip',
+    label: '12:30 PM motivation',
   },
   money: {
     cron: '30 17 * * *',

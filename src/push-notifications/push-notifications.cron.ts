@@ -25,12 +25,12 @@ export class PushNotificationsCron {
   }
 
   @Cron(PUSH_SCHEDULE.tip.cron, {
-    name: 'push-tip',
+    name: 'push-motivation-midday',
     timeZone: PUSH_TIMEZONE,
   })
-  handleTipPush(): void {
+  handleMiddayMotivationPush(): void {
     this.logger.debug(`Running ${PUSH_SCHEDULE.tip.label}`);
-    void this.pushNotificationsService.sendPushToSubscribers('tip');
+    void this.pushNotificationsService.sendPushToSubscribers('motivation');
   }
 
   @Cron(PUSH_SCHEDULE.money.cron, {
