@@ -67,6 +67,15 @@ export class PostsController {
   }
 
   @UseGuards(JwtGuard)
+  @Post(':postId/moderate')
+  moderate(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    return this.postsService.moderatePost(postId, req.user.userId);
+  }
+
+  @UseGuards(JwtGuard)
   @Delete(':postId')
   remove(
     @Req() req: Request & { user: { userId: number } },

@@ -47,7 +47,10 @@ const POST_CACHE_SELECT = {
   comment_count: true,
   created_at: true,
   updated_at: true,
+  moderated_at: true,
 } as const;
+
+const ACTIVE_POST_FILTER = { moderated_at: null } as const;
 
 export type CreatePostData = {
   authorId: number;
@@ -96,6 +99,7 @@ export class PostsRepository {
 
   findAllForCacheIndex(): Promise<PostCacheRow[]> {
     return this.prisma.post.findMany({
+      where: ACTIVE_POST_FILTER,
       select: POST_CACHE_SELECT,
       orderBy: { created_at: 'desc' },
       take: POST_FEED_REDIS_WINDOW_SIZE,
@@ -104,7 +108,26 @@ export class PostsRepository {
 
   countPosts(tagId?: string): Promise<number> {
     return this.prisma.post.count({
-      where: tagId ? { tag_id: tagId } : undefined,
+      where: tagId
+        ? { tag_id: tagId, ...ACTIVE_POST_FILTER }
+        : ACTIVE_POST_FILTER,
+    });
+  }
+
+  findUserRole(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { user_id: userId },
+      select: { role: true },
+    });
+  }
+
+  moderatePost(postId: number, moderatorId: number) {
+    return this.prisma.post.update({
+      where: { post_id: postId },
+      data: {
+        moderated_at: new Date(),
+        moderated_by_id: moderatorId,
+      },
     });
   }
 
@@ -112,7 +135,7 @@ export class PostsRepository {
     if (postIds.length === 0) return Promise.resolve([]);
 
     return this.prisma.post.findMany({
-      where: { post_id: { in: postIds } },
+      where: { post_id: { in: postIds }, ...ACTIVE_POST_FILTER },
       include: {
         author: { select: AUTHOR_SELECT },
       },
@@ -394,7 +417,10 @@ export class PostsRepository {
     const sort = options.sort ?? DEFAULT_POST_FEED_SORT;
     const offset = options.offset ?? 0;
     const limit = options.limit ?? POST_FEED_PAGE_SIZE;
-    const where = options.tagId ? { tag_id: options.tagId } : undefined;
+    const where = {
+      ...ACTIVE_POST_FILTER,
+      ...(options.tagId ? { tag_id: options.tagId } : {}),
+    };
 
     const orderBy = (() => {
       switch (sort) {
@@ -473,7 +499,10 @@ export class PostsRepository {
     limit = POST_FEED_PAGE_SIZE,
   ) {
     const rows = await this.prisma.post.findMany({
-      where: { author_id: authorId },
+      where: {
+        author_id: authorId,
+        ...(authorId !== viewerUserId ? ACTIVE_POST_FILTER : {}),
+      },
       orderBy: { created_at: 'desc' },
       skip: offset,
       take: limit + 1,
@@ -534,6 +563,7 @@ export class PostsRepository {
   ) {
     const rows = await this.prisma.post.findMany({
       where: {
+        ...ACTIVE_POST_FILTER,
         votes: {
           some: {
             user_id: voterId,

@@ -47,6 +47,7 @@ model User {
   slipEvents   SlipEvent[]
   quitAttempts QuitAttempt[]
   posts        Post[]
+  moderatedPosts Post[] @relation("ModeratedPosts")
   postComments      PostComment[]
   postVotes         PostVote[]
   postCommentVotes  PostCommentVote[]
@@ -199,6 +200,10 @@ model Post {
 
   comments       PostComment[]
   votes          PostVote[]
+
+  moderated_at     DateTime? @map("moderated_at") @db.Timestamptz(3)
+  moderated_by_id  Int?      @map("moderated_by_id")
+  moderated_by     User?     @relation("ModeratedPosts", fields: [moderated_by_id], references: [user_id], onDelete: SetNull)
 
   created_at     DateTime @default(now()) @db.Timestamptz(3)
   updated_at     DateTime @updatedAt @db.Timestamptz(3)

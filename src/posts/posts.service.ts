@@ -9,6 +9,8 @@ import { Prisma } from '@prisma/client';
 import { StorageService } from '../storage/storage.service';
 import { PresenceService } from '../presence/presence.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { PostModerationPushNotificationService } from '../push-notifications/post-moderation-push-notification.service';
+import { isSupportRole } from '../users/lib/user-roles';
 import type { CreateCommentDto } from './dto/create-comment.dto';
 import type { UpdateCommentDto } from './dto/update-comment.dto';
 import type { CreatePostDto } from './dto/create-post.dto';
@@ -54,6 +56,7 @@ export class PostsService {
     private readonly storageService: StorageService,
     private readonly presenceService: PresenceService,
     private readonly notificationsService: NotificationsService,
+    private readonly postModerationPush: PostModerationPushNotificationService,
   ) {}
 
   async listFeed(
@@ -592,6 +595,39 @@ export class PostsService {
     return { post_id: postId };
   }
 
+  async moderatePost(
+    postId: number,
+    moderatorUserId: number,
+  ): Promise<{ post_id: number; author_id: number }> {
+    const moderator = await this.postsRepository.findUserRole(moderatorUserId);
+    if (!isSupportRole(moderator?.role)) {
+      throw new ForbiddenException('Only support staff can moderate posts');
+    }
+
+    const post = await this.postsRepository.findById(postId);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    if (post.moderated_at) {
+      return { post_id: postId, author_id: post.author_id };
+    }
+
+    await this.postsRepository.moderatePost(postId, moderatorUserId);
+
+    await this.postsCacheRepository
+      .removePost(postId, post.tag_id)
+      .catch((error) => {
+        this.logger.warn(`Failed to remove post ${postId} from Redis`, error);
+      });
+
+    void this.postModerationPush.notifyPostRemoved({
+      authorUserId: post.author_id,
+      postId,
+    });
+
+    return { post_id: postId, author_id: post.author_id };
+  }
+
   private async buildFeedPageFromRows(
     rows: FeedPostRow[],
     viewerUserId: number,
@@ -727,7 +763,9 @@ export class PostsService {
 
   private requirePost(postId: number) {
     return this.postsRepository.findById(postId).then((post) => {
-      if (!post) throw new NotFoundException('Post not found');
+      if (!post || post.moderated_at) {
+        throw new NotFoundException('Post not found');
+      }
       return post;
     });
   }
@@ -736,6 +774,11 @@ export class PostsService {
     viewerUserId: number,
     postId: number,
   ): Promise<FeedPostResponse> {
+    const row = await this.postsRepository.findById(postId);
+    if (!row || row.moderated_at) {
+      throw new NotFoundException('Post not found');
+    }
+
     const [post] = await this.buildFeedFromCache(viewerUserId, [postId]);
     if (!post) throw new NotFoundException('Post not found');
     return post;
@@ -830,6 +873,7 @@ export class PostsService {
       post_id: row.post_id,
       author_id: row.author_id,
       is_mine: row.author_id === viewerUserId,
+      is_moderated: row.moderated_at != null,
       title: row.title,
       description: row.description,
       tag_id: row.tag_id ?? '',

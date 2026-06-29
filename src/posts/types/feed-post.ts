@@ -12,6 +12,7 @@ export type FeedPostResponse = {
   post_id: number;
   author_id: number;
   is_mine: boolean;
+  is_moderated?: boolean;
   title: string;
   description: string;
   tag_id: string;
