@@ -36,9 +36,10 @@ export class AuthService {
   ) {}
 
   async signup(dto: SignupDto) {
+    const email = dto.email.trim().toLowerCase();
     const hashedPassword = await argon2.hash(dto.password);
     const user = await this.usersService.createWithHashedPassword(
-      dto.email,
+      email,
       hashedPassword,
     );
     return this.issueTokensForUser(user.user_id, user.email);
@@ -94,7 +95,8 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.usersService.findByEmail(dto.email);
+    const email = dto.email.trim().toLowerCase();
+    const user = await this.usersService.findByEmail(email);
 
     if (!user) throw new NotFoundException('User not found');
 

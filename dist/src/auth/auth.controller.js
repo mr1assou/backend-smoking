@@ -62,7 +62,7 @@ let AuthController = class AuthController {
     async login(dto, res) {
         const { accessToken, refreshToken } = await this.authService.login(dto);
         this.setRefreshTokenCookie(res, refreshToken);
-        return { accessToken };
+        return { accessToken, refreshToken };
     }
     async refresh(req, res) {
         const { accessToken, refreshToken } = await this.authService.refresh(req.user.userId, req.user.refreshToken);

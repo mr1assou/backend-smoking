@@ -66,8 +66,9 @@ let AuthService = class AuthService {
         this.googleToken = googleToken;
     }
     async signup(dto) {
+        const email = dto.email.trim().toLowerCase();
         const hashedPassword = await argon2.hash(dto.password);
-        const user = await this.usersService.createWithHashedPassword(dto.email, hashedPassword);
+        const user = await this.usersService.createWithHashedPassword(email, hashedPassword);
         return this.issueTokensForUser(user.user_id, user.email);
     }
     async googleSignIn(idToken) {
@@ -101,7 +102,8 @@ let AuthService = class AuthService {
         return { ...tokens, isNewUser: true, email: user.email };
     }
     async login(dto) {
-        const user = await this.usersService.findByEmail(dto.email);
+        const email = dto.email.trim().toLowerCase();
+        const user = await this.usersService.findByEmail(email);
         if (!user)
             throw new common_1.NotFoundException('User not found');
         const passwordMatches = await argon2.verify(user.password, dto.password);

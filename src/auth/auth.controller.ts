@@ -100,7 +100,7 @@ export class AuthController {
   ) {
     const { accessToken, refreshToken } = await this.authService.login(dto);
     this.setRefreshTokenCookie(res, refreshToken);
-    return { accessToken };
+    return { accessToken, refreshToken };
   }
 
   @HttpCode(HttpStatus.OK)

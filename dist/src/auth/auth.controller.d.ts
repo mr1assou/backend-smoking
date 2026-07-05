@@ -35,6 +35,7 @@ export declare class AuthController {
     }>;
     login(dto: LoginDto, res: Response): Promise<{
         accessToken: string;
+        refreshToken: string;
     }>;
     refresh(req: Request & {
         user: {
