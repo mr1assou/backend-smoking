@@ -10,7 +10,10 @@ export type GoalProgressSnapshot = {
   elapsedSmokeFreeMs: number;
 };
 
-function computeMinTarget(type: GoalType, progress: GoalProgressSnapshot): number {
+function computeMinTarget(
+  type: GoalType,
+  progress: GoalProgressSnapshot,
+): number {
   switch (type) {
     case 'smoke_free_days':
       return minDaysAheadFromStreakDays(progress.smokeFreeDays);

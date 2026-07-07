@@ -106,8 +106,10 @@ export class StatsService {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
-    const sync = await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
-    const entries = await this.freedomPointsRepository.listLedgerForUser(userId);
+    const sync =
+      await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+    const entries =
+      await this.freedomPointsRepository.listLedgerForUser(userId);
 
     return {
       totalFreedomPoints: sync.totalFreedomPoints,

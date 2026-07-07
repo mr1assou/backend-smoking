@@ -215,7 +215,9 @@ export class ChatService {
   async recordCallHistory(
     userId: number,
     dto: RecordCallHistoryDto,
-  ): Promise<{ ok: true; message: ChatMessageDto } | { ok: true; duplicate: true }> {
+  ): Promise<
+    { ok: true; message: ChatMessageDto } | { ok: true; duplicate: true }
+  > {
     if (dto.peer_user_id === userId) {
       throw new BadRequestException('Invalid peer');
     }
@@ -296,7 +298,11 @@ export class ChatService {
     );
 
     const payload = this.toMessageDto(updated);
-    await this.publishThreadMessageEvent(thread, 'chat:message_updated', payload);
+    await this.publishThreadMessageEvent(
+      thread,
+      'chat:message_updated',
+      payload,
+    );
     return payload;
   }
 
@@ -310,7 +316,11 @@ export class ChatService {
 
     const deleted = await this.chatRepository.softDeleteMessage(messageId);
     const payload = this.toMessageDto(deleted);
-    await this.publishThreadMessageEvent(thread, 'chat:message_deleted', payload);
+    await this.publishThreadMessageEvent(
+      thread,
+      'chat:message_deleted',
+      payload,
+    );
     return payload;
   }
 

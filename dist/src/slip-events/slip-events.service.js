@@ -31,8 +31,7 @@ let SlipEventsService = class SlipEventsService {
         const previousQuitDate = user.quitDate ?? previousStreakStart;
         const cigarettesCount = (0, lib_1.resolveSlipCigarettesCount)(dto.outcome, dto.cigarettesCount);
         if (dto.outcome === 'relapse' &&
-            (cigarettesCount == null ||
-                cigarettesCount < lib_1.RELAPSE_MIN_CIGARETTE_COUNT)) {
+            (cigarettesCount == null || cigarettesCount < lib_1.RELAPSE_MIN_CIGARETTE_COUNT)) {
             throw new common_1.BadRequestException(`Relapse requires at least ${lib_1.RELAPSE_MIN_CIGARETTE_COUNT} cigarettes`);
         }
         const { event, streakStart, quitDate, currentAttemptNumber } = await this.slipEventsRepository.createWithAttemptRotation({

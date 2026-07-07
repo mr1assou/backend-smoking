@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ResetJourneyDto } from './dto/reset-journey.dto';
@@ -98,4 +108,3 @@ export class UsersController {
     return this.usersService.clearPushTokens(req.user.userId);
   }
 }
-

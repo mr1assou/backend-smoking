@@ -36,7 +36,7 @@ class OnboardingStep4Dto {
 }
 
 class OnboardingStep5Dto {
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string'
       ? value.trim().toLowerCase().slice(0, USERNAME_MAX_LENGTH)
       : value,

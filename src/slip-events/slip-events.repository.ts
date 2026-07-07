@@ -105,7 +105,7 @@ export class SlipEventsRepository {
 
     return this.prisma.$transaction(async (tx) => {
       const attempt = await tx.quitAttempt.findFirstOrThrow({
-        where: { attempt_id: activeAttempt!.attempt_id },
+        where: { attempt_id: activeAttempt.attempt_id },
       });
 
       const closedAttempt = await tx.quitAttempt.update({
@@ -200,10 +200,7 @@ export class SlipEventsRepository {
 
         currentAttemptNumber = reopened.attemptNumber;
 
-        await this.goalsRepository.restoreGoalsFailedBySlip(
-          tx,
-          slipEventId,
-        );
+        await this.goalsRepository.restoreGoalsFailedBySlip(tx, slipEventId);
 
         await tx.user.update({
           where: { user_id: userId },

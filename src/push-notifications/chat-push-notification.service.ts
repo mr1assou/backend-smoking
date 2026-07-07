@@ -26,7 +26,9 @@ export class ChatPushNotificationService {
   ) {}
 
   /** Sends an OS push when the recipient has no active presence connection. */
-  async notifyNewMessageIfOffline(params: ChatPushMessageParams): Promise<void> {
+  async notifyNewMessageIfOffline(
+    params: ChatPushMessageParams,
+  ): Promise<void> {
     try {
       const online = await this.presence.isOnline(params.recipientUserId);
       if (online) return;

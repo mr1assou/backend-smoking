@@ -14,7 +14,9 @@ export type PostModerationPushParams = {
 
 @Injectable()
 export class PostModerationPushNotificationService {
-  private readonly logger = new Logger(PostModerationPushNotificationService.name);
+  private readonly logger = new Logger(
+    PostModerationPushNotificationService.name,
+  );
 
   constructor(
     private readonly repository: PushNotificationsRepository,
@@ -23,7 +25,9 @@ export class PostModerationPushNotificationService {
 
   async notifyPostRemoved(params: PostModerationPushParams): Promise<void> {
     try {
-      const tokens = await this.repository.listPushTokensForUser(params.authorUserId);
+      const tokens = await this.repository.listPushTokensForUser(
+        params.authorUserId,
+      );
       if (tokens.length === 0) return;
 
       await this.expoPush.sendBatch(

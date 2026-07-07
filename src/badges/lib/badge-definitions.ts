@@ -10,12 +10,42 @@ export type BadgeDefinition = {
 
 /** Keep in sync with `quit-smoking/constants/progress/badges.ts`. */
 export const BADGE_DEFINITIONS: readonly BadgeDefinition[] = [
-  { id: FIRST_STEP_BADGE_ID, daysRequired: 0, fpRequired: 0, goalsCompletedRequired: 0 },
-  { id: 'rising-quitter', daysRequired: 1, fpRequired: 15, goalsCompletedRequired: 1 },
-  { id: 'craving-crusher', daysRequired: 3, fpRequired: 35, goalsCompletedRequired: 2 },
-  { id: 'two-weeks-free', daysRequired: 14, fpRequired: 700, goalsCompletedRequired: 4 },
-  { id: 'top-rated', daysRequired: 30, fpRequired: 1_200, goalsCompletedRequired: 6 },
-  { id: 'top-rated-plus', daysRequired: 60, fpRequired: 2_500, goalsCompletedRequired: 8 },
+  {
+    id: FIRST_STEP_BADGE_ID,
+    daysRequired: 0,
+    fpRequired: 0,
+    goalsCompletedRequired: 0,
+  },
+  {
+    id: 'rising-quitter',
+    daysRequired: 1,
+    fpRequired: 15,
+    goalsCompletedRequired: 1,
+  },
+  {
+    id: 'craving-crusher',
+    daysRequired: 3,
+    fpRequired: 35,
+    goalsCompletedRequired: 2,
+  },
+  {
+    id: 'two-weeks-free',
+    daysRequired: 14,
+    fpRequired: 700,
+    goalsCompletedRequired: 4,
+  },
+  {
+    id: 'top-rated',
+    daysRequired: 30,
+    fpRequired: 1_200,
+    goalsCompletedRequired: 6,
+  },
+  {
+    id: 'top-rated-plus',
+    daysRequired: 60,
+    fpRequired: 2_500,
+    goalsCompletedRequired: 8,
+  },
   {
     id: 'champion',
     daysRequired: 90,

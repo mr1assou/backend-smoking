@@ -9,7 +9,13 @@ import { GoalsRepository } from './goals.repository';
 import { GoalsService } from './goals.service';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AttemptsModule, FreedomPointsModule, BadgesModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AttemptsModule,
+    FreedomPointsModule,
+    BadgesModule,
+  ],
   controllers: [GoalsController],
   providers: [GoalsRepository, GoalsService],
   exports: [GoalsRepository],

@@ -396,17 +396,11 @@ export class PostsService {
     await this.postsCacheRepository
       .syncVoteStats(post.post_id, post.upvote_count, post.downvote_count)
       .catch((error) => {
-        this.logger.warn(
-          `Failed to sync vote stats for post ${postId}`,
-          error,
-        );
+        this.logger.warn(`Failed to sync vote stats for post ${postId}`, error);
       });
 
     // Notify the post author when a vote is actively cast (not on removal).
-    if (
-      (myVote === 'up' || myVote === 'down') &&
-      post.author_id !== userId
-    ) {
+    if ((myVote === 'up' || myVote === 'down') && post.author_id !== userId) {
       void this.notifyPostVote(postId, post.author_id, userId, myVote);
     }
 
@@ -470,7 +464,11 @@ export class PostsService {
 
     if (dto.image_url) {
       this.storageService.assertOwnedPostImageUrl(userId, dto.image_url);
-    } else if (dto.image_frame || dto.image_crop || dto.media_kind === 'video') {
+    } else if (
+      dto.image_frame ||
+      dto.image_crop ||
+      dto.media_kind === 'video'
+    ) {
       throw new BadRequestException(
         'image_url is required when image metadata is provided',
       );
@@ -559,9 +557,7 @@ export class PostsService {
                 : (dto.image_crop as unknown as Prisma.InputJsonValue),
           }
         : {}),
-      ...(dto.media_kind !== undefined
-        ? { media_kind: dto.media_kind }
-        : {}),
+      ...(dto.media_kind !== undefined ? { media_kind: dto.media_kind } : {}),
       ...(dto.media_duration_ms !== undefined
         ? { media_duration_ms: dto.media_duration_ms }
         : {}),

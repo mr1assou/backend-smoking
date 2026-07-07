@@ -45,7 +45,10 @@ export function currentValueForGoalType(
   }
 }
 
-export function isGoalMet(goal: GoalLike, progress: GoalProgressSnapshot): boolean {
+export function isGoalMet(
+  goal: GoalLike,
+  progress: GoalProgressSnapshot,
+): boolean {
   switch (goal.type) {
     case 'smoke_free_days':
       return isSmokeFreeDaysAheadGoalMet(

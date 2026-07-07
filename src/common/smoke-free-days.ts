@@ -78,7 +78,9 @@ export function isSmokeFreeDaysAheadGoalMet(
   daysAhead: number,
   elapsedMs: number,
 ): boolean {
-  return elapsedMs >= smokeFreeDaysAheadDeadlineMs(baselineElapsedMs, daysAhead);
+  return (
+    elapsedMs >= smokeFreeDaysAheadDeadlineMs(baselineElapsedMs, daysAhead)
+  );
 }
 
 /** Earliest streak duration if the user picks the minimum for their current streak. */

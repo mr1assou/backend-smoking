@@ -71,10 +71,7 @@ export class NotificationsService {
     if (input.postAuthorId !== actorId) {
       recipients.set(input.postAuthorId, 'comment');
     }
-    if (
-      input.replyToUserId &&
-      input.replyToUserId !== actorId
-    ) {
+    if (input.replyToUserId && input.replyToUserId !== actorId) {
       recipients.set(input.replyToUserId, 'reply');
     }
 
@@ -105,8 +102,7 @@ export class NotificationsService {
     const actorId = input.actor.user_id;
     if (input.postAuthorId === actorId) return;
 
-    const type: NotificationType =
-      input.vote === 'up' ? 'upvote' : 'downvote';
+    const type: NotificationType = input.vote === 'up' ? 'upvote' : 'downvote';
 
     await this.createAndPublish({
       recipientId: input.postAuthorId,

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { toUtcIso, utcInstantNow } from '../common/utc-instant';
 import { UsersRepository } from '../users/users.repository';
 import { CreateSlipEventDto } from './dto/create-slip-event.dto';
@@ -27,8 +31,7 @@ export class SlipEventsService {
 
     if (
       dto.outcome === 'relapse' &&
-      (cigarettesCount == null ||
-        cigarettesCount < RELAPSE_MIN_CIGARETTE_COUNT)
+      (cigarettesCount == null || cigarettesCount < RELAPSE_MIN_CIGARETTE_COUNT)
     ) {
       throw new BadRequestException(
         `Relapse requires at least ${RELAPSE_MIN_CIGARETTE_COUNT} cigarettes`,

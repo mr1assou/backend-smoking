@@ -7,7 +7,7 @@ import {
 } from '../lib/normalize-username-search';
 
 export class SearchUsersQueryDto {
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? normalizeUsernameSearchQuery(value) : value,
   )
   @IsString()

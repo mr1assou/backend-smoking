@@ -10,7 +10,12 @@ import { ChatRepository } from './chat.repository';
 import { ChatService } from './chat.service';
 
 @Module({
-  imports: [JwtModule.register({}), StorageModule, PushNotificationsModule, RedisModule],
+  imports: [
+    JwtModule.register({}),
+    StorageModule,
+    PushNotificationsModule,
+    RedisModule,
+  ],
   controllers: [ChatController],
   providers: [ChatRepository, ChatService, ChatPubSubService, ChatGateway],
   exports: [ChatService],

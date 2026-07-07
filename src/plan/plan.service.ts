@@ -14,7 +14,10 @@ import {
   PLAN_TOTAL_DAYS,
 } from './lib/plan-unlock';
 import { PlanRepository } from './plan.repository';
-import type { PlanDayProgressDto, PlanStateResponse } from './types/plan-state.response';
+import type {
+  PlanDayProgressDto,
+  PlanStateResponse,
+} from './types/plan-state.response';
 import { NOTE_MAX_LENGTH } from './dto/save-plan-task-note.dto';
 
 @Injectable()
@@ -24,7 +27,10 @@ export class PlanService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async getPlanState(userId: number, timezone: string): Promise<PlanStateResponse> {
+  async getPlanState(
+    userId: number,
+    timezone: string,
+  ): Promise<PlanStateResponse> {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
@@ -74,7 +80,9 @@ export class PlanService {
 
     const streakStart = user.streakStart ?? user.quitDate ?? null;
     if (!streakStart) {
-      throw new BadRequestException('Plan is not available without a streak start');
+      throw new BadRequestException(
+        'Plan is not available without a streak start',
+      );
     }
 
     const now = new Date();
@@ -90,18 +98,24 @@ export class PlanService {
     );
     const currentDay = getCurrentPlanDay(unlockedThroughDay, completedPlanDays);
 
-    if (!isPlanDayUnlocked(planDay, streakStart, timezone, completedPlanDays, now)) {
+    if (
+      !isPlanDayUnlocked(planDay, streakStart, timezone, completedPlanDays, now)
+    ) {
       throw new ForbiddenException('This plan day is not unlocked yet');
     }
 
     if (planDay !== currentDay) {
-      throw new ForbiddenException('Tasks can only be updated on your current plan day');
+      throw new ForbiddenException(
+        'Tasks can only be updated on your current plan day',
+      );
     }
 
     const existing = await this.planRepository.findDayProgress(userId, planDay);
     const taskStates = this.readTaskStates(existing);
     const nextTaskStates = { ...taskStates, [taskId]: done };
-    const completedAt = areAllPlanTasksDone(planDay, nextTaskStates) ? now : null;
+    const completedAt = areAllPlanTasksDone(planDay, nextTaskStates)
+      ? now
+      : null;
 
     await this.planRepository.upsertDayProgress(
       userId,
@@ -125,7 +139,9 @@ export class PlanService {
 
     const streakStart = user.streakStart ?? user.quitDate ?? null;
     if (!streakStart) {
-      throw new BadRequestException('Plan is not available without a streak start');
+      throw new BadRequestException(
+        'Plan is not available without a streak start',
+      );
     }
 
     if (!isValidPlanTaskId(planDay, taskId)) {
@@ -138,7 +154,9 @@ export class PlanService {
       rows.filter((row) => row.completed_at).map((row) => row.plan_day),
     );
 
-    if (!isPlanDayUnlocked(planDay, streakStart, timezone, completedPlanDays, now)) {
+    if (
+      !isPlanDayUnlocked(planDay, streakStart, timezone, completedPlanDays, now)
+    ) {
       throw new ForbiddenException('This plan day is not unlocked yet');
     }
 

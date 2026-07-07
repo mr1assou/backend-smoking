@@ -77,15 +77,11 @@ export class UsersService {
     const result = await this.usersRepository.updateOnboarding(userId, data);
 
     if (data.quitDate) {
-      await this.attemptsService.ensureFirstAttempt(
-        userId,
-        data.quitDate,
-        {
-          cigarettesPerDay: data.cigarettesPerDay ?? 0,
-          cigarettesPerPack: data.cigarettesPerPack ?? 20,
-          packPrice: data.packPrice,
-        },
-      );
+      await this.attemptsService.ensureFirstAttempt(userId, data.quitDate, {
+        cigarettesPerDay: data.cigarettesPerDay ?? 0,
+        cigarettesPerPack: data.cigarettesPerPack ?? 20,
+        packPrice: data.packPrice,
+      });
       await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
       await this.badgesService.syncEarnedBadges(userId);
     }

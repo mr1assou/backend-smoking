@@ -8,12 +8,13 @@ function messagePreview(
 ): string {
   if (messageType === 'text') {
     const preview = text?.trim();
-    return preview
-      ? preview.slice(0, PREVIEW_MAX_LENGTH)
-      : 'a message';
+    return preview ? preview.slice(0, PREVIEW_MAX_LENGTH) : 'a message';
   }
 
-  const mediaLabels: Record<Exclude<ChatMessageType, 'text' | 'call'>, string> = {
+  const mediaLabels: Record<
+    Exclude<ChatMessageType, 'text' | 'call'>,
+    string
+  > = {
     image: 'a photo',
     video: 'a video',
     audio: 'a voice message',

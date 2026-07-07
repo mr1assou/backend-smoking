@@ -32,7 +32,9 @@ export function getUnlockedThroughDay(
 ): number {
   let through = 0;
   for (let day = 1; day <= PLAN_TOTAL_DAYS; day += 1) {
-    if (!isPlanDayUnlocked(day, streakStart, timeZone, completedPlanDays, now)) {
+    if (
+      !isPlanDayUnlocked(day, streakStart, timeZone, completedPlanDays, now)
+    ) {
       break;
     }
     through = day;

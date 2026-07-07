@@ -9,7 +9,13 @@ import { StatsRepository } from './stats.repository';
 import { StatsService } from './stats.service';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AttemptsModule, GoalsModule, FreedomPointsModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AttemptsModule,
+    GoalsModule,
+    FreedomPointsModule,
+  ],
   controllers: [StatsController],
   providers: [StatsService, StatsRepository],
 })

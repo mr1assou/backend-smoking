@@ -121,8 +121,9 @@ export class FreedomPointsService {
       return { pointsAwarded: grant.pointsAwarded, totalFreedomPoints };
     }
 
-    const user =
-      await this.freedomPointsRepository.findUserStreakContext(input.userId);
+    const user = await this.freedomPointsRepository.findUserStreakContext(
+      input.userId,
+    );
 
     return {
       pointsAwarded: 0,

@@ -22,7 +22,7 @@ type DefaultProfileImagePath = (typeof DEFAULT_PROFILE_IMAGE_PATHS)[number];
 type NormalizedSex = 'male' | 'female' | 'prefer_not_say';
 
 function pickRandom<T>(items: readonly T[]): T {
-  return items[Math.floor(Math.random() * items.length)]!;
+  return items[Math.floor(Math.random() * items.length)];
 }
 
 function normalizeSex(sex: string | null | undefined): NormalizedSex | null {

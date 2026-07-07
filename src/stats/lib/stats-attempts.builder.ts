@@ -2,7 +2,6 @@ import { QuitAttempt } from '@prisma/client';
 import { AttemptsRepository } from '../../attempts/attempts.repository';
 import { AttemptsService } from '../../attempts/attempts.service';
 import { toUtcIso } from '../../common/utc-instant';
-import { UsersRepository } from '../../users/users.repository';
 import type { AttemptStatsRow } from '../types';
 import type { AttemptImpactSnapshot } from './attempt-impact';
 
@@ -38,8 +37,7 @@ export async function buildAttemptsList(
       }
 
       if (isActive) {
-        const timelineStart =
-          activeTimelineStart ?? row.startedAt;
+        const timelineStart = activeTimelineStart ?? row.startedAt;
         const snapshot = await attemptsService.computeSegmentedSnapshot(
           userId,
           row,

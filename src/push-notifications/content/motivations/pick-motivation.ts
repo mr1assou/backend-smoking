@@ -6,8 +6,7 @@ export function pickMotivationBody(input: {
   rotationSlot: number;
   motivationCardIndex: number;
 }): string {
-  const seed =
-    input.userId + input.rotationSlot + input.motivationCardIndex;
+  const seed = input.userId + input.rotationSlot + input.motivationCardIndex;
 
   return pickFromList(MOTIVATION_MESSAGES, seed).body;
 }

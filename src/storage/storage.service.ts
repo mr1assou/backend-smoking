@@ -92,11 +92,7 @@ export class StorageService {
     contentType: R2PostMediaContentType,
   ): Promise<PresignedUpload> {
     this.assertAllowedPostMediaType(contentType);
-    return this.createMediaUploadUrl(
-      R2_FOLDERS.POSTS,
-      userId,
-      contentType,
-    );
+    return this.createMediaUploadUrl(R2_FOLDERS.POSTS, userId, contentType);
   }
 
   private async createImageUploadUrl(
@@ -143,7 +139,9 @@ export class StorageService {
     const isAudio = R2_ALLOWED_CHAT_MEDIA_TYPES.includes(contentType);
 
     if (!isAudio) {
-      throw new BadRequestException('Only audio files can be uploaded for music');
+      throw new BadRequestException(
+        'Only audio files can be uploaded for music',
+      );
     }
 
     if (!/\.(mp3|wav|m4a|aac)$/i.test(lower)) {

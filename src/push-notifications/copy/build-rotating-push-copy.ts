@@ -15,7 +15,10 @@ function firstName(username: string | null): string {
   return username?.trim().split(/\s+/)[0] || 'Friend';
 }
 
-function computeMoneySaved(recipient: PushRecipient, elapsedMs: number): number {
+function computeMoneySaved(
+  recipient: PushRecipient,
+  elapsedMs: number,
+): number {
   const cigarettesPerDay = recipient.cigarettesPerDay ?? 0;
   const cigarettesPerPack = Math.max(1, recipient.cigarettesPerPack ?? 20);
   const packPrice = parsePackPrice(recipient.packPrice);

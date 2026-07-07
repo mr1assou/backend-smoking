@@ -85,8 +85,7 @@ export function computeSegmentedAttemptImpact(
   for (let index = 0; index < sorted.length; index += 1) {
     const segment = sorted[index];
     const segmentStartMs = Math.max(startMs, segment.effectiveFrom.getTime());
-    const nextStartMs =
-      sorted[index + 1]?.effectiveFrom.getTime() ?? endMs;
+    const nextStartMs = sorted[index + 1]?.effectiveFrom.getTime() ?? endMs;
     const segmentEndMs = Math.min(endMs, nextStartMs);
 
     if (segmentStartMs >= segmentEndMs) continue;

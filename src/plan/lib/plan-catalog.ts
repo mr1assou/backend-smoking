@@ -10,7 +10,10 @@ const days = (planData as { chapters: { days: PlanDay[] }[] }).chapters.flatMap(
 const taskIdsByDay = new Map<number, string[]>();
 
 for (const day of days) {
-  taskIdsByDay.set(day.day, day.tasks.map((task) => task.id));
+  taskIdsByDay.set(
+    day.day,
+    day.tasks.map((task) => task.id),
+  );
 }
 
 export function getPlanTaskIds(day: number): string[] {
@@ -26,5 +29,7 @@ export function areAllPlanTasksDone(
   taskStates: Record<string, boolean>,
 ): boolean {
   const taskIds = getPlanTaskIds(day);
-  return taskIds.length > 0 && taskIds.every((taskId) => taskStates[taskId] === true);
+  return (
+    taskIds.length > 0 && taskIds.every((taskId) => taskStates[taskId] === true)
+  );
 }

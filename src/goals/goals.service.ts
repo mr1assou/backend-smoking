@@ -21,10 +21,7 @@ import {
 } from './lib/goal-allowed-targets';
 import { computeGoalCompletionBonus } from './lib/goal-completion-bonus';
 import { elapsedSmokeFreeMs } from '../common/smoke-free-days';
-import {
-  buildGoalProgressSnapshot,
-  isGoalMet,
-} from './lib/goal-progress';
+import { buildGoalProgressSnapshot, isGoalMet } from './lib/goal-progress';
 
 export type UserGoalDto = {
   id: number;
@@ -116,10 +113,7 @@ export class GoalsService {
 
     const activeAttempt =
       context.active ??
-      (await this.attemptsService.ensureFirstAttempt(
-        userId,
-        user.quitDate,
-      ));
+      (await this.attemptsService.ensureFirstAttempt(userId, user.quitDate));
 
     const progress = buildGoalProgressSnapshot(
       user.streakStart,
@@ -150,7 +144,10 @@ export class GoalsService {
     return this.getGoalsState(userId);
   }
 
-  async deleteGoal(userId: number, goalId: number): Promise<GoalsStateResponse> {
+  async deleteGoal(
+    userId: number,
+    goalId: number,
+  ): Promise<GoalsStateResponse> {
     const goal = await this.goalsRepository.findByIdForUser(goalId, userId);
     if (!goal) throw new NotFoundException('Goal not found');
 
@@ -170,8 +167,11 @@ export class GoalsService {
     progress: GoalProgressSnapshot,
     economics: AttemptEconomics,
   ): Promise<void> {
-    const activeGoals = await this.goalsRepository.findActiveForAttempt(attemptId);
-    const completedGoals = activeGoals.filter((goal) => isGoalMet(goal, progress));
+    const activeGoals =
+      await this.goalsRepository.findActiveForAttempt(attemptId);
+    const completedGoals = activeGoals.filter((goal) =>
+      isGoalMet(goal, progress),
+    );
 
     await Promise.all(
       completedGoals.map((goal) => this.completeGoal(userId, goal, economics)),

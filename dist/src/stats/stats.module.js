@@ -21,7 +21,13 @@ let StatsModule = class StatsModule {
 exports.StatsModule = StatsModule;
 exports.StatsModule = StatsModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, attempts_module_1.AttemptsModule, goals_module_1.GoalsModule, freedom_points_module_1.FreedomPointsModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            users_module_1.UsersModule,
+            attempts_module_1.AttemptsModule,
+            goals_module_1.GoalsModule,
+            freedom_points_module_1.FreedomPointsModule,
+        ],
         controllers: [stats_controller_1.StatsController],
         providers: [stats_service_1.StatsService, stats_repository_1.StatsRepository],
     })

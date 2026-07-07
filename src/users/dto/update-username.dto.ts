@@ -6,7 +6,7 @@ import {
 } from '../lib/normalize-username';
 
 export class UpdateUsernameDto {
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? normalizeStoredUsername(value) : value,
   )
   @IsString()

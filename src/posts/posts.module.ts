@@ -10,7 +10,13 @@ import { PostsRepository } from './posts.repository';
 import { PostsService } from './posts.service';
 
 @Module({
-  imports: [StorageModule, PresenceModule, RedisModule, NotificationsModule, PushNotificationsModule],
+  imports: [
+    StorageModule,
+    PresenceModule,
+    RedisModule,
+    NotificationsModule,
+    PushNotificationsModule,
+  ],
   controllers: [PostsController],
   providers: [PostsService, PostsRepository, PostsCacheRepository],
   exports: [PostsService],

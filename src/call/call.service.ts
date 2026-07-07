@@ -94,10 +94,7 @@ export class CallService {
   }
 
   /** Caller hung up before the recipient answered. */
-  async cancel(
-    recipientUserId: number,
-    callId: string,
-  ): Promise<void> {
+  async cancel(recipientUserId: number, callId: string): Promise<void> {
     await this.clearPendingCall(recipientUserId, callId);
     await this.pubSub.relay(recipientUserId, {
       event: 'call:canceled',
