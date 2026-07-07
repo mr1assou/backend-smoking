@@ -7,7 +7,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // JSON APIs must not return 304 — clients expect a body on every GET /auth/me.
+  // JSON APIs must not return 304 — clients expect a body on every GET /auth/me
   const expressApp = app.getHttpAdapter().getInstance() as Application;
   expressApp.set('etag', false);
 
