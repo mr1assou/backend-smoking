@@ -29,6 +29,8 @@ model User {
   quitDate       DateTime? @db.Timestamptz(3)
   streakStart    DateTime? @db.Timestamptz(3)
 
+  isPremium Boolean @default(false) @map("is_premium")
+
   cigarettesPerDay     Int?
   cigarettesPerDayNote String?
   packPrice            String?

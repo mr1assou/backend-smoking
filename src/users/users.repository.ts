@@ -36,6 +36,7 @@ export class UsersRepository {
         user_id: true,
         email: true,
         username: true,
+        isPremium: true,
         sex: true,
         country: true,
         countryFlag: true,
@@ -54,6 +55,13 @@ export class UsersRepository {
         savedMotivationCardIds: true,
         role: true,
       },
+    });
+  }
+
+  updatePremium(userId: number, isPremium: boolean): Promise<User> {
+    return this.prisma.user.update({
+      where: { user_id: userId },
+      data: { isPremium },
     });
   }
 

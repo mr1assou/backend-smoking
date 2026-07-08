@@ -1,7 +1,7 @@
 import type { AttemptEconomics } from '../../stats/lib/attempt-impact';
 import type { GoalType } from '../goals.constants';
 
-/** One-time FP when a goal completes. Streak days remain the main FP source (3/day). */
+/** One-time FP when a goal completes. Streak days remain the main FP source (2/day). */
 export const GOAL_COMPLETION_BONUS = {
   FP_PER_DAY: 10,
 } as const;

@@ -164,6 +164,11 @@ export class UsersService {
     return this.usersRepository.updateDevicePreferences(userId, data);
   }
 
+  async updatePremium(userId: number, dto: { isPremium: boolean }) {
+    await this.usersRepository.updatePremium(userId, Boolean(dto.isPremium));
+    return this.getMe(userId);
+  }
+
   async updateProfileImage(userId: number, dto: UpdateProfileImageDto) {
     this.storageService.assertOwnedProfileImageUrl(userId, dto.image_url);
     await this.usersRepository.updateProfileImage(userId, dto.image_url);
@@ -223,6 +228,7 @@ export class UsersService {
       email: user.email,
       name: user.username ?? undefined,
       hasCompletedOnboarding: Boolean(user.username?.trim()),
+      isPremium: Boolean(user.isPremium),
       sex: user.sex ?? undefined,
       country: user.country ?? undefined,
       countryFlag: user.countryFlag ?? undefined,

@@ -24,6 +24,7 @@ export type UserMeProfile = {
   user_id: number;
   email: string;
   username: string | null;
+  isPremium: boolean;
   sex: string | null;
   country: string | null;
   countryFlag: string | null;

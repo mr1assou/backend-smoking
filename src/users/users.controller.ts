@@ -18,6 +18,7 @@ import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { UpdatePremiumDto } from './dto/update-premium.dto';
 import { UsersService } from './users.service';
 
 @Controller('auth')
@@ -73,6 +74,15 @@ export class UsersController {
     @Body() dto: UpdateHabitSettingsDto,
   ) {
     return this.usersService.updateHabitSettings(req.user.userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('me/premium')
+  updatePremium(
+    @Req() req: Request & { user: { userId: number } },
+    @Body() dto: UpdatePremiumDto,
+  ) {
+    return this.usersService.updatePremium(req.user.userId, dto);
   }
 
   @UseGuards(JwtGuard)

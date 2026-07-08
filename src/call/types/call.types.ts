@@ -5,7 +5,8 @@ export type CallKind = (typeof CALL_KINDS)[number];
 export type CallSignal =
   | { type: 'offer'; sdp: string }
   | { type: 'answer'; sdp: string }
-  | { type: 'candidate'; candidate: unknown };
+  | { type: 'candidate'; candidate: unknown }
+  | { type: 'camera'; enabled: boolean };
 
 /** Caller identity shown on the recipient's incoming-call screen. */
 export type CallerInfo = {
