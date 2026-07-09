@@ -4,4 +4,3 @@ export class UpdatePremiumDto {
   @IsBoolean()
   isPremium: boolean;
 }
-

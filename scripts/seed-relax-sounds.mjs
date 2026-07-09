@@ -36,8 +36,8 @@ const ROOT = path.resolve(BACKEND_ROOT, "..");
 const AUDIO_DIR = path.join(ROOT, "quit-smoking/assets/images/music/audios");
 
 const MANIFEST = [
-  { slug: "parallelUniverse", label: "Parallel Universe", description: "Dreamy cosmic atmosphere.", audioFileName: "paralell_universe.wav", sortOrder: 0 },
-  { slug: "surea", label: "Surea", description: "Ethereal light and still water.", audioFileName: "surea.wav", sortOrder: 1 },
+  { slug: "surea", label: "Surea", description: "Ethereal light and still water.", audioFileName: "surea.wav", sortOrder: 0 },
+  { slug: "parallelUniverse", label: "Parallel Universe", description: "Dreamy cosmic atmosphere.", audioFileName: "paralell_universe.wav", sortOrder: 1 },
   { slug: "forestRoad", label: "Forest Road", description: "A peaceful walk through the trees.", audioFileName: "road_in_forest.wav", sortOrder: 2 },
   { slug: "cyberpunk", label: "Cyberpunk", description: "Neon synth to focus your mind.", audioFileName: "cyberpunk.mp3", sortOrder: 3 },
   { slug: "relax", label: "Relax", description: "Classic calm to ease tension.", audioFileName: "relax_music.mp3", sortOrder: 4 },
