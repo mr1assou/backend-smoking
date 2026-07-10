@@ -5,6 +5,7 @@ export type FeedPostAuthor = {
   countryFlag: string | null;
   image_url: string | null;
   smoke_free_days: number;
+  badge_id: string;
   is_online: boolean;
 };
 

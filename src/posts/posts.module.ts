@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { BadgesModule } from '../badges/badges.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PresenceModule } from '../presence/presence.module';
 import { PushNotificationsModule } from '../push-notifications/push-notifications.module';
@@ -11,6 +12,7 @@ import { PostsService } from './posts.service';
 
 @Module({
   imports: [
+    BadgesModule,
     StorageModule,
     PresenceModule,
     RedisModule,

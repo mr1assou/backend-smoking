@@ -1,4 +1,3 @@
-import { LEADERBOARD_STATIC_BADGE_ID } from './leaderboard.constants';
 import type {
   LeaderboardEntryResponse,
   LeaderboardResponse,
@@ -10,6 +9,7 @@ type MapEntryOptions = {
   rank: number;
   viewerUserId: number;
   onlineById: Record<number, boolean>;
+  badgeByUserId: Map<number, string>;
 };
 
 function mapLeaderboardEntry(
@@ -24,7 +24,7 @@ function mapLeaderboardEntry(
     image_url: row.image_url,
     rank: options.rank,
     freedom_points: row.freedomPoints,
-    badge_id: LEADERBOARD_STATIC_BADGE_ID,
+    badge_id: options.badgeByUserId.get(row.user_id) ?? 'first-step',
     is_online: options.onlineById[row.user_id] === true,
     is_current_user: row.user_id === options.viewerUserId,
   };
@@ -35,6 +35,7 @@ type MapLeaderboardPageOptions = {
   viewerRow: LeaderboardUserRow | null;
   viewerRank: number;
   onlineById: Record<number, boolean>;
+  badgeByUserId: Map<number, string>;
   offset: number;
   limit: number;
   totalUsers: number;
@@ -50,6 +51,7 @@ export function mapLeaderboardPage(
       rank: options.offset + index + 1,
       viewerUserId: options.viewerUserId,
       onlineById: options.onlineById,
+      badgeByUserId: options.badgeByUserId,
     }),
   );
 
@@ -58,6 +60,7 @@ export function mapLeaderboardPage(
         rank: options.viewerRank,
         viewerUserId: options.viewerUserId,
         onlineById: options.onlineById,
+        badgeByUserId: options.badgeByUserId,
       })
     : null;
 

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { StorageService } from '../storage/storage.service';
+import { BadgesService } from '../badges/badges.service';
 import { PresenceService } from '../presence/presence.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PostModerationPushNotificationService } from '../push-notifications/post-moderation-push-notification.service';
@@ -55,6 +56,7 @@ export class PostsService {
     private readonly postsCacheRepository: PostsCacheRepository,
     private readonly storageService: StorageService,
     private readonly presenceService: PresenceService,
+    private readonly badgesService: BadgesService,
     private readonly notificationsService: NotificationsService,
     private readonly postModerationPush: PostModerationPushNotificationService,
   ) {}
@@ -63,6 +65,8 @@ export class PostsService {
     viewerUserId: number,
     query: ListPostsQueryDto = {},
   ): Promise<FeedPageResponse> {
+    await this.badgesService.syncEarnedBadges(viewerUserId);
+
     const sort = query.sort ?? DEFAULT_POST_FEED_SORT;
     const tagId = query.tag_id;
     const { offset, limit } = resolveFeedPagination(query);
@@ -181,6 +185,7 @@ export class PostsService {
     offset = 0,
     limit = 5,
   ) {
+    await this.badgesService.syncEarnedBadges(viewerUserId);
     await this.requirePost(postId);
 
     const { rows, hasMore } = await this.postsRepository.findComments(
@@ -190,10 +195,15 @@ export class PostsService {
       limit,
     );
     const authorIds = [...new Set(rows.map((row) => row.author_id))];
-    const onlineById = await this.presenceService.areOnline(authorIds);
+    const [onlineById, badgeByUserId] = await Promise.all([
+      this.presenceService.areOnline(authorIds),
+      this.badgesService.resolveHighestBadgeIdsByUserIds(authorIds),
+    ]);
 
     return {
-      items: rows.map((row) => this.toComment(row, viewerUserId, onlineById)),
+      items: rows.map((row) =>
+        this.toComment(row, viewerUserId, onlineById, badgeByUserId),
+      ),
       has_more: hasMore,
     };
   }
@@ -268,10 +278,11 @@ export class PostsService {
         );
       });
 
-    const onlineById = await this.presenceService.areOnline([
-      comment.author_id,
+    const [onlineById, badgeByUserId] = await Promise.all([
+      this.presenceService.areOnline([comment.author_id]),
+      this.badgesService.resolveHighestBadgeIdsByUserIds([comment.author_id]),
     ]);
-    return this.toComment(comment, userId, onlineById);
+    return this.toComment(comment, userId, onlineById, badgeByUserId);
   }
 
   async updateComment(
@@ -303,10 +314,11 @@ export class PostsService {
       text,
       userId,
     );
-    const onlineById = await this.presenceService.areOnline([
-      updated.author_id,
+    const [onlineById, badgeByUserId] = await Promise.all([
+      this.presenceService.areOnline([updated.author_id]),
+      this.badgesService.resolveHighestBadgeIdsByUserIds([updated.author_id]),
     ]);
-    return this.toComment(updated, userId, onlineById);
+    return this.toComment(updated, userId, onlineById, badgeByUserId);
   }
 
   async deleteComment(
@@ -630,10 +642,15 @@ export class PostsService {
     hasMore: boolean,
   ): Promise<FeedPageResponse> {
     const authorIds = [...new Set(rows.map((row) => row.author_id))];
-    const onlineById = await this.presenceService.areOnline(authorIds);
+    const [onlineById, badgeByUserId] = await Promise.all([
+      this.presenceService.areOnline(authorIds),
+      this.badgesService.resolveHighestBadgeIdsByUserIds(authorIds),
+    ]);
 
     return {
-      items: rows.map((row) => this.toFeedPost(row, viewerUserId, onlineById)),
+      items: rows.map((row) =>
+        this.toFeedPost(row, viewerUserId, onlineById, badgeByUserId),
+      ),
       has_more: hasMore,
     };
   }
@@ -673,7 +690,10 @@ export class PostsService {
     for (const author of authors) {
       authorById.set(author.user_id, author);
     }
-    const onlineById = await this.presenceService.areOnline(authorIds);
+    const [onlineById, badgeByUserId] = await Promise.all([
+      this.presenceService.areOnline(authorIds),
+      this.badgesService.resolveHighestBadgeIdsByUserIds(authorIds),
+    ]);
 
     return postIds
       .map((postId) => {
@@ -687,6 +707,7 @@ export class PostsService {
           viewerUserId,
           votesByPostId[postId] ?? null,
           onlineById,
+          badgeByUserId,
         );
       })
       .filter((item): item is FeedPostResponse => item !== null);
@@ -770,6 +791,8 @@ export class PostsService {
     viewerUserId: number,
     postId: number,
   ): Promise<FeedPostResponse> {
+    await this.badgesService.syncEarnedBadges(viewerUserId);
+
     const row = await this.postsRepository.findById(postId);
     if (!row || row.moderated_at) {
       throw new NotFoundException('Post not found');
@@ -782,7 +805,8 @@ export class PostsService {
 
   private toAuthor(
     author: AuthorRow,
-    onlineById: Record<number, boolean> = {},
+    onlineById: Record<number, boolean>,
+    badgeByUserId: Map<number, string>,
   ): FeedPostAuthor {
     return {
       user_id: author.user_id,
@@ -794,6 +818,7 @@ export class PostsService {
         author.streakStart,
         author.quitDate,
       ),
+      badge_id: badgeByUserId.get(author.user_id) ?? 'first-step',
       is_online: onlineById[author.user_id] ?? false,
     };
   }
@@ -814,6 +839,7 @@ export class PostsService {
     },
     viewerUserId: number,
     onlineById: Record<number, boolean> = {},
+    badgeByUserId: Map<number, string>,
   ): PostCommentResponse {
     const myVoteRaw = row.votes[0]?.vote;
     const myVote =
@@ -835,7 +861,7 @@ export class PostsService {
       downvote_count: row.downvote_count,
       my_vote: myVote,
       created_at: row.created_at.toISOString(),
-      author: this.toAuthor(row.author, onlineById),
+      author: this.toAuthor(row.author, onlineById, badgeByUserId),
     };
   }
 
@@ -863,6 +889,7 @@ export class PostsService {
     row: FeedPostRow,
     viewerUserId: number,
     onlineById: Record<number, boolean> = {},
+    badgeByUserId: Map<number, string>,
   ): FeedPostResponse {
     const myVote = row.votes[0]?.vote;
     return {
@@ -885,7 +912,7 @@ export class PostsService {
       my_vote: myVote === 'up' || myVote === 'down' ? myVote : null,
       created_at: row.created_at.toISOString(),
       updated_at: row.updated_at.toISOString(),
-      author: this.toAuthor(row.author, onlineById),
+      author: this.toAuthor(row.author, onlineById, badgeByUserId),
     };
   }
 
@@ -895,6 +922,7 @@ export class PostsService {
     viewerUserId: number,
     myVote: 'up' | 'down' | null,
     onlineById: Record<number, boolean> = {},
+    badgeByUserId: Map<number, string>,
   ): FeedPostResponse {
     return {
       post_id: card.post_id,
@@ -915,7 +943,7 @@ export class PostsService {
       my_vote: myVote,
       created_at: card.created_at,
       updated_at: card.updated_at,
-      author: this.toAuthor(author, onlineById),
+      author: this.toAuthor(author, onlineById, badgeByUserId),
     };
   }
 }

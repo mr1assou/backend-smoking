@@ -29,6 +29,7 @@ export type ChatThreadSummaryDto = {
   peer_username: string | null;
   peer_image_url: string | null;
   peer_country_flag: string | null;
+  peer_badge_id: string;
   peer_role: string;
   last_message: ChatMessageDto | null;
   unread_count: number;
@@ -58,6 +59,7 @@ export type SupportUserDto = {
   username: string | null;
   image_url: string | null;
   country_flag: string | null;
+  badge_id: string;
   role: string;
 };
 

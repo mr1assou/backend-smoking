@@ -14,6 +14,7 @@ export type CallerInfo = {
   callerName: string | null;
   callerAvatarUrl: string | null;
   callerCountryFlag: string | null;
+  callerBadgeId: string;
 };
 
 /** Server → client events emitted into a user's call room. */

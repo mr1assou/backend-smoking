@@ -47,13 +47,17 @@ export class LeaderboardService {
     const userIds = [
       ...new Set([viewerUserId, ...page.rows.map((row) => row.user_id)]),
     ];
-    const onlineById = await this.presenceService.areOnline(userIds);
+    const [onlineById, badgeByUserId] = await Promise.all([
+      this.presenceService.areOnline(userIds),
+      this.badgesService.resolveHighestBadgeIdsByUserIds(userIds),
+    ]);
 
     return mapLeaderboardPage(page.rows, {
       viewerUserId,
       viewerRow,
       viewerRank,
       onlineById,
+      badgeByUserId,
       offset,
       limit,
       totalUsers,

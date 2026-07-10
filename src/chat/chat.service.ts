@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { toUtcIso } from '../common/utc-instant';
+import { BadgesService } from '../badges/badges.service';
 import { ChatPushNotificationService } from '../push-notifications/chat-push-notification.service';
 import { RedisService } from '../redis/redis.service';
 import { StorageService } from '../storage/storage.service';
@@ -44,6 +45,7 @@ export class ChatService {
     private readonly chatPubSub: ChatPubSubService,
     private readonly storageService: StorageService,
     private readonly chatPushNotification: ChatPushNotificationService,
+    private readonly badgesService: BadgesService,
     private readonly redis: RedisService,
   ) {}
 
@@ -62,6 +64,11 @@ export class ChatService {
 
     const hasMore = rows.length > take;
     const page = hasMore ? rows.slice(0, take) : rows;
+    const peerIds = page.map((row) =>
+      row.user_one_id === userId ? row.userTwo.user_id : row.userOne.user_id,
+    );
+    const badgeByUserId =
+      await this.badgesService.resolveHighestBadgeIdsByUserIds(peerIds);
     const items = await Promise.all(
       page.map(async (row) => {
         const myRead = row.reads.find((read) => read.user_id === userId);
@@ -70,7 +77,14 @@ export class ChatService {
           userId,
           myRead?.last_read_at,
         );
-        return this.toThreadSummary(row, userId, unreadCount);
+        const peerId =
+          row.user_one_id === userId ? row.userTwo.user_id : row.userOne.user_id;
+        return this.toThreadSummary(
+          row,
+          userId,
+          unreadCount,
+          badgeByUserId.get(peerId) ?? 'first-step',
+        );
       }),
     );
 
@@ -92,6 +106,9 @@ export class ChatService {
 
     const hasMore = rows.length > take;
     const page = hasMore ? rows.slice(0, take) : rows;
+    const userIds = page.map((row) => row.user_id);
+    const badgeByUserId =
+      await this.badgesService.resolveHighestBadgeIdsByUserIds(userIds);
 
     return {
       items: page.map((row) => ({
@@ -99,6 +116,7 @@ export class ChatService {
         username: row.username,
         image_url: row.image_url,
         country_flag: row.countryFlag,
+        badge_id: badgeByUserId.get(row.user_id) ?? 'first-step',
         role: row.role ?? DEFAULT_USER_ROLE,
       })),
       has_more: hasMore,
@@ -128,7 +146,15 @@ export class ChatService {
       userId,
       myRead?.last_read_at,
     );
-    return this.toThreadSummary(thread, userId, unreadCount);
+    const peerId = peerUserIdFromThread(thread, userId);
+    const badgeByUserId =
+      await this.badgesService.resolveHighestBadgeIdsByUserIds([peerId]);
+    return this.toThreadSummary(
+      thread,
+      userId,
+      unreadCount,
+      badgeByUserId.get(peerId) ?? 'first-step',
+    );
   }
 
   async listMessages(
@@ -496,6 +522,7 @@ export class ChatService {
     },
     viewerUserId: number,
     unreadCount = 0,
+    peerBadgeId = 'first-step',
   ): ChatThreadSummaryDto {
     const peer =
       thread.user_one_id === viewerUserId ? thread.userTwo : thread.userOne;
@@ -508,6 +535,7 @@ export class ChatService {
       peer_username: peer.username,
       peer_image_url: peer.image_url,
       peer_country_flag: peer.countryFlag,
+      peer_badge_id: peerBadgeId,
       peer_role: peer.role ?? DEFAULT_USER_ROLE,
       last_message: lastMessage ? this.toMessageDto(lastMessage) : null,
       unread_count: unreadCount,

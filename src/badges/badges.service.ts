@@ -3,6 +3,7 @@ import { smokeFreeDaysFromInstant } from '../common/smoke-free-days';
 import { utcInstantNow } from '../common/utc-instant';
 import { BadgesRepository } from './badges.repository';
 import { findNextPendingBadgeGrant } from './lib/evaluate-pending-badges';
+import { highestEarnedBadgeId } from './lib/highest-earned-badge';
 
 export type SyncEarnedBadgesResult = {
   newBadges: string[];
@@ -19,6 +20,26 @@ export class BadgesService {
 
   findEarnedBadgeIds(userId: number): Promise<string[]> {
     return this.badgesRepository.findEarnedBadgeIds(userId);
+  }
+
+  async resolveHighestBadgeIdsByUserIds(
+    userIds: number[],
+  ): Promise<Map<number, string>> {
+    const uniqueIds = [...new Set(userIds)];
+    if (uniqueIds.length === 0) return new Map();
+
+    const badgesByUser =
+      await this.badgesRepository.findEarnedBadgeIdsByUserIds(uniqueIds);
+    const result = new Map<number, string>();
+
+    for (const userId of uniqueIds) {
+      result.set(
+        userId,
+        highestEarnedBadgeId(badgesByUser.get(userId) ?? []),
+      );
+    }
+
+    return result;
   }
 
   countCompletedGoals(userId: number): Promise<number> {

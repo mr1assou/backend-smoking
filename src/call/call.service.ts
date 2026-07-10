@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { BadgesService } from '../badges/badges.service';
 import { PresenceService } from '../presence/presence.service';
 import { CallPushNotificationService } from '../push-notifications/call-push-notification.service';
 import { RedisService } from '../redis/redis.service';
@@ -24,6 +25,7 @@ export class CallService {
     private readonly pubSub: CallPubSubService,
     private readonly presence: PresenceService,
     private readonly usersRepository: UsersRepository,
+    private readonly badgesService: BadgesService,
     private readonly callPush: CallPushNotificationService,
     private readonly redis: RedisService,
   ) {}
@@ -39,6 +41,9 @@ export class CallService {
     kind: CallKind,
   ): Promise<void> {
     const caller = await this.usersRepository.findById(callerUserId);
+    const badgeByUserId = await this.badgesService.resolveHighestBadgeIdsByUserIds(
+      [callerUserId],
+    );
 
     const incoming: IncomingCallPayload = {
       callId,
@@ -47,6 +52,7 @@ export class CallService {
       callerName: caller?.username ?? null,
       callerAvatarUrl: caller?.image_url ?? null,
       callerCountryFlag: caller?.countryFlag ?? null,
+      callerBadgeId: badgeByUserId.get(callerUserId) ?? 'first-step',
     };
 
     await this.storePendingCall(recipientUserId, incoming);

@@ -1,15 +1,13 @@
-import { getPlanDayUnlockMs } from './plan-timezone';
-
 export const PLAN_TOTAL_DAYS = 180;
 
 export function isPlanDayTimeUnlocked(
   planDay: number,
   streakStart: Date | null,
-  timeZone: string,
+  _timeZone: string,
   now: Date,
 ): boolean {
   if (!streakStart || planDay < 1 || planDay > PLAN_TOTAL_DAYS) return false;
-  return now.getTime() >= getPlanDayUnlockMs(streakStart, planDay, timeZone);
+  return now.getTime() >= streakStart.getTime();
 }
 
 export function isPlanDayUnlocked(

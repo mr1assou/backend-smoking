@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { BadgesModule } from '../badges/badges.module';
 import { PushNotificationsModule } from '../push-notifications/push-notifications.module';
 import { RedisModule } from '../redis/redis.module';
 import { StorageModule } from '../storage/storage.module';
@@ -12,6 +13,7 @@ import { ChatService } from './chat.service';
 @Module({
   imports: [
     JwtModule.register({}),
+    BadgesModule,
     StorageModule,
     PushNotificationsModule,
     RedisModule,
