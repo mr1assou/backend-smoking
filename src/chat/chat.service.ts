@@ -78,7 +78,9 @@ export class ChatService {
           myRead?.last_read_at,
         );
         const peerId =
-          row.user_one_id === userId ? row.userTwo.user_id : row.userOne.user_id;
+          row.user_one_id === userId
+            ? row.userTwo.user_id
+            : row.userOne.user_id;
         return this.toThreadSummary(
           row,
           userId,

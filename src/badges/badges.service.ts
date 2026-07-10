@@ -33,10 +33,7 @@ export class BadgesService {
     const result = new Map<number, string>();
 
     for (const userId of uniqueIds) {
-      result.set(
-        userId,
-        highestEarnedBadgeId(badgesByUser.get(userId) ?? []),
-      );
+      result.set(userId, highestEarnedBadgeId(badgesByUser.get(userId) ?? []));
     }
 
     return result;

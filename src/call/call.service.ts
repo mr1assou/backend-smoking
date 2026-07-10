@@ -41,9 +41,8 @@ export class CallService {
     kind: CallKind,
   ): Promise<void> {
     const caller = await this.usersRepository.findById(callerUserId);
-    const badgeByUserId = await this.badgesService.resolveHighestBadgeIdsByUserIds(
-      [callerUserId],
-    );
+    const badgeByUserId =
+      await this.badgesService.resolveHighestBadgeIdsByUserIds([callerUserId]);
 
     const incoming: IncomingCallPayload = {
       callId,
