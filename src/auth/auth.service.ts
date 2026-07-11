@@ -42,12 +42,9 @@ export class AuthService {
       email,
       hashedPassword,
     );
-    return this.issueTokensForUser(user.user_id, user.email);
+    return this.issueTokensForUserInternal(user.user_id, user.email);
   }
 
-  /**
-   * Google = sign up or login: find by email → login; else create account → sign up.
-   */
   async googleSignIn(idToken: string): Promise<GoogleAuthResult> {
     const googleUser = await this.googleToken.verifyIdToken(idToken);
     const email = googleUser.email.trim().toLowerCase();
@@ -126,7 +123,12 @@ export class AuthService {
     await this.usersService.setRefreshTokenHash(userId, null);
   }
 
-  private async issueTokensForUser(userId: number, email: string) {
+  /** Used after email OTP verification and other post-auth flows. */
+  issueTokensForUser(userId: number, email: string) {
+    return this.issueTokensForUserInternal(userId, email);
+  }
+
+  private async issueTokensForUserInternal(userId: number, email: string) {
     const tokens = await this.generateTokens(userId, email);
     await this.saveRefreshToken(userId, tokens.refreshToken);
     return tokens;

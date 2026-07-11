@@ -16,7 +16,10 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
+import { EmailSignupSendOtpDto } from './dto/email-signup-send-otp.dto';
+import { EmailSignupVerifyOtpDto } from './dto/email-signup-verify-otp.dto';
 import { GoogleOAuthService } from './google/google-oauth.service';
+import { EmailOtpService } from './email-otp/email-otp.service';
 import { REFRESH_COOKIE_MAX_AGE_MS } from './auth.constants';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtGuard } from './guards/jwt.guard';
@@ -26,6 +29,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private googleOAuth: GoogleOAuthService,
+    private emailOtpService: EmailOtpService,
   ) {}
 
   @Post('signup')
@@ -88,6 +92,44 @@ export class AuthController {
   ) {
     const { accessToken, refreshToken, isNewUser, email } =
       await this.authService.googleSignup(dto.idToken);
+    this.setRefreshTokenCookie(res, refreshToken);
+    return { accessToken, refreshToken, isNewUser, email };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('email/signup/send-otp')
+  async emailSignupSendOtp(@Body() dto: EmailSignupSendOtpDto) {
+    await this.emailOtpService.sendSignupOtp(dto.email);
+    return { ok: true };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('email/signup/verify-otp')
+  async emailSignupVerifyOtp(
+    @Body() dto: EmailSignupVerifyOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken, isNewUser, email } =
+      await this.emailOtpService.verifySignupOtp(dto.email, dto.code);
+    this.setRefreshTokenCookie(res, refreshToken);
+    return { accessToken, refreshToken, isNewUser, email };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('email/login/send-otp')
+  async emailLoginSendOtp(@Body() dto: EmailSignupSendOtpDto) {
+    await this.emailOtpService.sendLoginOtp(dto.email);
+    return { ok: true };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('email/login/verify-otp')
+  async emailLoginVerifyOtp(
+    @Body() dto: EmailSignupVerifyOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken, isNewUser, email } =
+      await this.emailOtpService.verifyLoginOtp(dto.email, dto.code);
     this.setRefreshTokenCookie(res, refreshToken);
     return { accessToken, refreshToken, isNewUser, email };
   }

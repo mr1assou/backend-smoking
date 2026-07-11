@@ -4,7 +4,8 @@
  * Usage (from backend-smoking):
  *   npm run seed:play-test-user
  *
- * Default credentials: test@gmail.com / 1234
+ * Default credentials: test@gmail.com — sign in with email OTP: 123456
+ * (Legacy password seed: PLAY_TEST_PASSWORD, default 1234)
  * Override: PLAY_TEST_EMAIL=... PLAY_TEST_PASSWORD=... npm run seed:play-test-user
  */
 import { fileURLToPath } from "node:url";
