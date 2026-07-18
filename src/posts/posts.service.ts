@@ -603,6 +603,62 @@ export class PostsService {
     return { post_id: postId };
   }
 
+  /** Support staff only — reported posts awaiting review, most-reported first. */
+  async listReportedPosts(supportUserId: number): Promise<{
+    items: (FeedPostResponse & { report_count: number })[];
+  }> {
+    await this.requireSupportUser(supportUserId);
+
+    const rows = await this.postsRepository.findReportedPosts(supportUserId);
+    const page = await this.buildFeedPageFromRows(rows, supportUserId, false);
+
+    // buildFeedPageFromRows preserves row order, so counts line up by index.
+    return {
+      items: page.items.map((item, index) => ({
+        ...item,
+        report_count: rows[index]._count.reports,
+      })),
+    };
+  }
+
+  /** Support staff only — clears reports on a post that is actually fine. */
+  async dismissPostReports(
+    postId: number,
+    supportUserId: number,
+  ): Promise<{ post_id: number; dismissed: true }> {
+    await this.requireSupportUser(supportUserId);
+
+    const post = await this.postsRepository.findById(postId);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    await this.postsRepository.dismissPostReports(postId);
+    return { post_id: postId, dismissed: true };
+  }
+
+  private async requireSupportUser(userId: number): Promise<void> {
+    const user = await this.postsRepository.findUserRole(userId);
+    if (!isSupportRole(user?.role)) {
+      throw new ForbiddenException('Only support staff can review reports');
+    }
+  }
+
+  /** Any signed-in user can flag a post for review (Play UGC policy). */
+  async reportPost(
+    postId: number,
+    reporterUserId: number,
+    reason?: string,
+  ): Promise<{ post_id: number; reported: true }> {
+    const post = await this.postsRepository.findById(postId);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    await this.postsRepository.reportPost(postId, reporterUserId, reason);
+    return { post_id: postId, reported: true };
+  }
+
   async moderatePost(
     postId: number,
     moderatorUserId: number,

@@ -54,6 +54,7 @@ export class AuthService {
       email,
       password,
     );
+    this.assertNotBlocked(user);
     const tokens = await this.issueTokensForUser(user.user_id, user.email);
     return { ...tokens, isNewUser, email: user.email };
   }
@@ -67,6 +68,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('No account found for this email');
     }
+    this.assertNotBlocked(user);
 
     const tokens = await this.issueTokensForUser(user.user_id, user.email);
     return { ...tokens, isNewUser: false, email: user.email };
@@ -100,6 +102,8 @@ export class AuthService {
     const passwordMatches = await argon2.verify(user.password, dto.password);
     if (!passwordMatches) throw new ForbiddenException('Invalid credentials');
 
+    this.assertNotBlocked(user);
+
     return this.issueTokensForUser(user.user_id, user.email);
   }
 
@@ -115,12 +119,23 @@ export class AuthService {
     );
     if (!tokenMatches) throw new ForbiddenException('Access denied');
 
+    this.assertNotBlocked(user);
+
     return this.issueTokensForUser(user.user_id, user.email);
   }
 
   async logout(userId: number) {
     await this.presenceService.markOffline(userId);
     await this.usersService.setRefreshTokenHash(userId, null);
+  }
+
+  /** Blocked accounts (moderated by support staff) cannot sign in. */
+  private assertNotBlocked(user: { status?: string | null }) {
+    if (user.status === 'blocked') {
+      throw new ForbiddenException(
+        'This account has been blocked for violating community guidelines.',
+      );
+    }
   }
 
   /** Used after email OTP verification and other post-auth flows. */

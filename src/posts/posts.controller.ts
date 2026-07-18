@@ -21,6 +21,7 @@ import {
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { ListPostsQueryDto } from './dto/list-posts-query.dto';
+import { ReportPostDto } from './dto/report-post.dto';
 import { VotePostDto } from './dto/vote-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
@@ -47,6 +48,22 @@ export class PostsController {
     return this.postsService.createPost(req.user.userId, dto);
   }
 
+  // Must be registered before ':postId' so 'reports' is not parsed as an id.
+  @UseGuards(JwtGuard)
+  @Get('reports')
+  listReported(@Req() req: Request & { user: { userId: number } }) {
+    return this.postsService.listReportedPosts(req.user.userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':postId/reports/dismiss')
+  dismissReports(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    return this.postsService.dismissPostReports(postId, req.user.userId);
+  }
+
   @UseGuards(JwtGuard)
   @Get(':postId')
   getOne(
@@ -64,6 +81,16 @@ export class PostsController {
     @Body() dto: UpdatePostDto,
   ) {
     return this.postsService.updatePost(postId, req.user.userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':postId/report')
+  report(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('postId', ParseIntPipe) postId: number,
+    @Body() dto: ReportPostDto,
+  ) {
+    return this.postsService.reportPost(postId, req.user.userId, dto.reason);
   }
 
   @UseGuards(JwtGuard)

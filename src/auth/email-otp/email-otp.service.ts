@@ -154,6 +154,11 @@ export class EmailOtpService {
     if (!user) {
       throw new NotFoundException('No account found for this email');
     }
+    if (user.status === 'blocked') {
+      throw new ForbiddenException(
+        'This account has been blocked for violating community guidelines.',
+      );
+    }
 
     if (isPlayReviewerEmail(email)) {
       if (trimmedCode !== PLAY_REVIEWER_OTP) {

@@ -1,8 +1,11 @@
 import {
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
+  Post,
   Query,
   Req,
   UseGuards,
@@ -23,6 +26,35 @@ export class UserProfilesController {
     @Query() query: SearchUsersQueryDto,
   ) {
     return this.userProfiles.searchUsers(req.user.userId, query.username);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':userId/block')
+  @HttpCode(HttpStatus.OK)
+  blockUser(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.userProfiles.blockUser(req.user.userId, userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':userId/moderation-status')
+  getModerationStatus(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.userProfiles.getModerationStatus(req.user.userId, userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':userId/unblock')
+  @HttpCode(HttpStatus.OK)
+  unblockUser(
+    @Req() req: Request & { user: { userId: number } },
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.userProfiles.unblockUser(req.user.userId, userId);
   }
 
   @UseGuards(JwtGuard)

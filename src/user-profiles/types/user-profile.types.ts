@@ -38,6 +38,7 @@ export type UserSearchResultItem = {
   country: string | null;
   badge_id: string;
   is_online: boolean;
+  status: string;
 };
 
 export type UserSearchResponse = {

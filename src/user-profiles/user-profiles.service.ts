@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BadgesRepository } from '../badges/badges.repository';
+import { isSupportRole } from '../users/lib/user-roles';
 import { highestEarnedBadgeId } from '../badges/lib/highest-earned-badge';
 import { PostsService } from '../posts/posts.service';
 import type { FeedPageResponse } from '../posts/types/feed-page';
@@ -29,6 +34,68 @@ export class UserProfilesService {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  /** Support staff only — blocks a user account (Play UGC policy). */
+  async blockUser(
+    requesterUserId: number,
+    targetUserId: number,
+  ): Promise<{ user_id: number; status: string }> {
+    return this.setUserStatus(requesterUserId, targetUserId, 'blocked');
+  }
+
+  /** Support staff only — re-activates a blocked account. */
+  async unblockUser(
+    requesterUserId: number,
+    targetUserId: number,
+  ): Promise<{ user_id: number; status: string }> {
+    return this.setUserStatus(requesterUserId, targetUserId, 'active');
+  }
+
+  /** Support staff only — current account status for moderation controls. */
+  async getModerationStatus(
+    requesterUserId: number,
+    targetUserId: number,
+  ): Promise<{ user_id: number; status: string }> {
+    const requester =
+      await this.profilesRepository.findRoleAndStatus(requesterUserId);
+    if (!isSupportRole(requester?.role)) {
+      throw new ForbiddenException('Only support staff can view user status');
+    }
+
+    const target =
+      await this.profilesRepository.findRoleAndStatus(targetUserId);
+    if (!target) {
+      throw new NotFoundException('User not found');
+    }
+
+    return { user_id: target.user_id, status: target.status };
+  }
+
+  private async setUserStatus(
+    requesterUserId: number,
+    targetUserId: number,
+    status: 'active' | 'blocked',
+  ): Promise<{ user_id: number; status: string }> {
+    const requester =
+      await this.profilesRepository.findRoleAndStatus(requesterUserId);
+    if (!isSupportRole(requester?.role)) {
+      throw new ForbiddenException('Only support staff can block users');
+    }
+    if (requesterUserId === targetUserId) {
+      throw new ForbiddenException('You cannot block your own account');
+    }
+
+    const target =
+      await this.profilesRepository.findRoleAndStatus(targetUserId);
+    if (!target) {
+      throw new NotFoundException('User not found');
+    }
+    if (isSupportRole(target.role)) {
+      throw new ForbiddenException('Support accounts cannot be blocked');
+    }
+
+    return this.profilesRepository.setUserStatus(targetUserId, status);
   }
 
   async getStreak(userId: number): Promise<UserStreakResponse> {
@@ -110,6 +177,7 @@ export class UserProfilesService {
         country: row.country,
         badge_id: highestEarnedBadgeId(badgesByUser.get(row.user_id) ?? []),
         is_online: onlineById[row.user_id] === true,
+        status: row.status,
       })),
     };
   }

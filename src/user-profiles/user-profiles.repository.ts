@@ -35,6 +35,25 @@ export class UserProfilesRepository {
     });
   }
 
+  findRoleAndStatus(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { user_id: userId },
+      select: { user_id: true, role: true, status: true },
+    });
+  }
+
+  /** Blocks/unblocks the account and revokes its refresh token when blocking. */
+  setUserStatus(userId: number, status: 'active' | 'blocked') {
+    return this.prisma.user.update({
+      where: { user_id: userId },
+      data: {
+        status,
+        ...(status === 'blocked' ? { hashedRefreshToken: null } : {}),
+      },
+      select: { user_id: true, status: true },
+    });
+  }
+
   async getStreakStats(userId: number): Promise<UserStreakStats | null> {
     const user = await this.findPublicUser(userId);
     if (!user) return null;
@@ -101,6 +120,7 @@ export class UserProfilesRepository {
         image_url: true,
         countryFlag: true,
         country: true,
+        status: true,
       },
       orderBy: { username: 'asc' },
       take: limit,

@@ -131,6 +131,43 @@ export class PostsRepository {
     });
   }
 
+  /** Idempotent — one report per user per post. */
+  reportPost(postId: number, reporterId: number, reason?: string) {
+    return this.prisma.postReport.upsert({
+      where: {
+        post_id_reporter_id: { post_id: postId, reporter_id: reporterId },
+      },
+      create: {
+        post_id: postId,
+        reporter_id: reporterId,
+        reason: reason ?? null,
+      },
+      update: { reason: reason ?? null },
+    });
+  }
+
+  /** Reported posts still visible in the feed, most-reported first. */
+  findReportedPosts(viewerUserId: number) {
+    return this.prisma.post.findMany({
+      where: { reports: { some: {} }, ...ACTIVE_POST_FILTER },
+      orderBy: [{ reports: { _count: 'desc' } }, { created_at: 'desc' }],
+      include: {
+        author: { select: AUTHOR_SELECT },
+        votes: {
+          where: { user_id: viewerUserId },
+          take: 1,
+          select: { vote: true },
+        },
+        _count: { select: { reports: true } },
+      },
+    });
+  }
+
+  /** Clears all reports on a post (support decided it is fine). */
+  dismissPostReports(postId: number) {
+    return this.prisma.postReport.deleteMany({ where: { post_id: postId } });
+  }
+
   findPostsByIds(postIds: number[]) {
     if (postIds.length === 0) return Promise.resolve([]);
 
