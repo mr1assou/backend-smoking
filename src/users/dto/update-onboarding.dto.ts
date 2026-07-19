@@ -9,7 +9,10 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { USERNAME_MAX_LENGTH } from '../lib/normalize-username';
+import {
+  normalizeStoredUsername,
+  USERNAME_MAX_LENGTH,
+} from '../lib/normalize-username';
 
 class OnboardingStep1Dto {
   @IsArray()
@@ -37,9 +40,7 @@ class OnboardingStep4Dto {
 
 class OnboardingStep5Dto {
   @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string'
-      ? value.trim().toLowerCase().slice(0, USERNAME_MAX_LENGTH)
-      : value,
+    typeof value === 'string' ? normalizeStoredUsername(value) : value,
   )
   @IsString()
   @MaxLength(USERNAME_MAX_LENGTH)
