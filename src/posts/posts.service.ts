@@ -382,7 +382,7 @@ export class PostsService {
     }
 
     const { comment: updated, myVote } =
-      await this.postsRepository.toggleCommentVote(commentId, userId, dto.vote);
+      await this.postsRepository.setCommentVote(commentId, userId, dto.vote);
 
     return {
       comment_id: updated.comment_id,
@@ -399,7 +399,7 @@ export class PostsService {
   ): Promise<PostEngagementResponse> {
     await this.requirePost(postId);
 
-    const { post, myVote } = await this.postsRepository.toggleVote(
+    const { post, myVote } = await this.postsRepository.setVote(
       postId,
       userId,
       dto.vote,
@@ -698,17 +698,46 @@ export class PostsService {
     hasMore: boolean,
   ): Promise<FeedPageResponse> {
     const authorIds = [...new Set(rows.map((row) => row.author_id))];
-    const [onlineById, badgeByUserId] = await Promise.all([
+    const postIds = rows.map((row) => row.post_id);
+    const [onlineById, badgeByUserId, liveVoteCounts] = await Promise.all([
       this.presenceService.areOnline(authorIds),
       this.badgesService.resolveHighestBadgeIdsByUserIds(authorIds),
+      this.postsRepository.findVoteCountsForPosts(postIds),
     ]);
 
-    return {
-      items: rows.map((row) =>
-        this.toFeedPost(row, viewerUserId, onlineById, badgeByUserId),
-      ),
-      has_more: hasMore,
-    };
+    const items = rows.map((row) => {
+      const live = liveVoteCounts.get(row.post_id);
+      const normalized = live
+        ? {
+            ...row,
+            upvote_count: live.upvote_count,
+            downvote_count: live.downvote_count,
+          }
+        : row;
+
+      if (
+        live &&
+        (row.upvote_count !== live.upvote_count ||
+          row.downvote_count !== live.downvote_count)
+      ) {
+        void this.postsRepository
+          .repairPostVoteCounts(
+            row.post_id,
+            live.upvote_count,
+            live.downvote_count,
+          )
+          .catch(() => undefined);
+      }
+
+      return this.toFeedPost(
+        normalized,
+        viewerUserId,
+        onlineById,
+        badgeByUserId,
+      );
+    });
+
+    return { items, has_more: hasMore };
   }
 
   private async buildFeedFromCache(
@@ -733,7 +762,36 @@ export class PostsService {
       }
     }
 
-    const votesByPostId = await this.resolveViewerVotes(viewerUserId, postIds);
+    // Redis cards can hold stale vote totals — overlay live counts from Postgres.
+    const [votesByPostId, liveVoteCounts] = await Promise.all([
+      this.resolveViewerVotes(viewerUserId, postIds),
+      this.postsRepository.findVoteCountsForPosts(postIds),
+    ]);
+
+    for (const postId of postIds) {
+      const card = cards.get(postId);
+      const live = liveVoteCounts.get(postId);
+      if (!card || !live) continue;
+      if (
+        card.upvote_count !== live.upvote_count ||
+        card.downvote_count !== live.downvote_count
+      ) {
+        card.upvote_count = live.upvote_count;
+        card.downvote_count = live.downvote_count;
+        cards.set(postId, card);
+        void this.postsCacheRepository
+          .syncVoteStats(postId, live.upvote_count, live.downvote_count)
+          .catch(() => undefined);
+        void this.postsRepository
+          .repairPostVoteCounts(
+            postId,
+            live.upvote_count,
+            live.downvote_count,
+          )
+          .catch(() => undefined);
+      }
+    }
+
     const authorIds = [
       ...new Set(
         postIds

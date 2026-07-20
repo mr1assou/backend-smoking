@@ -336,54 +336,59 @@ export class PostsRepository {
     });
   }
 
-  toggleCommentVote(commentId: number, userId: number, vote: PostVoteValue) {
+  /**
+   * Set the viewer's comment vote to exactly `vote` (`null` clears it), then
+   * recount totals from vote rows.
+   */
+  setCommentVote(
+    commentId: number,
+    userId: number,
+    vote: PostVoteValue | null,
+  ) {
     return this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT comment_id FROM post_comments WHERE comment_id = ${commentId} FOR UPDATE`;
+
       const existing = await tx.postCommentVote.findUnique({
         where: {
           comment_id_user_id: { comment_id: commentId, user_id: userId },
         },
       });
 
-      let upDelta = 0;
-      let downDelta = 0;
-      let myVote: PostVoteValue | null = vote;
-
-      if (!existing) {
+      if (vote === null) {
+        if (existing) {
+          await tx.postCommentVote.delete({
+            where: { comment_vote_id: existing.comment_vote_id },
+          });
+        }
+      } else if (!existing) {
         await tx.postCommentVote.create({
           data: { comment_id: commentId, user_id: userId, vote },
         });
-        if (vote === 'up') upDelta = 1;
-        else downDelta = 1;
-      } else if (existing.vote === vote) {
-        await tx.postCommentVote.delete({
-          where: { comment_vote_id: existing.comment_vote_id },
-        });
-        if (vote === 'up') upDelta = -1;
-        else downDelta = -1;
-        myVote = null;
-      } else {
+      } else if (existing.vote !== vote) {
         await tx.postCommentVote.update({
           where: { comment_vote_id: existing.comment_vote_id },
           data: { vote },
         });
-        if (vote === 'up') {
-          upDelta = 1;
-          downDelta = -1;
-        } else {
-          upDelta = -1;
-          downDelta = 1;
-        }
       }
+
+      const [upCount, downCount] = await Promise.all([
+        tx.postCommentVote.count({
+          where: { comment_id: commentId, vote: 'up' },
+        }),
+        tx.postCommentVote.count({
+          where: { comment_id: commentId, vote: 'down' },
+        }),
+      ]);
 
       const comment = await tx.postComment.update({
         where: { comment_id: commentId },
         data: {
-          upvote_count: { increment: upDelta },
-          downvote_count: { increment: downDelta },
+          upvote_count: upCount,
+          downvote_count: downCount,
         },
       });
 
-      return { comment, myVote };
+      return { comment, myVote: vote };
     });
   }
 
@@ -401,52 +406,96 @@ export class PostsRepository {
     });
   }
 
-  toggleVote(postId: number, userId: number, vote: PostVoteValue) {
+  /**
+   * Set the viewer's vote to exactly `vote` (`null` clears it), then recount
+   * upvote/downvote totals from vote rows so counters never drift.
+   */
+  setVote(postId: number, userId: number, vote: PostVoteValue | null) {
     return this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT post_id FROM posts WHERE post_id = ${postId} FOR UPDATE`;
+
       const existing = await tx.postVote.findUnique({
         where: { post_id_user_id: { post_id: postId, user_id: userId } },
       });
 
-      let upDelta = 0;
-      let downDelta = 0;
-      let myVote: PostVoteValue | null = vote;
-
-      if (!existing) {
+      if (vote === null) {
+        if (existing) {
+          await tx.postVote.delete({
+            where: { post_vote_id: existing.post_vote_id },
+          });
+        }
+      } else if (!existing) {
         await tx.postVote.create({
           data: { post_id: postId, user_id: userId, vote },
         });
-        if (vote === 'up') upDelta = 1;
-        else downDelta = 1;
-      } else if (existing.vote === vote) {
-        await tx.postVote.delete({
-          where: { post_vote_id: existing.post_vote_id },
-        });
-        if (vote === 'up') upDelta = -1;
-        else downDelta = -1;
-        myVote = null;
-      } else {
+      } else if (existing.vote !== vote) {
         await tx.postVote.update({
           where: { post_vote_id: existing.post_vote_id },
           data: { vote },
         });
-        if (vote === 'up') {
-          upDelta = 1;
-          downDelta = -1;
-        } else {
-          upDelta = -1;
-          downDelta = 1;
-        }
       }
+
+      const [upCount, downCount] = await Promise.all([
+        tx.postVote.count({ where: { post_id: postId, vote: 'up' } }),
+        tx.postVote.count({ where: { post_id: postId, vote: 'down' } }),
+      ]);
 
       const post = await tx.post.update({
         where: { post_id: postId },
         data: {
-          upvote_count: { increment: upDelta },
-          downvote_count: { increment: downDelta },
+          upvote_count: upCount,
+          downvote_count: downCount,
         },
       });
 
-      return { post, myVote };
+      return { post, myVote: vote };
+    });
+  }
+
+  /** Live upvote/downvote totals from vote rows (source of truth). */
+  async findVoteCountsForPosts(
+    postIds: number[],
+  ): Promise<Map<number, { upvote_count: number; downvote_count: number }>> {
+    const result = new Map<
+      number,
+      { upvote_count: number; downvote_count: number }
+    >();
+    for (const postId of postIds) {
+      result.set(postId, { upvote_count: 0, downvote_count: 0 });
+    }
+    if (postIds.length === 0) return result;
+
+    const rows = await this.prisma.postVote.groupBy({
+      by: ['post_id', 'vote'],
+      where: { post_id: { in: postIds } },
+      _count: { _all: true },
+    });
+
+    for (const row of rows) {
+      const current = result.get(row.post_id) ?? {
+        upvote_count: 0,
+        downvote_count: 0,
+      };
+      if (row.vote === 'up') current.upvote_count = row._count._all;
+      if (row.vote === 'down') current.downvote_count = row._count._all;
+      result.set(row.post_id, current);
+    }
+
+    return result;
+  }
+
+  repairPostVoteCounts(
+    postId: number,
+    upvoteCount: number,
+    downvoteCount: number,
+  ) {
+    return this.prisma.post.update({
+      where: { post_id: postId },
+      data: {
+        upvote_count: upvoteCount,
+        downvote_count: downvoteCount,
+      },
+      select: { post_id: true },
     });
   }
 
