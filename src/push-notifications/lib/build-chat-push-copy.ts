@@ -11,6 +11,8 @@ function messagePreview(
     return preview ? preview.slice(0, PREVIEW_MAX_LENGTH) : 'a message';
   }
 
+  if (messageType === 'call') return 'a message';
+
   const mediaLabels: Record<
     Exclude<ChatMessageType, 'text' | 'call'>,
     string
@@ -19,8 +21,6 @@ function messagePreview(
     video: 'a video',
     audio: 'a voice message',
   };
-
-  if (messageType === 'call') return 'a call';
 
   return mediaLabels[messageType];
 }

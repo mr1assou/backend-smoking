@@ -7,18 +7,15 @@ import {
 import { toUtcIso } from '../common/utc-instant';
 import { BadgesService } from '../badges/badges.service';
 import { ChatPushNotificationService } from '../push-notifications/chat-push-notification.service';
-import { RedisService } from '../redis/redis.service';
 import { StorageService } from '../storage/storage.service';
 import { ChatPubSubService } from './chat-pubsub.service';
 import { ChatRepository } from './chat.repository';
-import type { RecordCallHistoryDto } from './dto/record-call-history.dto';
 import type { SendMessageDto } from './dto/send-message.dto';
 import type { EditMessageDto } from './dto/edit-message.dto';
 import {
   canonicalThreadPair,
   peerUserIdFromThread,
 } from './lib/canonical-thread-pair';
-import { encodeCallHistoryPayload } from './lib/call-history-message';
 import { isWithinChatMessageEditWindow } from './lib/chat-message-mutation';
 import {
   CHAT_MESSAGES_PAGE_MAX,
@@ -46,7 +43,6 @@ export class ChatService {
     private readonly storageService: StorageService,
     private readonly chatPushNotification: ChatPushNotificationService,
     private readonly badgesService: BadgesService,
-    private readonly redis: RedisService,
   ) {}
 
   async listThreads(
@@ -239,66 +235,6 @@ export class ChatService {
     return payload;
   }
 
-  /** Persists a single call-history row in the peer's chat thread (deduped by call id). */
-  async recordCallHistory(
-    userId: number,
-    dto: RecordCallHistoryDto,
-  ): Promise<
-    { ok: true; message: ChatMessageDto } | { ok: true; duplicate: true }
-  > {
-    if (dto.peer_user_id === userId) {
-      throw new BadRequestException('Invalid peer');
-    }
-
-    const peer = await this.chatRepository.findUserExists(dto.peer_user_id);
-    if (!peer?.username?.trim()) {
-      throw new NotFoundException('User not found');
-    }
-
-    const dedupeKey = `call:history:${dto.call_id}`;
-    const claimed = await this.redis
-      .getClient()
-      .set(dedupeKey, '1', 'EX', 3600, 'NX');
-    if (claimed !== 'OK') {
-      return { ok: true, duplicate: true };
-    }
-
-    const thread = await this.chatRepository.findOrCreateThread(
-      userId,
-      dto.peer_user_id,
-    );
-
-    const text = encodeCallHistoryPayload({
-      v: 1,
-      callKind: dto.call_kind,
-      status: dto.status,
-      durationMs: dto.duration_ms,
-    });
-
-    const message = await this.chatRepository.createMessage({
-      threadId: thread.thread_id,
-      senderId: userId,
-      messageType: 'call',
-      text,
-    });
-
-    const payload = this.toMessageDto(message);
-    const [user_one_id, user_two_id] = canonicalThreadPair(
-      thread.user_one_id,
-      thread.user_two_id,
-    );
-
-    await this.chatPubSub.publish({
-      type: 'chat:message',
-      thread_id: thread.thread_id,
-      user_one_id,
-      user_two_id,
-      payload,
-    });
-
-    return { ok: true, message: payload };
-  }
-
   async editMessage(
     userId: number,
     threadId: number,
@@ -403,9 +339,7 @@ export class ChatService {
 
   private validateMessagePayload(userId: number, dto: SendMessageDto): void {
     if (dto.message_type === 'call') {
-      throw new BadRequestException(
-        'Call history is recorded via the call-history endpoint',
-      );
+      throw new BadRequestException('Call messages are not supported');
     }
     if (dto.message_type === 'text') {
       const text = dto.text?.trim();

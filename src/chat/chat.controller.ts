@@ -17,7 +17,6 @@ import { ChatService } from './chat.service';
 import { ListMessagesQueryDto } from './dto/list-messages-query.dto';
 import { ListSupportUsersQueryDto } from './dto/list-support-users-query.dto';
 import { OpenThreadDto } from './dto/open-thread.dto';
-import { RecordCallHistoryDto } from './dto/record-call-history.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { EditMessageDto } from './dto/edit-message.dto';
 import { CHAT_MESSAGES_PAGE_SIZE } from './lib/chat-pagination';
@@ -110,15 +109,6 @@ export class ChatController {
     @Param('messageId', ParseIntPipe) messageId: number,
   ) {
     return this.chatService.deleteMessage(req.user.userId, threadId, messageId);
-  }
-
-  @UseGuards(JwtGuard)
-  @Post('call-history')
-  recordCallHistory(
-    @Req() req: Request & { user: { userId: number } },
-    @Body() dto: RecordCallHistoryDto,
-  ) {
-    return this.chatService.recordCallHistory(req.user.userId, dto);
   }
 
   @UseGuards(JwtGuard)
