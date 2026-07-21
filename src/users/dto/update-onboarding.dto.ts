@@ -11,7 +11,7 @@ import {
 import { Transform, Type } from 'class-transformer';
 import {
   normalizeStoredUsername,
-  USERNAME_MAX_LENGTH,
+  USERNAME_STORED_MAX_LENGTH,
 } from '../lib/normalize-username';
 
 class OnboardingStep1Dto {
@@ -43,7 +43,7 @@ class OnboardingStep5Dto {
     typeof value === 'string' ? normalizeStoredUsername(value) : value,
   )
   @IsString()
-  @MaxLength(USERNAME_MAX_LENGTH)
+  @MaxLength(USERNAME_STORED_MAX_LENGTH)
   username: string;
 
   @IsOptional()

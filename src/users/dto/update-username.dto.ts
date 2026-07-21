@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import {
   normalizeStoredUsername,
-  USERNAME_MAX_LENGTH,
+  USERNAME_STORED_MAX_LENGTH,
 } from '../lib/normalize-username';
 
 export class UpdateUsernameDto {
@@ -11,6 +11,6 @@ export class UpdateUsernameDto {
   )
   @IsString()
   @IsNotEmpty()
-  @MaxLength(USERNAME_MAX_LENGTH)
+  @MaxLength(USERNAME_STORED_MAX_LENGTH)
   username: string;
 }

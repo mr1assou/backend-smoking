@@ -117,7 +117,8 @@ export class AttemptsRepository {
       .aggregate({
         where: {
           user_id: userId,
-          loggedAt: { gte: from, lt: to },
+          // (from, to] — closing slip at `to` counts on the ended attempt
+          loggedAt: { gt: from, lte: to },
           cigarettesCount: { not: null },
         },
         _sum: { cigarettesCount: true },
@@ -133,7 +134,8 @@ export class AttemptsRepository {
     return this.prisma.slipEvent.findMany({
       where: {
         user_id: userId,
-        loggedAt: { gte: from, lt: to },
+        // (from, to] — slip that started this attempt (at `from`) is excluded
+        loggedAt: { gt: from, lte: to },
       },
       select: {
         loggedAt: true,

@@ -87,7 +87,7 @@ export class UsersRepository {
       .aggregate({
         where: {
           user_id: userId,
-          loggedAt: { gte: from, lt: to },
+          loggedAt: { gt: from, lte: to },
           cigarettesCount: { not: null },
         },
         _sum: { cigarettesCount: true },
@@ -103,7 +103,7 @@ export class UsersRepository {
     return this.prisma.slipEvent.findMany({
       where: {
         user_id: userId,
-        loggedAt: { gte: from, lt: to },
+        loggedAt: { gt: from, lte: to },
       },
       select: {
         loggedAt: true,

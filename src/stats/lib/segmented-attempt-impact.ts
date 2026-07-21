@@ -50,6 +50,11 @@ function sumImpact(
   };
 }
 
+/**
+ * Slip that closes an attempt is logged at the same instant the attempt ends
+ * and the next attempt starts. Use (start, end] so that closing slip belongs to
+ * the ended attempt, not the new one.
+ */
 function slipCountInWindow(
   slipEvents: SlipEventSlice[],
   startMs: number,
@@ -58,7 +63,7 @@ function slipCountInWindow(
   return slipEvents
     .filter((event) => {
       const loggedMs = event.loggedAt.getTime();
-      return loggedMs >= startMs && loggedMs < endMs;
+      return loggedMs > startMs && loggedMs <= endMs;
     })
     .reduce((sum, event) => sum + Math.max(0, event.cigarettesCount ?? 0), 0);
 }

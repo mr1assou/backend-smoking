@@ -103,16 +103,30 @@ export class UserProfilesRepository {
     usernamePrefix: string,
     limit = USERNAME_SEARCH_RESULT_LIMIT,
   ) {
+    const handle = usernamePrefix.replace(/^@+/, '').toLowerCase();
+    if (!handle) return Promise.resolve([]);
+
+    const withAt = `@${handle}`;
+
     return this.prisma.user.findMany({
       where: {
         role: DEFAULT_USER_ROLE,
         user_id: { not: viewerUserId },
-        username: {
-          not: null,
-          startsWith: usernamePrefix,
-          mode: 'insensitive',
-        },
         NOT: { username: { equals: '' } },
+        OR: [
+          {
+            username: {
+              startsWith: withAt,
+              mode: 'insensitive',
+            },
+          },
+          {
+            username: {
+              startsWith: handle,
+              mode: 'insensitive',
+            },
+          },
+        ],
       },
       select: {
         user_id: true,

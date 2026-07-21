@@ -108,16 +108,39 @@ export class SlipEventsRepository {
         where: { attempt_id: activeAttempt.attempt_id },
       });
 
+      // Closing slip is logged at `now` (= endedAt). Snapshot window is (start, end]
+      // so it is included; still guarantee this event's cigarettes are stored.
+      const slipCigarettesSmoked = Math.max(
+        snapshot.slipCigarettesSmoked,
+        slipThisEvent,
+      );
+      const missingSlipCigarettes = Math.max(
+        0,
+        slipCigarettesSmoked - snapshot.slipCigarettesSmoked,
+      );
+      const cigarettesAvoided = Math.max(
+        0,
+        snapshot.cigarettesAvoided - missingSlipCigarettes,
+      );
+      const lifeMinutesGained = Math.max(
+        0,
+        snapshot.lifeMinutesGained - missingSlipCigarettes * 20,
+      );
+      const moneySaved =
+        snapshot.cigarettesAvoided > 0
+          ? snapshot.moneySaved * (cigarettesAvoided / snapshot.cigarettesAvoided)
+          : snapshot.moneySaved;
+
       const closedAttempt = await tx.quitAttempt.update({
         where: { attempt_id: attempt.attempt_id },
         data: {
           endedAt: now,
           endOutcome: data.outcome,
           durationSeconds: snapshot.durationSeconds,
-          cigarettesAvoided: snapshot.cigarettesAvoided,
-          moneySaved: snapshot.moneySaved,
-          lifeMinutesGained: snapshot.lifeMinutesGained,
-          slipCigarettesSmoked: snapshot.slipCigarettesSmoked,
+          cigarettesAvoided,
+          moneySaved,
+          lifeMinutesGained,
+          slipCigarettesSmoked,
         },
       });
 
