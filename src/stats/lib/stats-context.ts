@@ -33,12 +33,19 @@ export async function loadStatsUserContext(
     user.streakStart ?? user.quitDate ?? active?.startedAt ?? null;
 
   if (active && activeTimelineStart) {
-    activeSnapshot = await attemptsService.computeSegmentedSnapshot(
+    const snapshot = await attemptsService.computeSegmentedSnapshot(
       userId,
       active,
       activeTimelineStart,
       now,
+      undefined,
+      // Active attempt has not closed yet — no slip cigarettes belong to it.
+      { pendingSlipOnly: true },
     );
+    activeSnapshot = {
+      ...snapshot,
+      slipCigarettesSmoked: 0,
+    };
   }
 
   return {

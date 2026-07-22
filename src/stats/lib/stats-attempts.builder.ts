@@ -43,6 +43,8 @@ export async function buildAttemptsList(
           row,
           timelineStart,
           now,
+          undefined,
+          { pendingSlipOnly: true },
         );
         return {
           attemptNumber: row.attemptNumber,
@@ -51,6 +53,7 @@ export async function buildAttemptsList(
           endOutcome: null,
           isActive: true,
           ...snapshot,
+          slipCigarettesSmoked: 0,
         };
       }
 
