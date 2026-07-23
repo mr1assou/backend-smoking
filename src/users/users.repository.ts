@@ -58,10 +58,23 @@ export class UsersRepository {
     });
   }
 
-  updatePremium(userId: number, isPremium: boolean): Promise<User> {
+  updatePremium(
+    userId: number,
+    isPremium: boolean,
+    premiumBoundRcUserId: string | null,
+  ): Promise<User> {
     return this.prisma.user.update({
       where: { user_id: userId },
-      data: { isPremium },
+      data: {
+        isPremium,
+        premiumBoundRcUserId,
+      },
+    });
+  }
+
+  findByPremiumBoundRcUserId(rcUserId: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { premiumBoundRcUserId: rcUserId },
     });
   }
 

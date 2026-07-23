@@ -30,6 +30,8 @@ model User {
   streakStart    DateTime? @db.Timestamptz(3)
 
   isPremium Boolean @default(false) @map("is_premium")
+  /** RevenueCat originalAppUserId that unlocked premium — blocks restore onto other Quitify accounts. */
+  premiumBoundRcUserId String? @unique @map("premium_bound_rc_user_id")
 
   cigarettesPerDay     Int?
   cigarettesPerDayNote String?

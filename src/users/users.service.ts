@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -187,8 +188,36 @@ export class UsersService {
     return this.usersRepository.updateDevicePreferences(userId, data);
   }
 
-  async updatePremium(userId: number, dto: { isPremium: boolean }) {
-    await this.usersRepository.updatePremium(userId, Boolean(dto.isPremium));
+  async updatePremium(
+    userId: number,
+    dto: { isPremium: boolean; revenueCatOriginalAppUserId?: string },
+  ) {
+    const wantsPremium = Boolean(dto.isPremium);
+
+    if (!wantsPremium) {
+      await this.usersRepository.updatePremium(userId, false, null);
+      return this.getMe(userId);
+    }
+
+    const rcUserId = dto.revenueCatOriginalAppUserId?.trim() ?? '';
+    const expected = String(userId);
+
+    // Subscription must belong to this Quitify account (blocks Play restore onto another login).
+    if (!rcUserId || rcUserId !== expected) {
+      throw new ForbiddenException(
+        'This subscription belongs to another Quitify account. Sign in with the account that purchased VIP.',
+      );
+    }
+
+    const boundOwner =
+      await this.usersRepository.findByPremiumBoundRcUserId(rcUserId);
+    if (boundOwner && boundOwner.user_id !== userId) {
+      throw new ConflictException(
+        'This subscription is already linked to another Quitify account.',
+      );
+    }
+
+    await this.usersRepository.updatePremium(userId, true, rcUserId);
     return this.getMe(userId);
   }
 
