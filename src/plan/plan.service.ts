@@ -48,8 +48,11 @@ export class PlanService {
     }
 
     const rows = await this.planRepository.findProgressForUser(userId);
+    const normalizedRows = await this.repairFalseDayCompletions(userId, rows);
     const completedPlanDays = new Set(
-      rows.filter((row) => row.completed_at).map((row) => row.plan_day),
+      normalizedRows
+        .filter((row) => row.completed_at)
+        .map((row) => row.plan_day),
     );
     const unlockedThroughDay = getUnlockedThroughDay(
       streakStart,
@@ -64,7 +67,7 @@ export class PlanService {
       currentDay,
       unlockedThroughDay,
       totalDays: PLAN_TOTAL_DAYS,
-      days: rows.map((row) => this.toDayDto(row)),
+      days: normalizedRows.map((row) => this.toDayDto(row)),
     };
   }
 
@@ -78,6 +81,10 @@ export class PlanService {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
+    if (!isValidPlanTaskId(planDay, taskId)) {
+      throw new BadRequestException('Unknown plan task');
+    }
+
     const streakStart = user.streakStart ?? user.quitDate ?? null;
     if (!streakStart) {
       throw new BadRequestException(
@@ -87,8 +94,11 @@ export class PlanService {
 
     const now = new Date();
     const rows = await this.planRepository.findProgressForUser(userId);
+    const normalizedRows = await this.repairFalseDayCompletions(userId, rows);
     const completedPlanDays = new Set(
-      rows.filter((row) => row.completed_at).map((row) => row.plan_day),
+      normalizedRows
+        .filter((row) => row.completed_at)
+        .map((row) => row.plan_day),
     );
     const unlockedThroughDay = getUnlockedThroughDay(
       streakStart,
@@ -150,8 +160,11 @@ export class PlanService {
 
     const now = new Date();
     const rows = await this.planRepository.findProgressForUser(userId);
+    const normalizedRows = await this.repairFalseDayCompletions(userId, rows);
     const completedPlanDays = new Set(
-      rows.filter((row) => row.completed_at).map((row) => row.plan_day),
+      normalizedRows
+        .filter((row) => row.completed_at)
+        .map((row) => row.plan_day),
     );
 
     if (
@@ -173,6 +186,37 @@ export class PlanService {
     await this.planRepository.upsertTaskNote(userId, planDay, taskNotes);
 
     return this.getPlanState(userId, timezone);
+  }
+
+  private async repairFalseDayCompletions(
+    userId: number,
+    rows: PlanDayProgress[],
+  ): Promise<PlanDayProgress[]> {
+    const next: PlanDayProgress[] = [];
+
+    for (const row of rows) {
+      if (!row.completed_at) {
+        next.push(row);
+        continue;
+      }
+
+      const taskStates = this.readTaskStates(row);
+      if (areAllPlanTasksDone(row.plan_day, taskStates)) {
+        next.push(row);
+        continue;
+      }
+
+      // Old catalog had fewer tasks — day was marked complete too early.
+      await this.planRepository.upsertDayProgress(
+        userId,
+        row.plan_day,
+        taskStates,
+        null,
+      );
+      next.push({ ...row, completed_at: null });
+    }
+
+    return next;
   }
 
   private readTaskStates(row: PlanDayProgress | null): Record<string, boolean> {

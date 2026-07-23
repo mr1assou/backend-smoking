@@ -6,11 +6,13 @@ import {
   HttpStatus,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
+import { CheckUsernameQueryDto } from './dto/check-username-query.dto';
 import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
@@ -24,6 +26,15 @@ import { UsersService } from './users.service';
 @Controller('auth')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  /** Public — used by onboarding step 5 and settings (debounced). */
+  @Get('username/available')
+  checkUsernameAvailable(@Query() query: CheckUsernameQueryDto) {
+    return this.usersService.checkUsernameAvailable(
+      query.username,
+      query.excludeUserId,
+    );
+  }
 
   @UseGuards(JwtGuard)
   @Get('me')

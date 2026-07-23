@@ -158,6 +158,27 @@ export class UsersRepository {
     });
   }
 
+  findByUsername(username: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { username },
+    });
+  }
+
+  /** True when no other user owns this username (optionally ignoring one user). */
+  async isUsernameAvailable(
+    username: string,
+    excludeUserId?: number,
+  ): Promise<boolean> {
+    const existing = await this.prisma.user.findFirst({
+      where: {
+        username,
+        ...(excludeUserId != null ? { user_id: { not: excludeUserId } } : {}),
+      },
+      select: { user_id: true },
+    });
+    return existing == null;
+  }
+
   updateHabitSettings(
     userId: number,
     economics: {

@@ -1,9 +1,10 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { AttemptsService } from '../attempts/attempts.service';
 import {
   EconomicsSegmentsRepository,
@@ -74,19 +75,41 @@ export class UsersService {
 
   async updateOnboarding(userId: number, dto: UpdateOnboardingDto) {
     const data = this.mapOnboardingDtoToData(dto);
-    const result = await this.usersRepository.updateOnboarding(userId, data);
 
-    if (data.quitDate) {
-      await this.attemptsService.ensureFirstAttempt(userId, data.quitDate, {
-        cigarettesPerDay: data.cigarettesPerDay ?? 0,
-        cigarettesPerPack: data.cigarettesPerPack ?? 20,
-        packPrice: data.packPrice,
-      });
-      await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
-      await this.badgesService.syncEarnedBadges(userId);
+    if (data.username) {
+      await this.assertUsernameAvailable(data.username, userId);
     }
 
-    return result;
+    try {
+      const result = await this.usersRepository.updateOnboarding(userId, data);
+
+      if (data.quitDate) {
+        await this.attemptsService.ensureFirstAttempt(userId, data.quitDate, {
+          cigarettesPerDay: data.cigarettesPerDay ?? 0,
+          cigarettesPerPack: data.cigarettesPerPack ?? 20,
+          packPrice: data.packPrice,
+        });
+        await this.freedomPointsService.syncSmokeFreeDayRewards(userId);
+        await this.badgesService.syncEarnedBadges(userId);
+      }
+
+      return result;
+    } catch (error) {
+      this.rethrowUsernameConflict(error);
+    }
+  }
+
+  async checkUsernameAvailable(rawUsername: string, excludeUserId?: number) {
+    const username = normalizeStoredUsername(rawUsername);
+    if (!username) {
+      return { available: false, username: '' };
+    }
+
+    const available = await this.usersRepository.isUsernameAvailable(
+      username,
+      excludeUserId,
+    );
+    return { available, username };
   }
 
   async resetJourney(userId: number, dto: ResetJourneyDto = {}) {
@@ -181,8 +204,38 @@ export class UsersService {
       throw new BadRequestException('Username is required');
     }
 
-    await this.usersRepository.updateUsername(userId, username);
+    await this.assertUsernameAvailable(username, userId);
+
+    try {
+      await this.usersRepository.updateUsername(userId, username);
+    } catch (error) {
+      this.rethrowUsernameConflict(error);
+    }
+
     return this.getMe(userId);
+  }
+
+  private async assertUsernameAvailable(
+    username: string,
+    excludeUserId?: number,
+  ): Promise<void> {
+    const available = await this.usersRepository.isUsernameAvailable(
+      username,
+      excludeUserId,
+    );
+    if (!available) {
+      throw new ConflictException('Username already taken');
+    }
+  }
+
+  private rethrowUsernameConflict(error: unknown): never {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      throw new ConflictException('Username already taken');
+    }
+    throw error;
   }
 
   async setRefreshTokenHash(
