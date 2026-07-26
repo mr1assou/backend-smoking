@@ -24,6 +24,16 @@ export class PushNotificationsCron {
     void this.pushNotificationsService.sendPushToSubscribers('streak');
   }
 
+  /** 12:30 PM Eastern — was local-only; now Expo push. */
+  @Cron(PUSH_SCHEDULE.tip.cron, {
+    name: 'push-tip',
+    timeZone: PUSH_TIMEZONE,
+  })
+  handleTipPush(): void {
+    this.logger.debug(`Running ${PUSH_SCHEDULE.tip.label}`);
+    void this.pushNotificationsService.sendPushToSubscribers('tip');
+  }
+
   @Cron(PUSH_SCHEDULE.money.cron, {
     name: 'push-money',
     timeZone: PUSH_TIMEZONE,
@@ -31,5 +41,15 @@ export class PushNotificationsCron {
   handleMoneyPush(): void {
     this.logger.debug(`Running ${PUSH_SCHEDULE.money.label}`);
     void this.pushNotificationsService.sendPushToSubscribers('money');
+  }
+
+  /** 8:30 PM Eastern — was local-only; now Expo push. */
+  @Cron(PUSH_SCHEDULE.motivation.cron, {
+    name: 'push-motivation',
+    timeZone: PUSH_TIMEZONE,
+  })
+  handleMotivationPush(): void {
+    this.logger.debug(`Running ${PUSH_SCHEDULE.motivation.label}`);
+    void this.pushNotificationsService.sendPushToSubscribers('motivation');
   }
 }
