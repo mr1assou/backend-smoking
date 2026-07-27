@@ -1,0 +1,16 @@
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/birds/birds.mp3', audio_mime_type = 'audio/mpeg' WHERE slug = 'birds';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/calmGame/calm_game_music.mp3', audio_mime_type = 'audio/mpeg' WHERE slug = 'calmGame';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/chill/chill_music.wav', audio_mime_type = 'audio/wav' WHERE slug = 'chill';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/cyberpunk/cyberpunk.mp3', audio_mime_type = 'audio/mpeg' WHERE slug = 'cyberpunk';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/deathSound/death_sound.mp3', audio_mime_type = 'audio/mpeg' WHERE slug = 'deathSound';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/desertDunes/Dunes_atmosphere.wav', audio_mime_type = 'audio/wav' WHERE slug = 'desertDunes';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/filmScore/film_music.wav', audio_mime_type = 'audio/wav' WHERE slug = 'filmScore';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/forestRoad/road_in_forest.wav', audio_mime_type = 'audio/wav' WHERE slug = 'forestRoad';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/listen/listen.wav', audio_mime_type = 'audio/wav' WHERE slug = 'listen';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/lostDiary/lost_diary.wav', audio_mime_type = 'audio/wav' WHERE slug = 'lostDiary';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/midi/midi_sound.wav', audio_mime_type = 'audio/wav' WHERE slug = 'midi';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/parallelUniverse/paralell_universe.wav', audio_mime_type = 'audio/wav' WHERE slug = 'parallelUniverse';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/relax/relax_music.mp3', audio_mime_type = 'audio/mpeg' WHERE slug = 'relax';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/surea/surea.wav', audio_mime_type = 'audio/wav' WHERE slug = 'surea';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/surrealism/surrealism.mp3', audio_mime_type = 'audio/mpeg' WHERE slug = 'surrealism';
+UPDATE relax_sounds SET audio_url = 'https://pub-714616ca503e46f5a8ad273a91ef5ada.r2.dev/music/wandering/wandering.wav', audio_mime_type = 'audio/wav' WHERE slug = 'wandering';
