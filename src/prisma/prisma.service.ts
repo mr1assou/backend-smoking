@@ -9,7 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool, type PoolConfig } from 'pg';
 
-/** Strip URL SSL params — TLS is configured on the Pool with system CAs. */
+/** Strip URL SSL params — TLS is configured on the Pool (Render-safe). */
 function connectionStringWithoutSslParams(raw: string): string {
   const url = new URL(raw);
   for (const key of [
@@ -48,9 +48,20 @@ function createPgPool(config: ConfigService): Pool {
     throw new Error('DATABASE_URL is not set');
   }
 
+  const parsed = new URL(rawUrl);
+  // Render Internal DB hosts have no public DNS suffix and usually need no TLS.
+  // External Render Postgres often presents a cert Node rejects unless we relax verify.
+  const isRenderInternalHost =
+    !parsed.hostname.includes('.') || parsed.hostname.endsWith('.render.internal');
+  const wantsSsl =
+    !isRenderInternalHost &&
+    (parsed.searchParams.get('sslmode') === 'require' ||
+      parsed.hostname.includes('render.com') ||
+      parsed.hostname.includes('aivencloud.com'));
+
   const poolConfig: PoolConfig = {
     connectionString: connectionStringWithoutSslParams(rawUrl),
-    ssl: { rejectUnauthorized: true },
+    ssl: wantsSsl ? { rejectUnauthorized: false } : undefined,
     // Keep modest but avoid starvation when a request fans out to multiple queries.
     max: 20,
     idleTimeoutMillis: 30_000,
