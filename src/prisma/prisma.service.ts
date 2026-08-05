@@ -7,11 +7,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { Pool, type PoolConfig } from 'pg';
 
-/** Strip URL SSL params — TLS is configured on the Pool with certs/ca.pem. */
+/** Strip URL SSL params — TLS is configured on the Pool with system CAs. */
 function connectionStringWithoutSslParams(raw: string): string {
   const url = new URL(raw);
   for (const key of [
@@ -50,21 +48,14 @@ function createPgPool(config: ConfigService): Pool {
     throw new Error('DATABASE_URL is not set');
   }
 
-  const caPath =
-    config.get<string>('DATABASE_CA_PATH') ??
-    join(process.cwd(), 'certs', 'ca.pem');
-
   const poolConfig: PoolConfig = {
     connectionString: connectionStringWithoutSslParams(rawUrl),
-    ssl: {
-      ca: readFileSync(caPath, 'utf8'),
-      rejectUnauthorized: true,
-    },
+    ssl: { rejectUnauthorized: true },
     // Keep modest but avoid starvation when a request fans out to multiple queries.
     max: 20,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 30_000,
-    // Recycle connections before Aiven/cloud providers drop idle sockets.
+    // Recycle connections before cloud providers drop idle sockets.
     maxLifetimeSeconds: 300,
     keepAlive: true,
     keepAliveInitialDelayMillis: 10_000,

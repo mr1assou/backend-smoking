@@ -115,13 +115,7 @@ if (!databaseUrl) {
 
 const pool = new pg.Pool({
   connectionString: connectionStringWithoutSslParams(databaseUrl),
-  ssl: {
-    ca: fs.readFileSync(
-      process.env.DATABASE_CA_PATH ?? path.join(BACKEND_ROOT, "certs", "ca.pem"),
-      "utf8",
-    ),
-    rejectUnauthorized: true,
-  },
+  ssl: { rejectUnauthorized: true },
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
