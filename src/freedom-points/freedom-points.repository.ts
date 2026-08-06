@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { toUtcIso } from '../common/utc-instant';
+import { MS_PER_SMOKE_FREE_DAY } from '../common/smoke-free-days';
 import { PrismaService } from '../prisma/prisma.service';
 import type { FreedomPointLedgerRow } from './types/freedom-point-ledger-row';
 import { FREEDOM_POINT_SOURCES } from './lib/freedom-points.constants';
@@ -14,6 +15,8 @@ export type GrantFreedomPointsInput = {
   amount: number;
   sourceType: string;
   sourceKey: string;
+  /** When omitted, DB default `now()` is used. */
+  earnedAt?: Date;
 };
 
 export type UserStreakContext = {
@@ -121,6 +124,43 @@ export class FreedomPointsRepository {
     return staleIds.length;
   }
 
+  /** Align smoke-free day `earned_at` with streakStart + dayIndex (fixes catch-up stamps). */
+  async reconcileSmokeFreeDayEarnedAt(
+    userId: number,
+    attemptId: number,
+    streakStart: Date,
+  ): Promise<number> {
+    const prefix = `${attemptId}:`;
+    const entries = await this.prisma.freedomPointLedger.findMany({
+      where: {
+        user_id: userId,
+        source_type: FREEDOM_POINT_SOURCES.SMOKE_FREE_DAY,
+        source_key: { startsWith: prefix },
+      },
+      select: { ledger_id: true, source_key: true, earned_at: true },
+    });
+
+    let updated = 0;
+
+    for (const entry of entries) {
+      const dayIndex = parseSmokeFreeDayAttemptKey(entry.source_key, attemptId);
+      if (dayIndex === null) continue;
+
+      const correctEarnedAt = new Date(
+        streakStart.getTime() + dayIndex * MS_PER_SMOKE_FREE_DAY,
+      );
+      if (entry.earned_at.getTime() === correctEarnedAt.getTime()) continue;
+
+      await this.prisma.freedomPointLedger.update({
+        where: { ledger_id: entry.ledger_id },
+        data: { earned_at: correctEarnedAt },
+      });
+      updated += 1;
+    }
+
+    return updated;
+  }
+
   async recalculateUserFreedomPoints(userId: number): Promise<number> {
     const total = await this.prisma.freedomPointLedger
       .aggregate({
@@ -158,6 +198,7 @@ export class FreedomPointsRepository {
               amount: entry.amount,
               source_type: entry.sourceType,
               source_key: entry.sourceKey,
+              ...(entry.earnedAt ? { earned_at: entry.earnedAt } : null),
             },
           });
           pointsAwarded += entry.amount;

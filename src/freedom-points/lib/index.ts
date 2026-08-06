@@ -5,6 +5,7 @@ export {
 } from './freedom-points.constants';
 export {
   buildSmokeFreeDayRewards,
+  smokeFreeDayEarnedAt,
   type SmokeFreeDayReward,
   type SmokeFreeDayRewardContext,
 } from './smoke-free-day-rewards';

@@ -1,4 +1,4 @@
-import { smokeFreeDaysFromInstant } from '../../common/smoke-free-days';
+import { MS_PER_SMOKE_FREE_DAY, smokeFreeDaysFromInstant } from '../../common/smoke-free-days';
 import { FP_PER_SMOKE_FREE_DAY } from './freedom-points.constants';
 import { smokeFreeDaySourceKey } from './smoke-free-day-source-key';
 
@@ -6,6 +6,8 @@ export type SmokeFreeDayReward = {
   dayIndex: number;
   amount: number;
   sourceKey: string;
+  /** Instant the Nth 24h smoke-free period completed (streakStart + N days). */
+  earnedAt: Date;
 };
 
 export type SmokeFreeDayRewardContext = {
@@ -14,6 +16,14 @@ export type SmokeFreeDayRewardContext = {
   quitDate: Date | null;
   now?: Date;
 };
+
+/** UTC instant when smoke-free day `dayIndex` completed. */
+export function smokeFreeDayEarnedAt(
+  streakStart: Date,
+  dayIndex: number,
+): Date {
+  return new Date(streakStart.getTime() + dayIndex * MS_PER_SMOKE_FREE_DAY);
+}
 
 /** Builds pending smoke-free day rewards for the active quit attempt (idempotent keys). */
 export function buildSmokeFreeDayRewards(
@@ -40,6 +50,7 @@ export function buildSmokeFreeDayRewards(
       dayIndex,
       amount: FP_PER_SMOKE_FREE_DAY,
       sourceKey,
+      earnedAt: smokeFreeDayEarnedAt(start, dayIndex),
     });
   }
 

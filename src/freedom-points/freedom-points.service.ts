@@ -55,6 +55,15 @@ export class FreedomPointsService {
       completedDays,
     );
 
+    const streakAnchor = user.streakStart ?? user.quitDate;
+    if (streakAnchor) {
+      await this.freedomPointsRepository.reconcileSmokeFreeDayEarnedAt(
+        userId,
+        activeAttempt.attempt_id,
+        streakAnchor,
+      );
+    }
+
     const existingKeys =
       await this.freedomPointsRepository.findSmokeFreeDaySourceKeysForAttempt(
         userId,
@@ -81,6 +90,7 @@ export class FreedomPointsService {
           amount: reward.amount,
           sourceType: FREEDOM_POINT_SOURCES.SMOKE_FREE_DAY,
           sourceKey: reward.sourceKey,
+          earnedAt: reward.earnedAt,
         })),
       );
       pointsAwarded = grant.pointsAwarded;
