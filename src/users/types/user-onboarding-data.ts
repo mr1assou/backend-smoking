@@ -1,9 +1,13 @@
 /** Fields persisted from onboarding step 1–6 (labels / text). */
 export type UserOnboardingData = {
   quitReasons: string[];
+  quitReasonOtherText: string | null;
   motivation: string | null;
+  motivationOtherText: string | null;
   priorQuitAttempts: string | null;
+  priorQuitAttemptsOtherText: string | null;
   primaryInterests: string[];
+  primaryInterestOtherText: string | null;
   username: string | null;
   sex: string | null;
   country: string | null;

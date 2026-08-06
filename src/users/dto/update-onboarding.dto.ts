@@ -14,28 +14,50 @@ import {
   USERNAME_STORED_MAX_LENGTH,
 } from '../lib/normalize-username';
 
+const OTHER_TEXT_MAX_LENGTH = 500;
+
 class OnboardingStep1Dto {
   @IsArray()
   @IsString({ each: true })
   quitReasons: string[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(OTHER_TEXT_MAX_LENGTH)
+  otherText?: string;
 }
 
 class OnboardingStep2Dto {
   @IsOptional()
   @IsString()
   motivation?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(OTHER_TEXT_MAX_LENGTH)
+  otherText?: string;
 }
 
 class OnboardingStep3Dto {
   @IsOptional()
   @IsString()
   priorQuitAttempts?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(OTHER_TEXT_MAX_LENGTH)
+  otherText?: string;
 }
 
 class OnboardingStep4Dto {
   @IsArray()
   @IsString({ each: true })
   primaryInterests: string[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(OTHER_TEXT_MAX_LENGTH)
+  otherText?: string;
 }
 
 class OnboardingStep5Dto {

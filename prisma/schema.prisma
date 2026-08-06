@@ -19,6 +19,10 @@ model User {
   motivation        String?
   priorQuitAttempts String?
   primaryInterests  String[] @default([])
+  quitReasonOtherText        String?
+  motivationOtherText        String?
+  priorQuitAttemptsOtherText String?
+  primaryInterestOtherText   String?
 
   username       String? @unique
   sex            String?

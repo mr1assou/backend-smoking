@@ -338,12 +338,20 @@ export class UsersService {
 
   private mapOnboardingDtoToData(dto: UpdateOnboardingDto): UserOnboardingData {
     const quitDate = this.resolveQuitDate(dto.step5);
+    const trimOther = (value?: string): string | null => {
+      const trimmed = value?.trim();
+      return trimmed && trimmed.length > 0 ? trimmed : null;
+    };
 
     return {
       quitReasons: dto.step1.quitReasons,
+      quitReasonOtherText: trimOther(dto.step1.otherText),
       motivation: dto.step2.motivation ?? null,
+      motivationOtherText: trimOther(dto.step2.otherText),
       priorQuitAttempts: dto.step3.priorQuitAttempts ?? null,
+      priorQuitAttemptsOtherText: trimOther(dto.step3.otherText),
       primaryInterests: dto.step4.primaryInterests,
+      primaryInterestOtherText: trimOther(dto.step4.otherText),
       username: normalizeStoredUsername(dto.step5.username) || null,
       sex: dto.step5.sex ?? null,
       country: dto.step5.country ?? null,
