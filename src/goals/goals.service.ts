@@ -133,7 +133,7 @@ export class GoalsService {
         ? elapsedSmokeFreeMs(user.streakStart, user.quitDate, context.now)
         : progress.cigarettesAvoided;
 
-    await this.goalsRepository.upsertActiveGoal(
+    await this.goalsRepository.createOrUpdateActiveGoal(
       userId,
       activeAttempt.attempt_id,
       type,

@@ -33,7 +33,11 @@ export class GoalsRepository {
     });
   }
 
-  upsertActiveGoal(
+  /**
+   * Update the active goal of this type, or insert a new row when none is active.
+   * Completed/failed goals are never overwritten — they stay in history with their own ids (and FP keys).
+   */
+  async createOrUpdateActiveGoal(
     userId: number,
     attemptId: number,
     type: GoalType,
@@ -41,15 +45,25 @@ export class GoalsRepository {
     baselineProgress: number,
   ): Promise<UserGoal> {
     const now = utcInstantNow();
+    const active = await this.findActiveByAttemptAndType(attemptId, type);
 
-    return this.prisma.userGoal.upsert({
-      where: {
-        attempt_id_type: {
-          attempt_id: attemptId,
-          type,
+    if (active) {
+      return this.prisma.userGoal.update({
+        where: { goal_id: active.goal_id },
+        data: {
+          target,
+          baseline_progress: baselineProgress,
+          started_at: now,
+          completed_at: null,
+          failed_at: null,
+          failed_reason: null,
+          failed_by_slip_event_id: null,
         },
-      },
-      create: {
+      });
+    }
+
+    return this.prisma.userGoal.create({
+      data: {
         user_id: userId,
         attempt_id: attemptId,
         type,
@@ -57,16 +71,6 @@ export class GoalsRepository {
         baseline_progress: baselineProgress,
         status: 'active',
         started_at: now,
-      },
-      update: {
-        target,
-        baseline_progress: baselineProgress,
-        status: 'active',
-        started_at: now,
-        completed_at: null,
-        failed_at: null,
-        failed_reason: null,
-        failed_by_slip_event_id: null,
       },
     });
   }

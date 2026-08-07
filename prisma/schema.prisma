@@ -149,8 +149,10 @@ model UserGoal {
   user    User        @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   attempt QuitAttempt @relation(fields: [attempt_id], references: [attempt_id], onDelete: Cascade)
 
-  @@unique([attempt_id, type])
+  // One active goal per type per attempt is enforced by a partial unique index
+  // in migration (status = 'active'). Completed/failed history keeps separate rows.
   @@index([user_id, status])
+  @@index([attempt_id, type])
   @@map("user_goals")
 }
 
