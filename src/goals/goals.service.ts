@@ -19,7 +19,7 @@ import {
   isAllowedTarget,
   type GoalProgressSnapshot,
 } from './lib/goal-allowed-targets';
-import { computeGoalCompletionBonus } from './lib/goal-completion-bonus';
+import { computeGoalCompletionBonus, computeGoalCompletionEarnedAt } from './lib/goal-completion-bonus';
 import { elapsedSmokeFreeMs } from '../common/smoke-free-days';
 import { buildGoalProgressSnapshot, isGoalMet } from './lib/goal-progress';
 
@@ -77,6 +77,8 @@ export class GoalsService {
         context.active.attempt_id,
         progress,
         context.economics,
+        user.streakStart,
+        user.quitDate,
       );
     }
 
@@ -166,6 +168,8 @@ export class GoalsService {
     attemptId: number,
     progress: GoalProgressSnapshot,
     economics: AttemptEconomics,
+    streakStart: Date | null | undefined,
+    quitDate: Date | null | undefined,
   ): Promise<void> {
     const activeGoals =
       await this.goalsRepository.findActiveForAttempt(attemptId);
@@ -174,7 +178,9 @@ export class GoalsService {
     );
 
     await Promise.all(
-      completedGoals.map((goal) => this.completeGoal(userId, goal, economics)),
+      completedGoals.map((goal) =>
+        this.completeGoal(userId, goal, economics, streakStart, quitDate),
+      ),
     );
   }
 
@@ -182,11 +188,23 @@ export class GoalsService {
     userId: number,
     goal: UserGoal,
     economics: AttemptEconomics,
+    streakStart: Date | null | undefined,
+    quitDate: Date | null | undefined,
   ): Promise<void> {
-    await this.goalsRepository.markCompleted(goal.goal_id);
+    const goalType = goal.type as GoalType;
+    const earnedAt =
+      computeGoalCompletionEarnedAt(
+        goalType,
+        goal.target,
+        goal.baseline_progress,
+        streakStart,
+        quitDate,
+      ) ?? undefined;
+
+    await this.goalsRepository.markCompleted(goal.goal_id, earnedAt);
 
     const bonus = computeGoalCompletionBonus(
-      goal.type as GoalType,
+      goalType,
       goal.target,
       goal.baseline_progress,
       economics,
@@ -197,6 +215,7 @@ export class GoalsService {
       amount: bonus,
       sourceType: FREEDOM_POINT_SOURCES.GOAL_COMPLETION,
       sourceKey: String(goal.goal_id),
+      earnedAt,
     });
 
     await this.badgesService.syncEarnedBadges(userId);

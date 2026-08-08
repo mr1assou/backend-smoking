@@ -113,6 +113,8 @@ export class FreedomPointsService {
     amount: number;
     sourceType: string;
     sourceKey: string;
+    /** When the reward was actually earned (defaults to grant time). */
+    earnedAt?: Date;
   }): Promise<{ pointsAwarded: number; totalFreedomPoints: number }> {
     const grant = await this.freedomPointsRepository.grantMany([
       {
@@ -120,6 +122,7 @@ export class FreedomPointsService {
         amount: input.amount,
         sourceType: input.sourceType,
         sourceKey: input.sourceKey,
+        earnedAt: input.earnedAt,
       },
     ]);
 
