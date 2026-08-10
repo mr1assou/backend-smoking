@@ -100,33 +100,21 @@ export class UserProfilesRepository {
 
   searchNormalUsersByUsername(
     viewerUserId: number,
-    usernamePrefix: string,
+    usernameQuery: string,
     limit = USERNAME_SEARCH_RESULT_LIMIT,
   ) {
-    const handle = usernamePrefix.replace(/^@+/, '').toLowerCase();
+    const handle = usernameQuery.replace(/^@+/, '').toLowerCase().trim();
     if (!handle) return Promise.resolve([]);
-
-    const withAt = `@${handle}`;
 
     return this.prisma.user.findMany({
       where: {
         role: DEFAULT_USER_ROLE,
         user_id: { not: viewerUserId },
         NOT: { username: { equals: '' } },
-        OR: [
-          {
-            username: {
-              startsWith: withAt,
-              mode: 'insensitive',
-            },
-          },
-          {
-            username: {
-              startsWith: handle,
-              mode: 'insensitive',
-            },
-          },
-        ],
+        username: {
+          contains: handle,
+          mode: 'insensitive',
+        },
       },
       select: {
         user_id: true,
