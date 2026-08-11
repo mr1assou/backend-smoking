@@ -41,4 +41,26 @@ export type R2ChatMediaContentType =
 
 export const R2_PRESIGN_EXPIRES_SECONDS = 300;
 
-export const R2_MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+/** Profile avatar after client compression. */
+export const R2_MAX_PROFILE_IMAGE_BYTES = 2 * 1024 * 1024; // 2 MB
+
+/** Post still image after client compression. */
+export const R2_MAX_POST_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+/** Post video (duration also capped client-side). */
+export const R2_MAX_POST_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
+
+export const R2_MAX_POST_VIDEO_DURATION_MS = 60_000; // 60s
+
+/** @deprecated Prefer R2_MAX_POST_IMAGE_BYTES / R2_MAX_PROFILE_IMAGE_BYTES. */
+export const R2_MAX_IMAGE_BYTES = R2_MAX_POST_IMAGE_BYTES;
+
+export function isVideoContentType(contentType: string): boolean {
+  return contentType.startsWith('video/');
+}
+
+export function maxBytesForPostContentType(contentType: string): number {
+  return isVideoContentType(contentType)
+    ? R2_MAX_POST_VIDEO_BYTES
+    : R2_MAX_POST_IMAGE_BYTES;
+}

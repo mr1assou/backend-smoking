@@ -7,6 +7,10 @@ import {
   R2_ALLOWED_IMAGE_TYPES,
   R2_ALLOWED_POST_MEDIA_TYPES,
   R2_FOLDERS,
+  R2_MAX_POST_VIDEO_DURATION_MS,
+  R2_MAX_PROFILE_IMAGE_BYTES,
+  isVideoContentType,
+  maxBytesForPostContentType,
   type R2ChatMediaContentType,
   type R2ImageContentType,
   type R2PostMediaContentType,
@@ -23,6 +27,7 @@ export class StorageService {
     userId: number,
     dto: CreatePostUploadUrlDto,
   ): Promise<PresignedUpload> {
+    this.assertPostUploadLimits(dto);
     return this.createPostMediaUploadUrl(userId, dto.contentType);
   }
 
@@ -30,6 +35,7 @@ export class StorageService {
     userId: number,
     dto: CreateUploadUrlDto,
   ): Promise<PresignedUpload> {
+    this.assertProfileUploadLimits(dto.fileSizeBytes);
     return this.createImageUploadUrl(
       R2_FOLDERS.PROFILES,
       userId,
@@ -129,6 +135,37 @@ export class StorageService {
       key,
       expiresIn,
     };
+  }
+
+  private assertProfileUploadLimits(fileSizeBytes: number): void {
+    if (fileSizeBytes > R2_MAX_PROFILE_IMAGE_BYTES) {
+      throw new BadRequestException(
+        `Profile photos must be ${Math.floor(R2_MAX_PROFILE_IMAGE_BYTES / (1024 * 1024))} MB or smaller`,
+      );
+    }
+  }
+
+  private assertPostUploadLimits(dto: CreatePostUploadUrlDto): void {
+    const maxBytes = maxBytesForPostContentType(dto.contentType);
+    if (dto.fileSizeBytes > maxBytes) {
+      const mb = Math.floor(maxBytes / (1024 * 1024));
+      throw new BadRequestException(
+        isVideoContentType(dto.contentType)
+          ? `Videos must be ${mb} MB or smaller`
+          : `Images must be ${mb} MB or smaller`,
+      );
+    }
+
+    if (isVideoContentType(dto.contentType)) {
+      if (dto.durationMs == null) {
+        throw new BadRequestException('Video duration is required');
+      }
+      if (dto.durationMs > R2_MAX_POST_VIDEO_DURATION_MS) {
+        throw new BadRequestException(
+          `Videos must be ${Math.floor(R2_MAX_POST_VIDEO_DURATION_MS / 1000)} seconds or shorter`,
+        );
+      }
+    }
   }
 
   private assertAllowedMusicAudioType(
