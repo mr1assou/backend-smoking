@@ -22,10 +22,13 @@ export class LeaderboardService {
     viewerUserId: number,
     query: ListLeaderboardQueryDto = {},
   ): Promise<LeaderboardResponse> {
-    await this.freedomPointsService.syncSmokeFreeDayRewards(viewerUserId);
-    await this.badgesService.syncEarnedBadges(viewerUserId);
-
     const { offset, limit } = resolveLeaderboardPagination(query);
+
+    // Sync once on the first page only — paging / Spot my rank must stay fast.
+    if (offset === 0) {
+      await this.freedomPointsService.syncSmokeFreeDayRewards(viewerUserId);
+      await this.badgesService.syncEarnedBadges(viewerUserId);
+    }
     const [totalUsers, page, viewerRow, viewerRole] = await Promise.all([
       this.leaderboardRepository.countEligibleUsers(),
       this.leaderboardRepository.findEligibleUsersPaginated(offset, limit),

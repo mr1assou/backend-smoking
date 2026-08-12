@@ -17,6 +17,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:status": "prisma migrate status",
     "seed:play-test-user": "node scripts/ensure-play-test-user.mjs",
+    "seed:fake-users": "node scripts/seed-fake-users.mjs",
     "seed:relax-sounds": "node scripts/seed-relax-sounds.mjs",
     "seed:relax-sounds:db": "node scripts/seed-relax-sounds.mjs --db-only",
     "purge:r2-profiles": "node scripts/purge-r2-profiles.mjs",
