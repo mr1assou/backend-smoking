@@ -97,6 +97,8 @@ export class ChatRepository {
     return this.prisma.chatThread.findMany({
       where: {
         OR: [{ user_one_id: userId }, { user_two_id: userId }],
+        // Hide threads opened via Message but never used (0 messages).
+        messages: { some: {} },
       },
       orderBy: { updated_at: 'desc' },
       skip: offset,
