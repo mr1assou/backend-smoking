@@ -1,5 +1,3 @@
-import { MS_PER_SMOKE_FREE_DAY } from '../../common/smoke-free-days';
-import { parsePackPrice } from '../../stats/lib/attempt-impact';
 import { pickMotivationBody } from '../content/motivations';
 import { formatMoneySavedForPush } from '../content/money';
 import {
@@ -15,19 +13,6 @@ function firstName(username: string | null): string {
   return username?.trim().split(/\s+/)[0] || 'Friend';
 }
 
-function computeMoneySaved(
-  recipient: PushRecipient,
-  elapsedMs: number,
-): number {
-  const cigarettesPerDay = recipient.cigarettesPerDay ?? 0;
-  const cigarettesPerPack = Math.max(1, recipient.cigarettesPerPack ?? 20);
-  const packPrice = parsePackPrice(recipient.packPrice);
-  const avoided =
-    (Math.max(0, cigarettesPerDay) * elapsedMs) / MS_PER_SMOKE_FREE_DAY;
-
-  return (avoided / cigarettesPerPack) * packPrice;
-}
-
 function pluralize(count: number, singular: string): string {
   return count === 1 ? singular : `${singular}s`;
 }
@@ -39,6 +24,7 @@ export function buildRotatingPushCopy(input: {
   streakDaysInProgress: number;
   elapsedMs: number;
   contentSlot: number;
+  moneySaved?: number;
 }): PushCopy {
   const name = firstName(input.recipient.username);
   const duration = formatStreakDurationForPush(input.elapsedMs);
@@ -73,7 +59,7 @@ export function buildRotatingPushCopy(input: {
     }
 
     case 'money': {
-      const saved = computeMoneySaved(input.recipient, input.elapsedMs);
+      const saved = input.moneySaved ?? 0;
       const formatted = formatMoneySavedForPush(
         saved,
         input.recipient.currency,

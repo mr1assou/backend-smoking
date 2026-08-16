@@ -8,6 +8,7 @@ import {
 import { utcInstantNow } from '../common/utc-instant';
 import { ExpoPushClient } from './clients/expo-push.client';
 import { buildRotatingPushCopy } from './copy/build-rotating-push-copy';
+import { computePushMoneySaved } from './copy/compute-push-money-saved';
 import { PushNotificationsRepository } from './push-notifications.repository';
 import { dailyContentSlot, type PushKind } from './rotation/push-rotation';
 
@@ -37,6 +38,13 @@ export class PushNotificationsService {
 
       const now = utcInstantNow();
       const contentSlot = dailyContentSlot(now);
+      const moneyContextByUserId =
+        kind === 'money'
+          ? await this.repository.listMoneyContextByUserId(
+              [...new Set(recipients.map((recipient) => recipient.userId))],
+              now,
+            )
+          : new Map();
 
       const messages = recipients.map((recipient) => {
         const elapsedMs = elapsedSmokeFreeMs(
@@ -59,6 +67,15 @@ export class PushNotificationsService {
           ),
           elapsedMs,
           contentSlot,
+          moneySaved:
+            kind === 'money'
+              ? computePushMoneySaved(
+                  recipient,
+                  elapsedMs,
+                  now,
+                  moneyContextByUserId.get(recipient.userId),
+                )
+              : undefined,
         });
 
         return {

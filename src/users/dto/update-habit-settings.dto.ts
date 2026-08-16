@@ -20,6 +20,6 @@ export class UpdateHabitSettingsDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
+  @Min(0.01)
   packCost?: number;
 }
