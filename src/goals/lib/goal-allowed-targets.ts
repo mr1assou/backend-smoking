@@ -1,4 +1,4 @@
-import { minDaysAheadFromStreakDays } from '../../common/smoke-free-days';
+import { minDaysAheadFromStreakDays, maxDaysAheadFromStreakDays } from '../../common/smoke-free-days';
 import type { GoalType } from '../goals.constants';
 
 export type GoalProgressSnapshot = {
@@ -22,6 +22,18 @@ function computeMinTarget(
   }
 }
 
+function computeMaxTarget(
+  type: GoalType,
+  progress: GoalProgressSnapshot,
+): number | null {
+  switch (type) {
+    case 'smoke_free_days':
+      return maxDaysAheadFromStreakDays(progress.smokeFreeDays);
+    case 'cigarettes_avoided':
+      return null;
+  }
+}
+
 export function computeAllMinTargets(
   progress: GoalProgressSnapshot,
 ): Record<GoalType, number> {
@@ -31,13 +43,28 @@ export function computeAllMinTargets(
   };
 }
 
+export function computeAllMaxTargets(
+  progress: GoalProgressSnapshot,
+): Record<GoalType, number | null> {
+  return {
+    smoke_free_days: computeMaxTarget('smoke_free_days', progress),
+    cigarettes_avoided: computeMaxTarget('cigarettes_avoided', progress),
+  };
+}
+
 export function isAllowedTarget(
   type: GoalType,
   target: number,
   progress: GoalProgressSnapshot,
 ): boolean {
   if (!Number.isFinite(target) || target <= 0) return false;
+  if (!Number.isInteger(target)) return false;
 
   const minTarget = computeMinTarget(type, progress);
-  return Number.isInteger(target) && target >= minTarget;
+  if (target < minTarget) return false;
+
+  const maxTarget = computeMaxTarget(type, progress);
+  if (maxTarget != null && target > maxTarget) return false;
+
+  return true;
 }

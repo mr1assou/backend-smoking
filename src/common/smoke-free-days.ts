@@ -14,6 +14,16 @@ export function minDaysAheadFromStreakDays(streakDays: number): number {
   return 6;
 }
 
+/** Max days-ahead for goals, based on completed streak days on the current attempt. */
+export function maxDaysAheadFromStreakDays(streakDays: number): number {
+  if (streakDays < 3) return 3;
+  if (streakDays < 14) return 7;
+  if (streakDays < 30) return 14;
+  if (streakDays < 40) return 21;
+  if (streakDays < 50) return 30;
+  return 45;
+}
+
 /** Values below this in `baseline_progress` are legacy completed-day counts. */
 const BASELINE_LEGACY_DAY_MAX = 1000;
 

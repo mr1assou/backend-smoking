@@ -16,6 +16,7 @@ import type { GoalType } from './goals.constants';
 import { GoalsRepository } from './goals.repository';
 import {
   computeAllMinTargets,
+  computeAllMaxTargets,
   isAllowedTarget,
   type GoalProgressSnapshot,
 } from './lib/goal-allowed-targets';
@@ -40,6 +41,7 @@ export type GoalsStateResponse = {
   progress: GoalProgressSnapshot;
   goals: UserGoalDto[];
   minTargets: Record<GoalType, number>;
+  maxTargets: Record<GoalType, number | null>;
 };
 
 @Injectable()
@@ -91,6 +93,7 @@ export class GoalsService {
       progress,
       goals: goals.map((goal) => this.toDto(goal)),
       minTargets: computeAllMinTargets(progress),
+      maxTargets: computeAllMaxTargets(progress),
     };
   }
 
@@ -126,7 +129,7 @@ export class GoalsService {
 
     if (!isAllowedTarget(type, target, progress)) {
       throw new BadRequestException(
-        'Target must be at or above the minimum for your current progress',
+        'Target must be within the allowed range for your current streak',
       );
     }
 
