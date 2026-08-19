@@ -47,12 +47,13 @@ export class SlipEventsRepository {
     });
   }
 
+  /** Slips strictly after `since` — a slip at the attempt start belongs to the closed attempt. */
   sumSlipCigarettesSince(userId: number, since: Date): Promise<number> {
     return this.prisma.slipEvent
       .aggregate({
         where: {
           user_id: userId,
-          loggedAt: { gte: since },
+          loggedAt: { gt: since },
           cigarettesCount: { not: null },
         },
         _sum: { cigarettesCount: true },

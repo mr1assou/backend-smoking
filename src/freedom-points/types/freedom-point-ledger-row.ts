@@ -4,4 +4,6 @@ export type FreedomPointLedgerRow = {
   sourceType: string;
   sourceKey: string;
   earnedAt: string;
+  attemptId: number | null;
+  attemptNumber: number | null;
 };

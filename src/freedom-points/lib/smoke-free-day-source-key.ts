@@ -13,15 +13,25 @@ export function isLegacyTimestampSmokeFreeDayKey(sourceKey: string): boolean {
   return Number.isFinite(value) && value > 1_000_000_000_000;
 }
 
+export function parseSmokeFreeDaySourceKey(
+  sourceKey: string,
+): { attemptId: number; dayIndex: number } | null {
+  if (isLegacyTimestampSmokeFreeDayKey(sourceKey)) return null;
+
+  const [prefix, dayPart] = sourceKey.split(':');
+  const attemptId = Number(prefix);
+  const dayIndex = Number(dayPart);
+  if (!Number.isInteger(attemptId) || attemptId <= 0) return null;
+  if (!Number.isInteger(dayIndex) || dayIndex <= 0) return null;
+
+  return { attemptId, dayIndex };
+}
+
 export function parseSmokeFreeDayAttemptKey(
   sourceKey: string,
   attemptId: number,
 ): number | null {
-  const [prefix, dayPart] = sourceKey.split(':');
-  if (Number(prefix) !== attemptId) return null;
-
-  const dayIndex = Number(dayPart);
-  if (!Number.isFinite(dayIndex) || dayIndex <= 0) return null;
-
-  return dayIndex;
+  const parsed = parseSmokeFreeDaySourceKey(sourceKey);
+  if (!parsed || parsed.attemptId !== attemptId) return null;
+  return parsed.dayIndex;
 }

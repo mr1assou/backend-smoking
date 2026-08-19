@@ -8,6 +8,7 @@ import { FREEDOM_POINT_SOURCES } from './lib/freedom-points.constants';
 import {
   isLegacyTimestampSmokeFreeDayKey,
   parseSmokeFreeDayAttemptKey,
+  parseSmokeFreeDaySourceKey,
 } from './lib/smoke-free-day-source-key';
 
 export type GrantFreedomPointsInput = {
@@ -34,28 +35,80 @@ export type GrantFreedomPointsResult = {
 export class FreedomPointsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  listLedgerForUser(userId: number): Promise<FreedomPointLedgerRow[]> {
-    return this.prisma.freedomPointLedger
-      .findMany({
-        where: { user_id: userId },
-        orderBy: { earned_at: 'desc' },
-        select: {
-          ledger_id: true,
-          amount: true,
-          source_type: true,
-          source_key: true,
-          earned_at: true,
-        },
-      })
-      .then((rows) =>
-        rows.map((row) => ({
-          id: row.ledger_id,
-          amount: row.amount,
-          sourceType: row.source_type,
-          sourceKey: row.source_key,
-          earnedAt: toUtcIso(row.earned_at),
-        })),
-      );
+  async listLedgerForUser(userId: number): Promise<FreedomPointLedgerRow[]> {
+    const rows = await this.prisma.freedomPointLedger.findMany({
+      where: { user_id: userId },
+      orderBy: { earned_at: 'desc' },
+      select: {
+        ledger_id: true,
+        amount: true,
+        source_type: true,
+        source_key: true,
+        earned_at: true,
+      },
+    });
+
+    const attemptIds = new Set<number>();
+    const goalIds: number[] = [];
+
+    for (const row of rows) {
+      if (row.source_type === FREEDOM_POINT_SOURCES.SMOKE_FREE_DAY) {
+        const parsed = parseSmokeFreeDaySourceKey(row.source_key);
+        if (parsed) attemptIds.add(parsed.attemptId);
+        continue;
+      }
+
+      if (row.source_type === FREEDOM_POINT_SOURCES.GOAL_COMPLETION) {
+        const goalId = Number(row.source_key);
+        if (Number.isInteger(goalId) && goalId > 0) goalIds.push(goalId);
+      }
+    }
+
+    const goalAttemptById = new Map<number, number>();
+    if (goalIds.length > 0) {
+      const goals = await this.prisma.userGoal.findMany({
+        where: { user_id: userId, goal_id: { in: goalIds } },
+        select: { goal_id: true, attempt_id: true },
+      });
+      for (const goal of goals) {
+        goalAttemptById.set(goal.goal_id, goal.attempt_id);
+        attemptIds.add(goal.attempt_id);
+      }
+    }
+
+    const attemptNumberById = new Map<number, number>();
+    if (attemptIds.size > 0) {
+      const attempts = await this.prisma.quitAttempt.findMany({
+        where: { user_id: userId, attempt_id: { in: [...attemptIds] } },
+        select: { attempt_id: true, attemptNumber: true },
+      });
+      for (const attempt of attempts) {
+        attemptNumberById.set(attempt.attempt_id, attempt.attemptNumber);
+      }
+    }
+
+    return rows.map((row) => {
+      let attemptId: number | null = null;
+
+      if (row.source_type === FREEDOM_POINT_SOURCES.SMOKE_FREE_DAY) {
+        attemptId = parseSmokeFreeDaySourceKey(row.source_key)?.attemptId ?? null;
+      } else if (row.source_type === FREEDOM_POINT_SOURCES.GOAL_COMPLETION) {
+        const goalId = Number(row.source_key);
+        attemptId = goalAttemptById.get(goalId) ?? null;
+      }
+
+      return {
+        id: row.ledger_id,
+        amount: row.amount,
+        sourceType: row.source_type,
+        sourceKey: row.source_key,
+        earnedAt: toUtcIso(row.earned_at),
+        attemptId,
+        attemptNumber: attemptId
+          ? (attemptNumberById.get(attemptId) ?? null)
+          : null,
+      };
+    });
   }
 
   findUserStreakContext(userId: number): Promise<UserStreakContext | null> {

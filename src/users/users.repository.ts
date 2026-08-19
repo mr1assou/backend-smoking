@@ -78,12 +78,17 @@ export class UsersRepository {
     });
   }
 
+  /**
+   * Slips strictly after `since`. A slip logged exactly at the attempt start
+   * closed the previous attempt, so it must not count against the new one —
+   * same (start, end] convention as segmented-attempt-impact.
+   */
   sumSlipCigarettesSince(userId: number, since: Date): Promise<number> {
     return this.prisma.slipEvent
       .aggregate({
         where: {
           user_id: userId,
-          loggedAt: { gte: since },
+          loggedAt: { gt: since },
           cigarettesCount: { not: null },
         },
         _sum: { cigarettesCount: true },

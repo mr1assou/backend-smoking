@@ -12,5 +12,6 @@ export {
 export {
   isLegacyTimestampSmokeFreeDayKey,
   parseSmokeFreeDayAttemptKey,
+  parseSmokeFreeDaySourceKey,
   smokeFreeDaySourceKey,
 } from './smoke-free-day-source-key';
