@@ -1,10 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { ExpoPushClient } from './clients/expo-push.client';
-import {
-  POST_MODERATION_PUSH_BODY,
-  POST_MODERATION_PUSH_TITLE,
-} from './lib/post-moderation-push-copy';
+import { buildPostModerationPushCopy } from './lib/post-moderation-push-copy';
+import { resolvePushLocale } from './lib/push-locale';
 import { PushNotificationsRepository } from './push-notifications.repository';
 
 export type PostModerationPushParams = {
@@ -30,11 +28,17 @@ export class PostModerationPushNotificationService {
       );
       if (tokens.length === 0) return;
 
+      const copy = buildPostModerationPushCopy(
+        resolvePushLocale(
+          await this.repository.getUserLocale(params.authorUserId),
+        ),
+      );
+
       await this.expoPush.sendBatch(
         tokens.map((token) => ({
           to: token,
-          title: POST_MODERATION_PUSH_TITLE,
-          body: POST_MODERATION_PUSH_BODY,
+          title: copy.title,
+          body: copy.body,
           data: {
             type: 'post_moderated',
             postId: params.postId,

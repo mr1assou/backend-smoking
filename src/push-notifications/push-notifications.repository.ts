@@ -11,6 +11,7 @@ export type PushRecipient = {
   token: string;
   userId: number;
   username: string | null;
+  locale: string | null;
   streakStart: Date | null;
   quitDate: Date | null;
   cigarettesPerDay: number | null;
@@ -34,6 +35,7 @@ export class PushNotificationsRepository {
             select: {
               user_id: true,
               username: true,
+              locale: true,
               streakStart: true,
               quitDate: true,
               cigarettesPerDay: true,
@@ -51,6 +53,7 @@ export class PushNotificationsRepository {
           token: row.token,
           userId: row.user.user_id,
           username: row.user.username,
+          locale: row.user.locale,
           streakStart: row.user.streakStart,
           quitDate: row.user.quitDate,
           cigarettesPerDay: row.user.cigarettesPerDay,
@@ -137,5 +140,15 @@ export class PushNotificationsRepository {
         select: { token: true },
       })
       .then((rows) => rows.map((row) => row.token));
+  }
+
+  /** App language chosen by the user — for localized realtime pushes. */
+  getUserLocale(userId: number): Promise<string | null> {
+    return this.prisma.user
+      .findUnique({
+        where: { user_id: userId },
+        select: { locale: true },
+      })
+      .then((row) => row?.locale ?? null);
   }
 }

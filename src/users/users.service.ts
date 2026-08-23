@@ -173,6 +173,9 @@ export class UsersService {
 
   async updatePreferences(userId: number, dto: UpdateUserPreferencesDto) {
     const data: UserDevicePreferencesUpdate = {};
+    if (dto.locale !== undefined) {
+      data.locale = dto.locale;
+    }
     if (dto.motivationCardIndex !== undefined) {
       data.motivationCardIndex = dto.motivationCardIndex;
     }

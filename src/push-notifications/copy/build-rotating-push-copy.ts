@@ -5,12 +5,15 @@ import {
   formatStreakDurationForPush,
 } from '../content/streak';
 import { pickTipBody } from '../content/tips';
+import { resolvePushLocale, type PushLocale } from '../lib/push-locale';
 import type { PushRecipient } from '../push-notifications.repository';
 import type { PushKind } from '../rotation/push-rotation';
 import type { PushCopy } from './push-copy.types';
 
-function firstName(username: string | null): string {
-  return username?.trim().split(/\s+/)[0] || 'Friend';
+function firstName(username: string | null, locale: PushLocale): string {
+  return (
+    username?.trim().split(/\s+/)[0] || (locale === 'fr' ? 'Ami' : 'Friend')
+  );
 }
 
 function pluralize(count: number, singular: string): string {
@@ -26,8 +29,9 @@ export function buildRotatingPushCopy(input: {
   contentSlot: number;
   moneySaved?: number;
 }): PushCopy {
-  const name = firstName(input.recipient.username);
-  const duration = formatStreakDurationForPush(input.elapsedMs);
+  const locale = resolvePushLocale(input.recipient.locale);
+  const name = firstName(input.recipient.username, locale);
+  const duration = formatStreakDurationForPush(input.elapsedMs, locale);
   const days = input.streakDaysInProgress;
 
   switch (input.kind) {
@@ -37,6 +41,7 @@ export function buildRotatingPushCopy(input: {
         streakDays: input.streakDays,
         streakDaysInProgress: input.streakDaysInProgress,
         elapsedMs: input.elapsedMs,
+        locale,
       });
       return {
         kind: 'streak',
@@ -50,10 +55,14 @@ export function buildRotatingPushCopy(input: {
         userId: input.recipient.userId,
         rotationSlot: input.contentSlot,
         tipsCardIndex: input.recipient.tipsCardIndex,
+        locale,
       });
       return {
         kind: 'tip',
-        title: '💡 Quick tip for you',
+        title:
+          locale === 'fr'
+            ? '💡 Petit conseil pour vous'
+            : '💡 Quick tip for you',
         body: `${name}, ${tip}`,
       };
     }
@@ -68,15 +77,24 @@ export function buildRotatingPushCopy(input: {
       if (days <= 0 || saved <= 0) {
         return {
           kind: 'money',
-          title: '💰 Your savings are growing',
-          body: `${name}, every smoke-free hour puts money back in your pocket.`,
+          title:
+            locale === 'fr'
+              ? '💰 Vos économies grandissent'
+              : '💰 Your savings are growing',
+          body:
+            locale === 'fr'
+              ? `${name}, chaque heure sans fumer remet de l'argent dans votre poche.`
+              : `${name}, every smoke-free hour puts money back in your pocket.`,
         };
       }
 
       return {
         kind: 'money',
-        title: '💰 Money saved',
-        body: `${formatted} saved so far (${duration} smoke-free). That is real money back, ${name}.`,
+        title: locale === 'fr' ? '💰 Argent économisé' : '💰 Money saved',
+        body:
+          locale === 'fr'
+            ? `${formatted} économisés (${duration} sans fumer). C'est de l'argent bien réel, ${name}.`
+            : `${formatted} saved so far (${duration} smoke-free). That is real money back, ${name}.`,
       };
     }
 
@@ -85,13 +103,21 @@ export function buildRotatingPushCopy(input: {
         userId: input.recipient.userId,
         rotationSlot: input.contentSlot,
         motivationCardIndex: input.recipient.motivationCardIndex,
+        locale,
       });
       const streakLine =
-        days > 0 ? ` ${days} ${pluralize(days, 'day')} strong.` : '';
+        days > 0
+          ? locale === 'fr'
+            ? ` ${days} ${pluralize(days, 'jour')} de force.`
+            : ` ${days} ${pluralize(days, 'day')} strong.`
+          : '';
 
       return {
         kind: 'motivation',
-        title: `❤️ We believe in you, ${name}`,
+        title:
+          locale === 'fr'
+            ? `❤️ On croit en vous, ${name}`
+            : `❤️ We believe in you, ${name}`,
         body: `${line}${streakLine}`,
       };
     }

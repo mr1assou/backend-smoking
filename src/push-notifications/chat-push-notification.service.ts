@@ -4,6 +4,7 @@ import type { ChatMessageType } from '../chat/types/chat.types';
 import { PresenceService } from '../presence/presence.service';
 import { ExpoPushClient } from './clients/expo-push.client';
 import { buildChatPushCopy } from './lib/build-chat-push-copy';
+import { resolvePushLocale } from './lib/push-locale';
 import { PushNotificationsRepository } from './push-notifications.repository';
 
 export type ChatPushMessageParams = {
@@ -38,10 +39,14 @@ export class ChatPushNotificationService {
       );
       if (tokens.length === 0) return;
 
+      const locale = resolvePushLocale(
+        await this.repository.getUserLocale(params.recipientUserId),
+      );
       const copy = buildChatPushCopy({
         senderUsername: params.senderUsername,
         messageType: params.messageType,
         text: params.text,
+        locale,
       });
 
       await this.expoPush.sendBatch(

@@ -1,6 +1,10 @@
-import { IsArray, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class UpdateUserPreferencesDto {
+  @IsOptional()
+  @IsIn(['en', 'fr'])
+  locale?: string;
+
   @IsOptional()
   @IsInt()
   @Min(0)

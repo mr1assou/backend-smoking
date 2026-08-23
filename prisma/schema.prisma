@@ -29,6 +29,8 @@ model User {
   country        String?
   countryFlag    String?
   currency       String?
+  /// App language chosen by the user ("en" | "fr") — used for push notification copy.
+  locale         String  @default("en")
   quitDatePreset String?
   quitDate       DateTime? @db.Timestamptz(3)
   streakStart    DateTime? @db.Timestamptz(3)
