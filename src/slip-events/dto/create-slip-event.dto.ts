@@ -1,4 +1,4 @@
-import { IsIn, IsInt, Max, Min, ValidateIf } from 'class-validator';
+import { IsIn, IsInt, Min, ValidateIf } from 'class-validator';
 import { RELAPSE_MIN_CIGARETTE_COUNT } from '../lib/slip-cigarette-count';
 import { SLIP_OUTCOMES } from '../types/slip-outcome';
 
@@ -9,6 +9,5 @@ export class CreateSlipEventDto {
   @ValidateIf((dto: CreateSlipEventDto) => dto.outcome === 'relapse')
   @IsInt()
   @Min(RELAPSE_MIN_CIGARETTE_COUNT)
-  @Max(100)
   cigarettesCount?: number;
 }
