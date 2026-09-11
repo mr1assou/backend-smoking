@@ -188,6 +188,15 @@ export class PostsService {
     await this.badgesService.syncEarnedBadges(viewerUserId);
     await this.requirePost(postId);
 
+    // Keep Postgres column + Redis aligned with real comment rows.
+    // Feed still reads Redis; this heals any prior drift when a post is opened.
+    void this.reconcileCommentCount(postId).catch((error) => {
+      this.logger.warn(
+        `Failed to reconcile comment count for post ${postId}`,
+        error,
+      );
+    });
+
     const { rows, hasMore } = await this.postsRepository.findComments(
       postId,
       viewerUserId,
@@ -706,25 +715,27 @@ export class PostsService {
     ]);
 
     const items = rows.map((row) => {
-      const live = liveVoteCounts.get(row.post_id);
-      const normalized = live
-        ? {
-            ...row,
-            upvote_count: live.upvote_count,
-            downvote_count: live.downvote_count,
-          }
-        : row;
+      const liveVotes = liveVoteCounts.get(row.post_id);
+      const normalized = {
+        ...row,
+        ...(liveVotes
+          ? {
+              upvote_count: liveVotes.upvote_count,
+              downvote_count: liveVotes.downvote_count,
+            }
+          : {}),
+      };
 
       if (
-        live &&
-        (row.upvote_count !== live.upvote_count ||
-          row.downvote_count !== live.downvote_count)
+        liveVotes &&
+        (row.upvote_count !== liveVotes.upvote_count ||
+          row.downvote_count !== liveVotes.downvote_count)
       ) {
         void this.postsRepository
           .repairPostVoteCounts(
             row.post_id,
-            live.upvote_count,
-            live.downvote_count,
+            liveVotes.upvote_count,
+            liveVotes.downvote_count,
           )
           .catch(() => undefined);
       }
@@ -762,7 +773,8 @@ export class PostsService {
       }
     }
 
-    // Redis cards can hold stale vote totals — overlay live counts from Postgres.
+    // Feed comment counts come from Redis. Vote totals can still drift — overlay
+    // live vote counts from Postgres and repair Redis when needed.
     const [votesByPostId, liveVoteCounts] = await Promise.all([
       this.resolveViewerVotes(viewerUserId, postIds),
       this.postsRepository.findVoteCountsForPosts(postIds),
@@ -770,26 +782,29 @@ export class PostsService {
 
     for (const postId of postIds) {
       const card = cards.get(postId);
-      const live = liveVoteCounts.get(postId);
-      if (!card || !live) continue;
+      const liveVotes = liveVoteCounts.get(postId);
+      if (!card) continue;
+
       if (
-        card.upvote_count !== live.upvote_count ||
-        card.downvote_count !== live.downvote_count
+        liveVotes &&
+        (card.upvote_count !== liveVotes.upvote_count ||
+          card.downvote_count !== liveVotes.downvote_count)
       ) {
-        card.upvote_count = live.upvote_count;
-        card.downvote_count = live.downvote_count;
-        cards.set(postId, card);
+        card.upvote_count = liveVotes.upvote_count;
+        card.downvote_count = liveVotes.downvote_count;
         void this.postsCacheRepository
-          .syncVoteStats(postId, live.upvote_count, live.downvote_count)
+          .syncVoteStats(postId, liveVotes.upvote_count, liveVotes.downvote_count)
           .catch(() => undefined);
         void this.postsRepository
           .repairPostVoteCounts(
             postId,
-            live.upvote_count,
-            live.downvote_count,
+            liveVotes.upvote_count,
+            liveVotes.downvote_count,
           )
           .catch(() => undefined);
       }
+
+      cards.set(postId, card);
     }
 
     const authorIds = [
@@ -899,6 +914,25 @@ export class PostsService {
       }
       return post;
     });
+  }
+
+  /**
+   * Sets `posts.comment_count` and Redis `comments` to the live row count
+   * so Community (Redis) and Postgres stay identical.
+   */
+  private async reconcileCommentCount(postId: number): Promise<number> {
+    const counts = await this.postsRepository.findCommentCountsForPosts([
+      postId,
+    ]);
+    const live = counts.get(postId)?.live_count ?? 0;
+    const stored = counts.get(postId)?.stored_count ?? 0;
+
+    if (stored !== live) {
+      await this.postsRepository.repairPostCommentCount(postId, live);
+    }
+
+    await this.postsCacheRepository.syncCommentCount(postId, live);
+    return live;
   }
 
   async getPost(

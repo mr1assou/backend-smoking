@@ -267,13 +267,16 @@ export class PostsRepository {
         commentId,
         allComments,
       );
-      const removedCount = removedCommentIds.length;
 
       await tx.postComment.delete({ where: { comment_id: commentId } });
 
+      const remaining = await tx.postComment.count({
+        where: { post_id: postId },
+      });
+
       const post = await tx.post.update({
         where: { post_id: postId },
-        data: { comment_count: { decrement: removedCount } },
+        data: { comment_count: remaining },
         select: POST_CACHE_SELECT,
       });
 
@@ -326,9 +329,13 @@ export class PostsRepository {
         },
       });
 
+      const total = await tx.postComment.count({
+        where: { post_id: postId },
+      });
+
       const post = await tx.post.update({
         where: { post_id: postId },
-        data: { comment_count: { increment: 1 } },
+        data: { comment_count: total },
         select: POST_CACHE_SELECT,
       });
 
@@ -482,6 +489,66 @@ export class PostsRepository {
     }
 
     return result;
+  }
+
+  /**
+   * Live comment totals from comment rows (source of truth for reconciliation).
+   * Also returns the denormalized `posts.comment_count` so callers can repair drift.
+   */
+  async findCommentCountsForPosts(
+    postIds: number[],
+  ): Promise<
+    Map<number, { live_count: number; stored_count: number }>
+  > {
+    const result = new Map<
+      number,
+      { live_count: number; stored_count: number }
+    >();
+    for (const postId of postIds) {
+      result.set(postId, { live_count: 0, stored_count: 0 });
+    }
+    if (postIds.length === 0) return result;
+
+    const [posts, groups] = await Promise.all([
+      this.prisma.post.findMany({
+        where: { post_id: { in: postIds } },
+        select: { post_id: true, comment_count: true },
+      }),
+      this.prisma.postComment.groupBy({
+        by: ['post_id'],
+        where: { post_id: { in: postIds } },
+        _count: { _all: true },
+      }),
+    ]);
+
+    for (const post of posts) {
+      const current = result.get(post.post_id) ?? {
+        live_count: 0,
+        stored_count: 0,
+      };
+      current.stored_count = post.comment_count;
+      result.set(post.post_id, current);
+    }
+
+    for (const row of groups) {
+      const current = result.get(row.post_id) ?? {
+        live_count: 0,
+        stored_count: 0,
+      };
+      current.live_count = row._count._all;
+      result.set(row.post_id, current);
+    }
+
+    return result;
+  }
+
+  /** Set `posts.comment_count` to an absolute value (keeps Postgres aligned with Redis). */
+  repairPostCommentCount(postId: number, commentCount: number) {
+    return this.prisma.post.update({
+      where: { post_id: postId },
+      data: { comment_count: commentCount },
+      select: { post_id: true, comment_count: true },
+    });
   }
 
   repairPostVoteCounts(
