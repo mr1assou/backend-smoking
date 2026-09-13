@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Resend } from 'resend';
 
@@ -38,7 +42,9 @@ export class MailService {
 
     if (error) {
       this.logger.error(`Failed to send OTP email to ${to}`, error);
-      throw new InternalServerErrorException('Could not send verification email');
+      throw new InternalServerErrorException(
+        'Could not send verification email',
+      );
     }
   }
 }

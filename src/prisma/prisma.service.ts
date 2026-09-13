@@ -52,7 +52,8 @@ function createPgPool(config: ConfigService): Pool {
   // Render Internal DB hosts have no public DNS suffix and usually need no TLS.
   // External Render Postgres often presents a cert Node rejects unless we relax verify.
   const isRenderInternalHost =
-    !parsed.hostname.includes('.') || parsed.hostname.endsWith('.render.internal');
+    !parsed.hostname.includes('.') ||
+    parsed.hostname.endsWith('.render.internal');
   const wantsSsl =
     !isRenderInternalHost &&
     (parsed.searchParams.get('sslmode') === 'require' ||

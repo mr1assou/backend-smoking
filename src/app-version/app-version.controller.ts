@@ -7,7 +7,7 @@ const ANDROID_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.pottypaw.quitify';
 
 @Controller('app-version')
-export class AppVersionController{
+export class AppVersionController {
   /** Public: clients call this on launch to know if they must update. */
   @Get()
   getRequirement() {

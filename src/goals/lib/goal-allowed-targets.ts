@@ -1,4 +1,7 @@
-import { minDaysAheadFromStreakDays, maxDaysAheadFromStreakDays } from '../../common/smoke-free-days';
+import {
+  minDaysAheadFromStreakDays,
+  maxDaysAheadFromStreakDays,
+} from '../../common/smoke-free-days';
 import type { GoalType } from '../goals.constants';
 
 export type GoalProgressSnapshot = {

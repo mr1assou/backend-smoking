@@ -313,7 +313,8 @@ export class UsersService {
       email: user.email,
       name: user.username ?? undefined,
       hasCompletedOnboarding: Boolean(user.username?.trim()),
-      isPremium: user.email === 'test@gmail.com' ? true : Boolean(user.isPremium),
+      isPremium:
+        user.email === 'test@gmail.com' ? true : Boolean(user.isPremium),
       sex: user.sex ?? undefined,
       country: user.country ?? undefined,
       countryFlag: user.countryFlag ?? undefined,

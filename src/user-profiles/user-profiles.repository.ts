@@ -11,6 +11,15 @@ export type UserStreakStats = {
   member_since: string;
 };
 
+export type UserSearchRow = {
+  user_id: number;
+  username: string | null;
+  image_url: string | null;
+  countryFlag: string | null;
+  country: string | null;
+  status: string;
+};
+
 @Injectable()
 export class UserProfilesRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -102,7 +111,7 @@ export class UserProfilesRepository {
     viewerUserId: number,
     usernameQuery: string,
     limit = USERNAME_SEARCH_RESULT_LIMIT,
-  ) {
+  ): Promise<UserSearchRow[]> {
     const handle = usernameQuery.replace(/^@+/, '').toLowerCase().trim();
     if (!handle) return Promise.resolve([]);
 

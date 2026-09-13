@@ -75,7 +75,10 @@ export class GoalsRepository {
     });
   }
 
-  markCompleted(goalId: number, completedAt = utcInstantNow()): Promise<UserGoal> {
+  markCompleted(
+    goalId: number,
+    completedAt = utcInstantNow(),
+  ): Promise<UserGoal> {
     return this.prisma.userGoal.update({
       where: { goal_id: goalId },
       data: {

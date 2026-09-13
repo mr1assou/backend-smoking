@@ -44,7 +44,7 @@ export const MOTIVATION_MESSAGES_FR: readonly MotivationMessage[] = [
   },
   {
     id: 11,
-    body: 'Votre cœur apprend à battre avec moins d\'effort chaque jour sans tabac.',
+    body: "Votre cœur apprend à battre avec moins d'effort chaque jour sans tabac.",
   },
   {
     id: 12,

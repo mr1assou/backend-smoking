@@ -91,7 +91,8 @@ export class FreedomPointsRepository {
       let attemptId: number | null = null;
 
       if (row.source_type === FREEDOM_POINT_SOURCES.SMOKE_FREE_DAY) {
-        attemptId = parseSmokeFreeDaySourceKey(row.source_key)?.attemptId ?? null;
+        attemptId =
+          parseSmokeFreeDaySourceKey(row.source_key)?.attemptId ?? null;
       } else if (row.source_type === FREEDOM_POINT_SOURCES.GOAL_COMPLETION) {
         const goalId = Number(row.source_key);
         attemptId = goalAttemptById.get(goalId) ?? null;

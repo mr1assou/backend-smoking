@@ -1,4 +1,7 @@
-import { MS_PER_SMOKE_FREE_DAY, smokeFreeDaysFromInstant } from '../../common/smoke-free-days';
+import {
+  MS_PER_SMOKE_FREE_DAY,
+  smokeFreeDaysFromInstant,
+} from '../../common/smoke-free-days';
 import { FP_PER_SMOKE_FREE_DAY } from './freedom-points.constants';
 import { smokeFreeDaySourceKey } from './smoke-free-day-source-key';
 

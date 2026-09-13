@@ -94,7 +94,9 @@ export class EmailOtpService {
       .getClient()
       .get(emailSignupOtpKey(email));
     if (!storedHash) {
-      throw new ForbiddenException('Code expired or not found. Request a new one.');
+      throw new ForbiddenException(
+        'Code expired or not found. Request a new one.',
+      );
     }
 
     const matches = await argon2.verify(storedHash, code.trim());
@@ -105,7 +107,10 @@ export class EmailOtpService {
     await this.redis.getClient().del(emailSignupOtpKey(email));
 
     const password = await argon2.hash(randomBytes(32).toString('hex'));
-    const user = await this.usersService.createWithHashedPassword(email, password);
+    const user = await this.usersService.createWithHashedPassword(
+      email,
+      password,
+    );
     const tokens = await this.authService.issueTokensForUser(
       user.user_id,
       user.email,

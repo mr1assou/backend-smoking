@@ -497,9 +497,7 @@ export class PostsRepository {
    */
   async findCommentCountsForPosts(
     postIds: number[],
-  ): Promise<
-    Map<number, { live_count: number; stored_count: number }>
-  > {
+  ): Promise<Map<number, { live_count: number; stored_count: number }>> {
     const result = new Map<
       number,
       { live_count: number; stored_count: number }

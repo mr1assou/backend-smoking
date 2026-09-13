@@ -793,7 +793,11 @@ export class PostsService {
         card.upvote_count = liveVotes.upvote_count;
         card.downvote_count = liveVotes.downvote_count;
         void this.postsCacheRepository
-          .syncVoteStats(postId, liveVotes.upvote_count, liveVotes.downvote_count)
+          .syncVoteStats(
+            postId,
+            liveVotes.upvote_count,
+            liveVotes.downvote_count,
+          )
           .catch(() => undefined);
         void this.postsRepository
           .repairPostVoteCounts(

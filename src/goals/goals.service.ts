@@ -20,7 +20,10 @@ import {
   isAllowedTarget,
   type GoalProgressSnapshot,
 } from './lib/goal-allowed-targets';
-import { computeGoalCompletionBonus, computeGoalCompletionEarnedAt } from './lib/goal-completion-bonus';
+import {
+  computeGoalCompletionBonus,
+  computeGoalCompletionEarnedAt,
+} from './lib/goal-completion-bonus';
 import { elapsedSmokeFreeMs } from '../common/smoke-free-days';
 import { buildGoalProgressSnapshot, isGoalMet } from './lib/goal-progress';
 

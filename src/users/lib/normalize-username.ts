@@ -4,7 +4,7 @@ export const USERNAME_STORED_MAX_LENGTH = USERNAME_MAX_LENGTH + 1;
 
 /** Strip leading `@` characters and lowercase. */
 export function stripUsernameAtPrefix(raw: string): string {
-  return raw.trim().replace(/^@+/, "").toLowerCase();
+  return raw.trim().replace(/^@+/, '').toLowerCase();
 }
 
 /**
@@ -13,7 +13,7 @@ export function stripUsernameAtPrefix(raw: string): string {
  */
 export function normalizeStoredUsername(raw: string): string {
   const handle = stripUsernameAtPrefix(raw).slice(0, USERNAME_MAX_LENGTH);
-  if (!handle) return "";
+  if (!handle) return '';
   return `@${handle}`;
 }
 
@@ -21,5 +21,5 @@ export function normalizeStoredUsername(raw: string): string {
 export function formatUsernameMention(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) return trimmed;
-  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
+  return trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
 }

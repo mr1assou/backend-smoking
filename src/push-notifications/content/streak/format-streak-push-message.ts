@@ -58,7 +58,8 @@ export function buildStreakPushCopy(input: {
   locale?: PushLocale;
 }): StreakPushCopy {
   const locale = input.locale ?? 'en';
-  const firstName = input.username?.trim().split(/\s+/)[0] || defaultName(locale);
+  const firstName =
+    input.username?.trim().split(/\s+/)[0] || defaultName(locale);
   const duration = formatStreakDurationForPush(input.elapsedMs, locale);
   const days = input.streakDaysInProgress;
 

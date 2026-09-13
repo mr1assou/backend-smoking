@@ -109,7 +109,9 @@ export class AttemptsService {
     timelineStart: Date,
     endedAt: Date,
     pendingSlip?: { loggedAt: Date; cigarettesCount: number },
-    options?: { /** Only count the pending closing slip (ignore DB time-window slips). */ pendingSlipOnly?: boolean },
+    options?: {
+      /** Only count the pending closing slip (ignore DB time-window slips). */ pendingSlipOnly?: boolean;
+    },
   ): Promise<AttemptImpactSnapshot> {
     const segments = await this.economicsSegmentsRepository.listForAttempt(
       attempt.attempt_id,

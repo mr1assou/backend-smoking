@@ -19,9 +19,6 @@ import { PushNotificationsService } from './push-notifications.service';
     PostModerationPushNotificationService,
     PushNotificationsCron,
   ],
-  exports: [
-    ChatPushNotificationService,
-    PostModerationPushNotificationService,
-  ],
+  exports: [ChatPushNotificationService, PostModerationPushNotificationService],
 })
 export class PushNotificationsModule {}
