@@ -160,7 +160,8 @@ export class AuthController {
       req.user.refreshToken,
     );
     this.setRefreshTokenCookie(res, refreshToken);
-    return { accessToken };
+    // Include refreshToken in the body for mobile clients (no cookie jar).
+    return { accessToken, refreshToken };
   }
 
   @HttpCode(HttpStatus.OK)

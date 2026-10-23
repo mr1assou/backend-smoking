@@ -110,6 +110,7 @@ export class UserProfilesRepository {
   searchNormalUsersByUsername(
     viewerUserId: number,
     usernameQuery: string,
+    offset = 0,
     limit = USERNAME_SEARCH_RESULT_LIMIT,
   ): Promise<UserSearchRow[]> {
     const handle = usernameQuery.replace(/^@+/, '').toLowerCase().trim();
@@ -134,6 +135,7 @@ export class UserProfilesRepository {
         status: true,
       },
       orderBy: { username: 'asc' },
+      skip: offset,
       take: limit,
     });
   }

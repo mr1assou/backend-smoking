@@ -25,7 +25,12 @@ export class UserProfilesController {
     @Req() req: Request & { user: { userId: number } },
     @Query() query: SearchUsersQueryDto,
   ) {
-    return this.userProfiles.searchUsers(req.user.userId, query.username);
+    return this.userProfiles.searchUsers(
+      req.user.userId,
+      query.username,
+      query.offset,
+      query.limit,
+    );
   }
 
   @UseGuards(JwtGuard)

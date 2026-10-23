@@ -43,4 +43,5 @@ export type UserSearchResultItem = {
 
 export type UserSearchResponse = {
   items: UserSearchResultItem[];
+  has_more: boolean;
 };

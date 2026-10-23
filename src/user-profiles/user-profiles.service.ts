@@ -17,7 +17,10 @@ import type {
   UserSearchResponse,
   UserStreakResponse,
 } from './types/user-profile.types';
-import { normalizeUsernameSearchQuery } from './lib/normalize-username-search';
+import {
+  normalizeUsernameSearchQuery,
+  USERNAME_SEARCH_RESULT_LIMIT,
+} from './lib/normalize-username-search';
 
 @Injectable()
 export class UserProfilesService {
@@ -155,21 +158,27 @@ export class UserProfilesService {
   async searchUsers(
     viewerUserId: number,
     rawUsername: string,
+    offset = 0,
+    limit = USERNAME_SEARCH_RESULT_LIMIT,
   ): Promise<UserSearchResponse> {
     const username = normalizeUsernameSearchQuery(rawUsername);
     const rows = await this.profilesRepository.searchNormalUsersByUsername(
       viewerUserId,
       username,
+      offset,
+      limit + 1,
     );
 
-    const userIds = rows.map((row) => row.user_id);
+    const hasMore = rows.length > limit;
+    const pageRows = hasMore ? rows.slice(0, limit) : rows;
+    const userIds = pageRows.map((row) => row.user_id);
     const [onlineById, badgesByUser] = await Promise.all([
       this.presenceService.areOnline(userIds),
       this.badgesRepository.findEarnedBadgeIdsByUserIds(userIds),
     ]);
 
     return {
-      items: rows.map((row) => ({
+      items: pageRows.map((row) => ({
         user_id: row.user_id,
         username: row.username?.trim() ?? '',
         image_url: row.image_url,
@@ -179,6 +188,7 @@ export class UserProfilesService {
         is_online: onlineById[row.user_id] === true,
         status: row.status,
       })),
+      has_more: hasMore,
     };
   }
 }
