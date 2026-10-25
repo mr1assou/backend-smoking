@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
+import { isURL } from 'class-validator';
 import { AttemptsService } from '../attempts/attempts.service';
 import {
   EconomicsSegmentsRepository,
@@ -20,7 +21,11 @@ import { UpdateHabitSettingsDto } from './dto/update-habit-settings.dto';
 import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { normalizeStoredUsername } from './lib/normalize-username';
-import { defaultProfileImageForSex } from './lib/default-profile-image';
+import {
+  DEFAULT_PROFILE_IMAGE_PATHS,
+  defaultProfileImage,
+  isDefaultProfileImagePath,
+} from './lib/default-profile-image';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
@@ -225,7 +230,15 @@ export class UsersService {
   }
 
   async updateProfileImage(userId: number, dto: UpdateProfileImageDto) {
-    this.storageService.assertOwnedProfileImageUrl(userId, dto.image_url);
+    const isBundledAvatar = (
+      DEFAULT_PROFILE_IMAGE_PATHS as readonly string[]
+    ).includes(dto.image_url);
+    if (!isBundledAvatar) {
+      if (!isURL(dto.image_url, { require_protocol: true })) {
+        throw new BadRequestException('Profile image must be an avatar or a valid uploaded photo URL');
+      }
+      this.storageService.assertOwnedProfileImageUrl(userId, dto.image_url);
+    }
     await this.usersRepository.updateProfileImage(userId, dto.image_url);
     return { image_url: dto.image_url };
   }
@@ -369,7 +382,9 @@ export class UsersService {
       packPrice: dto.step6.packPrice ?? null,
       yearsSmoking: dto.step6.yearsSmoking ?? null,
       cigarettesPerPack: dto.step6.cigarettesPerPack ?? null,
-      image_url: defaultProfileImageForSex(dto.step5.sex),
+      image_url: isDefaultProfileImagePath(dto.step5.profileImage)
+        ? dto.step5.profileImage
+        : defaultProfileImage(),
     };
   }
 
