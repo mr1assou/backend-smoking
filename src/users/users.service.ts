@@ -22,7 +22,7 @@ import { ResetJourneyDto } from './dto/reset-journey.dto';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { normalizeStoredUsername } from './lib/normalize-username';
 import {
-  DEFAULT_PROFILE_IMAGE_PATHS,
+  ALL_DEFAULT_PROFILE_IMAGE_PATHS,
   defaultProfileImage,
   isDefaultProfileImagePath,
 } from './lib/default-profile-image';
@@ -231,7 +231,7 @@ export class UsersService {
 
   async updateProfileImage(userId: number, dto: UpdateProfileImageDto) {
     const isBundledAvatar = (
-      DEFAULT_PROFILE_IMAGE_PATHS as readonly string[]
+      ALL_DEFAULT_PROFILE_IMAGE_PATHS as readonly string[]
     ).includes(dto.image_url);
     if (!isBundledAvatar) {
       if (!isURL(dto.image_url, { require_protocol: true })) {

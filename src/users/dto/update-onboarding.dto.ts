@@ -14,7 +14,7 @@ import {
   normalizeStoredUsername,
   USERNAME_STORED_MAX_LENGTH,
 } from '../lib/normalize-username';
-import { DEFAULT_PROFILE_IMAGE_PATHS } from '../lib/default-profile-image';
+import { ALL_DEFAULT_PROFILE_IMAGE_PATHS } from '../lib/default-profile-image';
 
 const OTHER_TEXT_MAX_LENGTH = 500;
 
@@ -87,7 +87,7 @@ class OnboardingStep5Dto {
 
   @IsOptional()
   @IsString()
-  @IsIn([...DEFAULT_PROFILE_IMAGE_PATHS])
+  @IsIn([...ALL_DEFAULT_PROFILE_IMAGE_PATHS])
   profileImage?: string;
 
   @IsOptional()
