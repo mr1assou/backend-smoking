@@ -433,4 +433,10 @@ export class UsersService {
     await this.usersRepository.clearPushTokensForUser(userId);
     return { ok: true as const };
   }
+
+  async deleteAccount(userId: number): Promise<void> {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    await this.usersRepository.deleteById(userId);
+  }
 }

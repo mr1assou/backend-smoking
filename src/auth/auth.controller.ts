@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -162,6 +163,13 @@ export class AuthController {
     this.setRefreshTokenCookie(res, refreshToken);
     // Include refreshToken in the body for mobile clients (no cookie jar).
     return { accessToken, refreshToken };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtGuard)
+  @Delete('me')
+  deleteAccount(@Req() req: Request & { user: { userId: number } }) {
+    return this.authService.deleteAccount(req.user.userId);
   }
 
   @HttpCode(HttpStatus.OK)

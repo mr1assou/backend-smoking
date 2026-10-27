@@ -289,4 +289,10 @@ export class UsersRepository {
       .deleteMany({ where: { user_id: userId } })
       .then(() => undefined);
   }
+
+  deleteById(userId: number): Promise<void> {
+    return this.prisma.user
+      .delete({ where: { user_id: userId } })
+      .then(() => undefined);
+  }
 }

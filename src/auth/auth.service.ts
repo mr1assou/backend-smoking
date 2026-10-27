@@ -129,6 +129,17 @@ export class AuthService {
     await this.usersService.setRefreshTokenHash(userId, null);
   }
 
+  /** Removes the account and related rows, then the client signs out locally. */
+  async deleteAccount(userId: number) {
+    try {
+      await this.presenceService.markOffline(userId);
+    } catch {
+      // Deletion still proceeds if presence is unavailable.
+    }
+    await this.usersService.deleteAccount(userId);
+    return { ok: true as const };
+  }
+
   /** Blocked accounts (moderated by support staff) cannot sign in. */
   private assertNotBlocked(user: { status?: string | null }) {
     if (user.status === 'blocked') {
