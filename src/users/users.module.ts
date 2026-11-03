@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AttemptsModule } from '../attempts/attempts.module';
 import { BadgesModule } from '../badges/badges.module';
 import { FreedomPointsModule } from '../freedom-points/freedom-points.module';
+import { PostsCacheModule } from '../posts/posts-cache.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { StorageModule } from '../storage/storage.module';
 import { UsersRepository } from './users.repository';
@@ -14,6 +15,7 @@ import { UsersService } from './users.service';
     StorageModule,
     BadgesModule,
     FreedomPointsModule,
+    PostsCacheModule,
   ],
   providers: [UsersRepository, UsersService],
   exports: [UsersService, UsersRepository],

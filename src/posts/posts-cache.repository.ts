@@ -148,10 +148,20 @@ export class PostsCacheRepository {
   }
 
   async removePost(postId: number, tagId: string | null): Promise<void> {
+    await this.removePosts([{ postId, tagId }]);
+  }
+
+  async removePosts(
+    posts: { postId: number; tagId: string | null }[],
+  ): Promise<void> {
+    if (posts.length === 0) return;
+
     const pipeline = this.client().pipeline();
-    pipeline.del(postCardKey(postId));
-    pipeline.zrem(feedKey('newest'), postId);
-    if (tagId) pipeline.zrem(feedKey('newest', tagId), postId);
+    for (const post of posts) {
+      pipeline.del(postCardKey(post.postId));
+      pipeline.zrem(feedKey('newest'), post.postId);
+      if (post.tagId) pipeline.zrem(feedKey('newest', post.tagId), post.postId);
+    }
     await pipeline.exec();
   }
 

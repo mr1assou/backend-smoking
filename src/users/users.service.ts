@@ -30,6 +30,7 @@ import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
 import { RegisterPushTokenDto } from './dto/register-push-token.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { PostsCacheRepository } from '../posts/posts-cache.repository';
 import { UsersRepository } from './users.repository';
 import type { UserDevicePreferencesUpdate } from './types/user-device-preferences';
 import type { UserOnboardingData } from './types/user-onboarding-data';
@@ -45,6 +46,7 @@ export class UsersService {
     private readonly storageService: StorageService,
     private readonly badgesService: BadgesService,
     private readonly freedomPointsService: FreedomPointsService,
+    private readonly postsCacheRepository: PostsCacheRepository,
   ) {}
 
   async createWithHashedPassword(
@@ -437,6 +439,11 @@ export class UsersService {
   async deleteAccount(userId: number): Promise<void> {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
+
+    const posts = await this.usersRepository.findAuthoredPostCacheKeys(userId);
+    await this.postsCacheRepository.removePosts(
+      posts.map((post) => ({ postId: post.post_id, tagId: post.tag_id })),
+    );
     await this.usersRepository.deleteById(userId);
   }
 }

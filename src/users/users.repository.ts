@@ -290,6 +290,13 @@ export class UsersRepository {
       .then(() => undefined);
   }
 
+  findAuthoredPostCacheKeys(userId: number) {
+    return this.prisma.post.findMany({
+      where: { author_id: userId },
+      select: { post_id: true, tag_id: true },
+    });
+  }
+
   deleteById(userId: number): Promise<void> {
     return this.prisma.user
       .delete({ where: { user_id: userId } })

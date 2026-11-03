@@ -5,7 +5,7 @@ import { PresenceModule } from '../presence/presence.module';
 import { PushNotificationsModule } from '../push-notifications/push-notifications.module';
 import { RedisModule } from '../redis/redis.module';
 import { StorageModule } from '../storage/storage.module';
-import { PostsCacheRepository } from './posts-cache.repository';
+import { PostsCacheModule } from './posts-cache.module';
 import { PostsController } from './posts.controller';
 import { PostsRepository } from './posts.repository';
 import { PostsService } from './posts.service';
@@ -18,9 +18,10 @@ import { PostsService } from './posts.service';
     RedisModule,
     NotificationsModule,
     PushNotificationsModule,
+    PostsCacheModule,
   ],
   controllers: [PostsController],
-  providers: [PostsService, PostsRepository, PostsCacheRepository],
+  providers: [PostsService, PostsRepository],
   exports: [PostsService],
 })
 export class PostsModule {}
